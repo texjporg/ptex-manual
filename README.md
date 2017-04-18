@@ -5,21 +5,18 @@ This repository will be only temporary.
 
 ## このリポジトリの目的
 
-- https://github.com/texjporg/ptex-base/issues/2
-
+[ptex-base issue #2](https://github.com/texjporg/ptex-base/issues/2)
 での議論を機に，pTeX のドキュメント化を進めようという取り組みです。
 手始めにプリミティブの一覧を作成しようと考えています。
 
-最終的には ptex-base リポジトリ
-
-- https://github.com/texjporg/ptex-base
+最終的には
+[ptex-base repository](https://github.com/texjporg/ptex-base)
 の一部に含める予定ですが，そちらは ISO-2022-JP エンコーディングにしているため
 GitHub 上で文字化けして読みづらくなっています。
 そこで，新規ドキュメントの準備をある程度こちらのリポジトリ
-
-- https://github.com/texjporg/ptex-manual
-
+https://github.com/texjporg/ptex-manual
 で行い，一定の成果物となった段階で ptex-base リポジトリにインストールします。
+UTF-8 encoding なので，GitHub で読みやすくなっています。
 
 ## License
 
