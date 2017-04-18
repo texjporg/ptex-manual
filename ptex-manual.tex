@@ -1,0 +1,289 @@
+%#!make ptex-manual.pdf
+\documentclass[a4paper,11pt]{jsarticle}
+\usepackage[textwidth=42zw,lines=40,truedimen,centering]{geometry}
+%\usepackage{amsmath,mathtools,amssymb,multicol,comment}
+\usepackage{array}\usepackage[all]{xy}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage[T1]{fontenc}
+\usepackage{booktabs,enumitem}
+\usepackage[defaultsups]{newpxtext}
+\usepackage{newpxmath}
+\usepackage[dvipdfmx]{hyperref}
+\usepackage{pxjahyper}
+\usepackage[bold,deluxe]{otf}
+\usepackage{hologo}
+\usepackage{makeidx}\makeindex
+
+%%%%%%%%%%%%%%%%
+% preamble copied from eptexdoc.tex
+\makeatletter
+\def\epTeX{$\varepsilon$-\pTeX}\def\eTeX{$\varepsilon$-\TeX}
+\def\upTeX{u\pTeX}\def\pTeX{p\kern-.15em\TeX}
+\def\headfont{\normalfont\mathversion{bold}\gtfamily\bfseries}
+\def\node#1{\textit{#1}}
+\def\.#1{\texorpdfstring{%
+     \leavevmode\hbox{\texttt{\textbackslash#1}}\ifmmode\else\textcompwordmark\fi}{\textbackslash #1}}
+\let\orig@cs=\.
+\def\ind@cs#1{\orig@cs{#1}\indcs{#1}}
+\def\indcs#1{\index{{\texttt{\textbackslash #1}}}}
+\newlist{cslist}{description}1
+\setlist[cslist]{%
+  style=nextline,itemsep=\medskipamount,listparindent=1zw,
+  font=\normalfont\mdseries}
+\def\csitem[#1]{\item[\llap{$\blacktriangleright$~}\let\.=\ind@cs#1]}
+\def\emph#1{{\bfseries\sffamily\gtfamily\mathversion{bold}#1}}
+\def\listx{\def\makelabel{\hbox to 1em{\hfil\textbullet\hfil}}\def\@{\hfill}
+\labelwidth=13zw\leftmargin15zw\itemindent=0zw}
+\def\paragraph#1{\par\medskip\par\noindent\emph{■#1}\par\nobreak}
+\def\Pkg#1{\textsf{#1}}
+\catcode`\<=13
+\xspcode`\\=3
+\xspcode`\*=3
+\xspcode`\-=3
+\xspcode23=3 % \textcompwordmark
+\def<#1>{\ensuremath{\langle\hbox{\normalfont\itshape #1\/}\rangle}}
+
+\font\man=manfnt at 10pt
+\def\dbend{\raise0pt\hbox{\man\char'177}}
+\AtBeginDvi{\special{pdf:mapfile otf-ipaex.map}}
+\def\delbit#1#2{\underbracket[0.4pt]{#1}_{\text{#2}}}
+
+\newenvironment{multilist}[2]%
+ {$$\setbox\z@=\hbox\bgroup  % catch some funny things -> \mathord
+  \let\a=\empty
+  \let\b=\empty
+  \count@=\z@
+  \toks@={#2}%
+  \def\item##1\cr
+   {\ifnum \count@=\z@
+      \count@=#1%
+      \expandafter\def\expandafter\b\expandafter{\b\y{}}%
+    \fi
+    \advance\count@ by\m@ne
+    \expandafter\def\expandafter\a\expandafter{\a\x{##1}}}%
+  \ignorespaces}%
+ {\loop
+  \ifnum \count@>\z@
+    \expandafter\def\expandafter\a\expandafter{\a\expandafter\z\b\relax}%
+    \advance\count@ by\m@ne
+  \repeat
+  \def\x##1{\expandafter\y\b\relax{##1}}%
+  \def\y\y##1##2\relax##3%
+   {\ifx @##1@%
+      \def\b{##2\y{##3}}%
+    \else
+      \def\b{##2\y{##1&##3}}%
+    \fi}%
+  \def\z\y##1##2\relax{\def\b{##2\y{##1}}}%
+  \a
+  \def\x
+   {\expandafter\egroup\expandafter\halign\expandafter\bgroup
+    \expandafter&\the\toks@\cr}%
+  \def\y##1{\expandafter\def\expandafter\x\expandafter{\x##1\cr}}%
+  \b
+  \x\egroup $$}
+
+\makeatletter
+\def\hex#1{%
+{\count@=#1\@tempcnta=#1\@tempcntb=\@tempcnta\relax
+\divide\@tempcntb by 16%
+\ifnum\count@=0\else
+  \multiply\@tempcntb by16%
+  \advance\@tempcnta-\@tempcntb
+  \divide\@tempcntb by16%
+  \hex{\the\@tempcntb}%
+  \ifcase\@tempcnta\relax 0\or1\or2\or3\or4\or5\or6\or
+    7\or8\or9\or A\or B\or C\or D\or E\pr F\fi
+\fi}}
+\clubpenalty=8000\widowpenalty=8000
+
+\normalsize
+\bigskipamount=\baselineskip
+\medskipamount=.5\baselineskip
+\smallskipamount=.25\baselineskip
+
+\usepackage{etoolbox}
+\patchcmd\@verbatim\@totalleftmargin{\dimexpr\@totalleftmargin+3zw\relax}{}{}
+
+\newenvironment{dangerous}{%
+  \par\small\leftskip=\dimexpr\textwidth-44zw\relax\@totalleftmargin=\leftskip
+  \parindent1zw\noindent\kern-\leftskip\hbox to\leftskip{\dbend\hss}%
+  \everypar{\everypar{}}\ignorespaces
+}{\par\medskip}
+
+\renewenvironment{theindex}{%
+    \def\presectionname{}\def\postsectionname{}%
+    \section*{\indexname}
+    \@mkboth{\indexname}{\indexname}%
+    \plainifnotempty % \thispagestyle{plain}
+    \parindent\z@
+    \parskip\z@ \@plus .3\p@\relax
+    \let\item\@idxitem
+    \raggedright
+    \begin{multicols}{2}
+  }{
+    \end{multicols}
+    \clearpage
+  }
+\makeatother
+%%%%%%%%%%%%%%%%
+
+\def\_{\leavevmode\vrule width .45em height -.2ex depth .3ex\relax}
+\frenchspacing
+\begin{document}
+\title{\emph{\pTeX マニュアル}}
+\author{日本語\TeX 開発コミュニティ\null
+\thanks{\url{https://texjp.org},\ 
+e-mail: \texttt{issue(at)texjp.org}}}
+\date{version p3.7.1，\today}
+\maketitle
+
+\tableofcontents
+
+\newpage
+
+\section{文字間のスペース}
+
+\.{kanjiskip}
+\.{xkanjiskip}
+
+\.{xspcode}
+\.{inhibitxspcode}
+
+\.{autospacing}
+\.{noautospacing}
+\.{autoxspacing}
+\.{noautoxspacing}
+\.{showmode}
+
+\.{inhibitglue}
+
+\section{禁則}
+
+\.{prebreakpenalty}
+\.{postbreakpenalty}
+
+\.{jcharwidowpenalty}
+
+\section{組方向}
+
+% ptexdoc.tex の「ディレクション」を簡略化
+従来の\TeX では，字送り方向が水平右向き（→），行送り方向が垂直下向き（↓）
+に固定されていた。\pTeX では，\TeX の状態として“組方向（ディレクション）”
+を考え，ディレクションによって字送り方向と行送り方向を変えることにしてある．
+なお，行は水平ボックス(horizontal box)，ページは垂直ボックス(vertical box)である
+という点は，\pTeX でも従来の\TeX と同様である．
+
+以下が，組方向の変更や現在の組方向判定に関わるプリミティブの一覧である．
+
+% アスキー公式サイトのプリミティブ一覧から適当にまとめ
+\begin{cslist}
+\csitem[\.{tate}, \.{yoko}, \.{dtou}]
+  組方向をそれぞれ縦方向，横方向，DtoU方向\footnote{%
+  下から上(Down to Up)であろう．}に変更する．
+  カレントの和文フォントは縦方向では縦組用フォント，
+  横方向およびDtoU方向では横組用フォントになる．
+
+  ディレクションの変更は，作成中のリストやボックスに何も入力されていない
+  状態でのみ許される．違反した場合，
+\begin{verbatim}
+! Use `\tate' at top of list.
+\end{verbatim}
+  のようなエラーが出る．
+
+  また，ボックスを\.{copy}したり中身を\.{unhbox}や
+  \.{unvbox}で取り出す場合は，同じ組方向のボックス内でなければならない．
+  違反した場合，
+\begin{verbatim}
+! Incompatible direction list can't be unboxed.
+\end{verbatim}
+  なるエラーが出る．
+
+% luatexja.dtx より pTeX 用に移植
+\begin{table}[tbp]
+\caption{\pTeX のサポートする組方向}
+\label{tab-dir}
+\centering\small
+\def\mathmode{}
+\def\obox#1{%
+  \setbox0=\hbox{\yoko\hbox{#1%
+  \large\tbaselineshift0pt%
+  \vrule height 25pt width 0.4pt depth 15pt\kern-.2pt%
+  \raise25pt\hbox to 0pt{\hss\composite{*r^@{>>}}\hss}%
+  \raise-15pt\hbox to 0pt{\hss\composite{*l^@{>|}}\hss}\kern.2pt%
+  \vrule height.2pt depth.2pt width 60pt\hbox to 0pt{\hss\composite{*d^@{>}}\hss}\kern-60pt
+  \mathmode\hbox to 60pt{\,銀は、Ag\hss}\mathmode}}%
+  \raise\dimexpr 0.5\dp0-0.5\ht0\box0%
+}
+\begin{tabular}{>{\bfseries}lcccc}
+\toprule
+&横組&縦組&DtoU方向&縦数式ディレクション\\
+\midrule
+命令&\.{yoko}&\.{tate}&\.{dtou}&縦組中の数式内のボックス\\
+字送り方向&水平右向き（→）&垂直下向き（↓）&垂直上向き（↑）&垂直下向き（↓）\\
+行送り方向&垂直下向き（↓）&水平左向き（←）&水平右向き（→）&水平左向き（←）\\
+\parbox[t]{6zw}{使用する和文フォント}&横組用(\.{jfont})&縦組用(\.{tfont})&
+\multicolumn{2}{c}{%
+  横組用(\.{jfont})の$90^\circ$回転}\\[\smallskipamount]
+  組版例 &\obox{\yoko}&\obox{\tate}&\obox{\dtou}&\def\mathmode{$}\obox{\tate}\\
+\noalign{\medskip}
+\bottomrule
+\end{tabular}
+\end{table}
+
+\csitem[\.{iftdir}, \.{ifydir}, \.{ifddir}, \.{ifmdir}]
+  現在の組方向を判定する．
+
+\csitem[\.{iftbox} <number>, \.{ifybox} <number>, \.{ifdbox} <number>, \.{ifmbox} <number>]
+  <number>番のボックスの組方向を判定する．<number>は有効なboxレジスタでなければならない．
+
+  バージョンp3.7までの\pTeX では，ボックスが一旦ノードとして組まれてしまうと，
+  通常の縦ディレクションで組まれているのか，それとも縦数式ディレクションで組ま
+  れているのかという情報が失われていた．しかし，それでは後述の「ベースライン
+  補正の戻し量」を誤り，欧文の垂直位置が揃わないという問題が生じた(\cite{tatemath})．
+  この問題を解決する副産物として\.{ifmbox}プリミティブが実装された．
+\end{cslist}
+
+\section{ベースライン補正}
+
+\.{tbaselineshift}
+\.{ybaselineshift}
+
+\.{textbaselineshiftfactor}
+\.{scriptbaselineshiftfactor}
+\.{scriptscriptbaselineshiftfactor}
+
+\section{和文ファミリ}
+
+\.{jfam}
+\.{jfont}
+\.{tfont}
+
+\.{kcatcode}
+
+\section{文字コード変換}
+
+\.{kuten}
+\.{jis}
+\.{euc}
+\.{sjis}
+
+\.{kansuji}
+\.{kansujichar}
+
+\section{長さ単位}
+
+zw
+zh
+
+\begin{thebibliography}{99}
+ \bibitem{tatemath} aminophen, 「縦数式ディレクションとベースライン補正」，
+  2016/09/05,\\
+  \url{http://tug.org/pipermail/xetex/2015-July/026044.html}
+\end{thebibliography}
+
+\printindex
+
+\newpage
+
+\end{document}
