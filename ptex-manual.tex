@@ -261,15 +261,68 @@ e-mail: \texttt{issue(at)texjp.org}}}
 
 \.{kcatcode}
 
-\section{文字コード変換}
+\section{文字コード変換，漢数字}
 
-\.{kuten}
-\.{jis}
-\.{euc}
-\.{sjis}
+\pTeX の内部コードは環境によって異なる．そこで，異なる文字コード間で同じ文字を
+表現するため，文字コードから内部コードへの変換プリミティブが用意されている．
+また，漢数字を出力するプリミティブも用意されている\footnote{%
+実は\.{kansuji}, \.{kansujichar}プリミティブはp3.1.1でいったん削除され，
+p3.1.2で復活したという経緯がある．}．
 
-\.{kansuji}
-\.{kansujichar}
+% jtexdoc.tex の「追加されたプリミティブ」を簡略化
+\begin{cslist}
+\csitem[\.{kuten} <16-bit number>]
+  区点コードから内部コードへの変換を行う．
+  16進4桁の上2桁が区，下2桁が点であると解釈する．
+  たとえば，\verb|\char\kuten"253C|は，「\char\kuten"253C」（37区60点）である．
+
+\csitem[\.{jis} <16-bit number>, \.{euc} <16-bit number>, \.{sjis} <16-bit number>]
+  それぞれJISコード，EUCコード，Shift\_JISコードから内部コードへの変換を行う．
+  たとえば，\verb|\char\jis"346E|，\verb|\char\euc"B0A5|，\verb|\char\sjis"8A79|は，
+  それぞれ「\char\jis"346E」，「\char\euc"B0A5」，「\char\sjis"8A79」である．
+
+\csitem[\.{kansuji} <number>, \.{kansujichar} <0--9>=<16-bit number>]
+  \.{kansuji}は，続く数値<number>を漢数字の文字列で出力する．
+  出力される文字は\.{kansujichar}で指定できる（デフォルトは「〇一二三四五六七八九」）．
+  たとえば
+\begin{verbatim}
+\kansuji 1978年
+\end{verbatim}
+  は「\kansuji 1978年」と出力され，
+\begin{verbatim}
+\kansujichar1=`壱
+\kansujichar2=\euc"C6F5\relax
+\kansujichar3=\jis"3B32\relax
+\kansuji 1234
+\end{verbatim}
+  は「{\kansujichar1=`壱 \kansujichar2=\euc"C6F5\relax
+       \kansujichar3=\jis"3B32\relax \kansuji 1234}」と出力される．
+\end{cslist}
+
+% luatexja.dtx より pTeX 用に移植
+以上に挙げたプリミティブ（\.{kuten}, \.{jis}, \.{euc}, \.{sjis}, \.{kansuji}）は
+内部整数を引数にとるが，実行結果は\emph{文字列}であることに注意．
+また，\pTeX はJIS X 0213には対応せず，JIS X 0208の範囲のみ扱える．
+
+\medskip
+\begin{minipage}{.6\linewidth}
+\begin{verbatim}
+    \newcount\hoge
+    \hoge="2423
+    \the\hoge, \kansuji\hoge\\
+    \jis\hoge, \char\jis\hoge\\
+    \kansuji1701
+\end{verbatim}
+\end{minipage}
+\begin{minipage}{.3\linewidth}
+{
+  \newcount\hoge
+  \hoge="2423 %"
+  \the\hoge, \kansuji\hoge\\
+  \jis\hoge, \char\jis\hoge\\
+  \kansuji1701
+}
+\end{minipage}\medskip
 
 \section{長さ単位}
 
