@@ -7,6 +7,7 @@
 \usepackage[T1]{fontenc}
 \usepackage{booktabs,enumitem}
 \usepackage[defaultsups]{newpxtext}
+\usepackage[zerostyle=c,straightquotes]{newtxtt}
 \usepackage{newpxmath}
 \usepackage[dvipdfmx]{hyperref}
 \usepackage{pxjahyper}
@@ -19,7 +20,7 @@
 \makeatletter
 \def\epTeX{$\varepsilon$-\pTeX}\def\eTeX{$\varepsilon$-\TeX}
 \def\upTeX{u\pTeX}\def\pTeX{p\kern-.15em\TeX}
-\def\headfont{\normalfont\mathversion{bold}\gtfamily\bfseries}
+\def\headfont{\normalfont\mathversion{bold}\sffamily}
 \def\node#1{\textit{#1}}
 \def\.#1{\texorpdfstring{%
      \leavevmode\hbox{\texttt{\textbackslash#1}}\ifmmode\else\textcompwordmark\fi}{\textbackslash #1}}
@@ -29,7 +30,7 @@
 \newlist{cslist}{description}1
 \setlist[cslist]{%
   style=nextline,itemsep=\medskipamount,listparindent=1zw,
-  font=\normalfont\mdseries}
+  font=\normalfont\mdseries, leftmargin=2zw}
 \def\csitem[#1]{\item[\llap{$\blacktriangleright$~}\let\.=\ind@cs#1]}
 \def\emph#1{{\bfseries\sffamily\gtfamily\mathversion{bold}#1}}
 \def\listx{\def\makelabel{\hbox to 1em{\hfil\textbullet\hfil}}\def\@{\hfill}
@@ -41,12 +42,11 @@
 \xspcode`\*=3
 \xspcode`\-=3
 \xspcode23=3 % \textcompwordmark
-\def<#1>{\ensuremath{\langle\hbox{\normalfont\itshape #1\/}\rangle}}
+\def<#1>{\ensuremath{\langle\hbox{\normalfont\textit{#1}}\rangle}}
 
 \font\man=manfnt at 10pt
 \def\dbend{\raise0pt\hbox{\man\char'177}}
 \AtBeginDvi{\special{pdf:mapfile otf-ipaex.map}}
-\def\delbit#1#2{\underbracket[0.4pt]{#1}_{\text{#2}}}
 
 \newenvironment{multilist}[2]%
  {$$\setbox\z@=\hbox\bgroup  % catch some funny things -> \mathord
@@ -125,12 +125,23 @@
     \end{multicols}
     \clearpage
   }
+
+\def\tableautorefname{表}
+\def\figureautorefname{図}
+\def\HyRef@autoref#1#2{%
+  \begingroup
+    \Hy@safe@activestrue
+    \expandafter\HyRef@autosetref\csname r@#2\endcsname{#2}{#1}%
+  \endgroup\textcompwordmark %欧文ゴースト
+}
+
 \makeatother
 %%%%%%%%%%%%%%%%
 
 \def\_{\leavevmode\vrule width .45em height -.2ex depth .3ex\relax}
 \frenchspacing
 \begin{document}
+\catcode`\<=13
 \title{\emph{\pTeX マニュアル}}
 \author{日本語\TeX 開発コミュニティ\null
 \thanks{\url{https://texjp.org},\ 
@@ -141,7 +152,6 @@ e-mail: \texttt{issue(at)texjp.org}}}
 \tableofcontents
 
 \newpage
-
 \section{文字間のスペース}
 
 \.{kanjiskip}
@@ -174,32 +184,16 @@ e-mail: \texttt{issue(at)texjp.org}}}
 なお，行は水平ボックス(horizontal box)，ページは垂直ボックス(vertical box)である
 という点は，\pTeX でも従来の\TeX と同様である．
 
-以下が，組方向の変更や現在の組方向判定に関わるプリミティブの一覧である．
+\pTeX のサポートする組方向は\emph{横組}，\emph{縦組}，そして
+\emph{DtoU方向}\footnote{下から上(Down to Up)であろう．}の3つである．
+また数式モード中で作られたボックスは数式ディレクションというまた別の状態になる．
+横組での数式ディレクション（横数式ディレクション）と
+DtoU方向での数式ディレクションはそれぞれ非数式の場合と区別はないが，
+縦組での数式ディレクション（\emph{縦数式ディレクション}）では横組を時計回りに
+90度回転させたような状態となる．
+従って，\pTeX では縦数式ディレクションまで含めると合計4種類の組方向がサポートされていると
+いえる（\autoref{tab-dir}）．
 
-% アスキー公式サイトのプリミティブ一覧から適当にまとめ
-\begin{cslist}
-\csitem[\.{tate}, \.{yoko}, \.{dtou}]
-  組方向をそれぞれ縦方向，横方向，DtoU方向\footnote{%
-  下から上(Down to Up)であろう．}に変更する．
-  カレントの和文フォントは縦方向では縦組用フォント，
-  横方向およびDtoU方向では横組用フォントになる．
-
-  ディレクションの変更は，作成中のリストやボックスに何も入力されていない
-  状態でのみ許される．違反した場合，
-\begin{verbatim}
-! Use `\tate' at top of list.
-\end{verbatim}
-  のようなエラーが出る．
-
-  また，ボックスを\.{copy}したり中身を\.{unhbox}や\.{unvbox}で取り出し
-  たりする場合は，同じ組方向のボックス内でなければならない．
-  違反した場合，
-\begin{verbatim}
-! Incompatible direction list can't be unboxed.
-\end{verbatim}
-  なるエラーが出る．
-
-% luatexja.dtx より pTeX 用に移植
 \begin{table}[tbp]
 \caption{\pTeX のサポートする組方向}
 \label{tab-dir}
@@ -219,7 +213,7 @@ e-mail: \texttt{issue(at)texjp.org}}}
 \toprule
 &横組&縦組&DtoU方向&縦数式ディレクション\\
 \midrule
-命令&\.{yoko}&\.{tate}&\.{dtou}&縦組中の数式内のボックス\\
+命令&\.{yoko}&\.{tate}&\.{dtou}&---\\
 字送り方向&水平右向き（→）&垂直下向き（↓）&垂直上向き（↑）&垂直下向き（↓）\\
 行送り方向&垂直下向き（↓）&水平左向き（←）&水平右向き（→）&水平左向き（←）\\
 \parbox[t]{6zw}{使用する和文フォント}&横組用(\.{jfont})&縦組用(\.{tfont})&
@@ -231,14 +225,56 @@ e-mail: \texttt{issue(at)texjp.org}}}
 \end{tabular}
 \end{table}
 
-\csitem[\.{iftdir}, \.{ifydir}, \.{ifddir}, \.{ifmdir}]
-  現在の組方向を判定する．
 
+以下が，組方向の変更や現在の組方向判定に関わるプリミティブの一覧である．
+
+% アスキー公式サイトのプリミティブ一覧から適当にまとめ
+\begin{cslist}
+\csitem[\.{tate}, \.{yoko}, \.{dtou}]
+  組方向をそれぞれ縦組，横組，DtoU方向に変更する．
+  カレントの和文フォントは縦組では縦組用フォント，
+  横組およびDtoU方向では横組用フォントになる．
+
+  ディレクションの変更は，作成中のリストやボックスに何も入力されていない
+  状態でのみ許される．違反した場合，
+\begin{verbatim}
+! Use `\tate' at top of list.
+\end{verbatim}
+  のようなエラーが出る．
+
+  また，ボックスを\.{copy}したり中身を\.{unhbox}や\.{unvbox}で取り出し
+  たりする場合は，同じ組方向のボックス内でなければならない．
+  違反した場合，
+\begin{verbatim}
+! Incompatible direction list can't be unboxed.
+\end{verbatim}
+  なるエラーが出る．
+
+\csitem[\.{iftdir}, \.{ifydir}, \.{ifddir}, \.{ifmdir}]
+  現在の組方向を判定する．\.{iftdir}, \.{ifydir}, \.{ifddir}はそれぞれ
+  縦組，横組，DtoU方向であるかどうかを判定する（数式ディレクションであるかは問わない）．
+  一方，\.{ifmdir}は数式ディレクションであるかどうかを判定する．
+
+  従って，\autoref{tab-dir}に示した4つの状況のどれに属するかは以下のようにして判定できることになる．
+  \begin{verbatim}
+\iftdir
+  \ifmdir
+    （縦数式ディレクション）
+  \else
+    （通常の縦組）
+  \fi
+\else\ifydir
+  （横組）
+\else
+  （DtoU方向）
+\fi
+  \end{verbatim}
+  
 \csitem[\.{iftbox} <number>, \.{ifybox} <number>, \.{ifdbox} <number>, \.{ifmbox} <number>]
   <number>番のボックスの組方向を判定する．<number>は有効なboxレジスタでなければならない．
 
   バージョンp3.7までの\pTeX では，ボックスが一旦ノードとして組まれてしまうと，
-  通常の縦ディレクションで組まれているのか，それとも縦数式ディレクションで組ま
+  通常の縦組で組まれているのか，それとも縦数式ディレクションで組ま
   れているのかという情報が失われていた．しかし，それでは後述の「ベースライン
   補正の戻し量」を誤り，欧文の垂直位置が揃わないという問題が生じた(\cite{tatemath})．
   この問題を解決する副産物として\.{ifmbox}プリミティブが実装された．
