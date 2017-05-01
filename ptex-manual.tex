@@ -19,7 +19,7 @@
 % preamble copied from eptexdoc.tex
 \makeatletter
 \def\epTeX{$\varepsilon$-\pTeX}\def\eTeX{$\varepsilon$-\TeX}
-\def\upTeX{u\pTeX}\def\pTeX{p\kern-.15em\TeX}
+\def\eupTeX{$\varepsilon$-\upTeX}\def\upTeX{u\pTeX}\def\pTeX{p\kern-.15em\TeX}
 \def\headfont{\normalfont\mathversion{bold}\sffamily}
 \def\.#1{\texorpdfstring{%
      \leavevmode\hbox{\texttt{\textbackslash#1}}\ifmmode\else\textcompwordmark\fi}{\textbackslash #1}}
@@ -59,7 +59,7 @@
   \ifnum\@listdepth>\z@
     \GenericError{}{Do not use `dangerous' environment inside any list}{}{}
   \fi
-  \par\medskip
+  \par\addvspace\medskipamount
   \@tempdima=\dimexpr\textwidth-2zw\relax\small
   \divide\@tempdima by\dimexpr1zw\relax\@tempcnta=\@tempdima
   \leftskip=\dimexpr\textwidth-\@tempcnta zw\relax
@@ -67,7 +67,7 @@
     \linewidth=\dimexpr\@tempcnta zw-0zw
   \parindent1zw\noindent\kern-\leftskip\hbox to\leftskip{\dbend\hss}%
   \everypar{\everypar{}}\ignorespaces
-}{\par\medskip}
+}{\par\addvspace\medskipamount}
 
 \renewenvironment{theindex}{%
     \def\presectionname{}\def\postsectionname{}%
@@ -226,6 +226,8 @@ e-mail: \texttt{issue(at)texjp.org}}}
   \item 連続した和文文字の間にペナルティがあった場合，暗黙の\.{kanjiskip}が
 	挿入されないので明示的にノードが作られる．
  \end{itemize}
+\end{dangerous}
+\begin{dangerous}
   しばしば
   
   \medskip\noindent
@@ -250,6 +252,7 @@ e-mail: \texttt{issue(at)texjp.org}}}
 
 \begin{cslist}
 \csitem[\.{xkanjiskip}]
+
 \end{cslist}
 
 
@@ -277,17 +280,6 @@ e-mail: \texttt{issue(at)texjp.org}}}
 \emph{DtoU方向}\footnote{下から上(Down to Up)であろう．}の3つである．
 また数式モード中で作られたボックスは数式ディレクションというまた別の状態になる．
 横組での数式ディレクション（横数式ディレクション）と
-\begin{dangerous}
-あああああああああああああああああああああああああああああ
-あああああああああああああああああああああああああああああ
-あああああああああああああああああああああああああああああ
-あああああああああああああああああああああああああああああ
-あああああああああああああああああああああああああああああ
-\begin{itemize}
- \item いいいいいいいいいいいいいいいいいいいいいいいいいい
-いいいいいいいいいいいいいいいいいいいいいい
-\end{itemize}
-\end{dangerous}
 DtoU方向での数式ディレクションはそれぞれ非数式の場合と区別はないが，
 縦組での数式ディレクション（\emph{縦数式ディレクション}）では横組を時計回りに
 90度回転させたような状態となる．
@@ -389,13 +381,61 @@ DtoU方向での数式ディレクションはそれぞれ非数式の場合と�
 \.{scriptbaselineshiftfactor}
 \.{scriptscriptbaselineshiftfactor}
 
-\section{和文ファミリ}
+\section{和文フォント}
 
-\.{jfam}
-\.{jfont}
-\.{tfont}
+\begin{cslist}
+\csitem[\.{jfam}=<0--15>]
+現在の和文数式フォントファミリの番号を格納する
+\footnote{\epTeX, \eupTeX では欧文の\.{fam}と共に0--255に範囲が拡張されている．}．
+現在の欧文数式ファミリの番号を格納する\.{fam}と原理的に同じ番号を指定することは
+原理的には可能だが，数式ファミリは和文・欧文共用であるので実際には
+異なる値を指定することになる．
 
-\.{kcatcode}
+欧文フォントが設定されている数式ファミリの番号を\.{jfam}に指定し，数式中で和文文字を記述すると
+\begin{verbatim}
+! Not two-byte family.
+\end{verbatim}
+というエラーが発生する．逆に，和文フォントが設定されているファミリの番号を
+\.{fam}に指定し，数式中に欧文文字を記述すると
+\begin{verbatim}
+! Not one-byte family.
+\end{verbatim}
+というエラーが発生する．
+
+\csitem[\.{jfont}, \.{tfont}]
+欧文フォントを定義したり，現在の欧文フォントを取得する\.{font}の和文版である．
+一応\.{jfont}が「和文の横組用フォント」の，\.{tfont}が「和文の縦組用フォント」のために
+用いる命令である．
+\begin{itemize}
+ \item フォントを定義する際は，欧文フォント・和文の横組用フォント・
+       和文の縦組用のフォントのいずれも
+       \.{font}, \.{jfont}, \.{tfont}のどれを用いても定義できる．
+ \item \.{the}等で「現在のフォント」を取得する際には，
+       \.{jfont}で「和文の横組用フォント」を，
+       \.{tfont}で「和文の縦組用フォント」を返す．
+\end{itemize}
+
+\csitem[\.{kcatcode}<16-bit number>=<16--18>]
+\pTeX では，和文文字に16~($\mathit{kanji}$), 17~($\mathit{kana}$), 
+18~($\mathit{other\_kchar}$)のいずれかのカテゴリーコードを割り当てている．
+これらの値による動作の違いは次のようになる：
+\begin{itemize}
+ \item \TeX82では，「複数文字からなる命令」(control word)には
+カテゴリーコードが11~($\mathit{letter}$)の文字しか使用できないことになっていたが，
+\pTeX では16,~17の和文文字も合わせて使用することが出来る．
+
+カテゴリーコードが18の和文文字はcontrol word中には使用できない
+\footnote{\.{」}のように一文字命令(control symbol)としての使用は可能である．}．
+ \item 前で説明した\.{jcharwidowpenalty}は，カテゴリーコードが16,~17の和文文字の前にのみ
+挿入されうるもので，カテゴリーコードが18の和文文字の前には挿入されない．
+\end{itemize}
+
+\.{kcatcode}はDVI中の上位バイト（すなわち，JISコードでいう区ごと）に値が設定可能である．
+初期状態では1,~2, 7--15, 85--94区の文字が18，3--6区の文字が17，16--84区の文字が16である．
+\end{cslist}
+\begin{dangerous}
+ \upTeX においては，\.{kcatcode}は大きく仕様変更されている．
+\end{dangerous}
 
 \section{文字コード変換，漢数字}
 
