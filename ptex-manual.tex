@@ -2,10 +2,10 @@
 \documentclass[a4paper,11pt]{jsarticle}
 \usepackage[textwidth=42zw,lines=40,truedimen,centering]{geometry}
 %\usepackage{amsmath,mathtools,amssymb,multicol,comment}
-\usepackage{array}\usepackage[all]{xy}
+\usepackage{array}\usepackage[arrow]{xy}
 \usepackage[dvipdfmx]{graphicx}
 \usepackage[T1]{fontenc}
-\usepackage{booktabs,enumitem}
+\usepackage{booktabs,enumitem,multicol}
 \usepackage[defaultsups]{newpxtext}
 \usepackage[zerostyle=c,straightquotes]{newtxtt}
 \usepackage{newpxmath}
@@ -21,7 +21,6 @@
 \def\epTeX{$\varepsilon$-\pTeX}\def\eTeX{$\varepsilon$-\TeX}
 \def\upTeX{u\pTeX}\def\pTeX{p\kern-.15em\TeX}
 \def\headfont{\normalfont\mathversion{bold}\sffamily}
-\def\node#1{\textit{#1}}
 \def\.#1{\texorpdfstring{%
      \leavevmode\hbox{\texttt{\textbackslash#1}}\ifmmode\else\textcompwordmark\fi}{\textbackslash #1}}
 \let\orig@cs=\.
@@ -29,14 +28,14 @@
 \def\indcs#1{\index{{\texttt{\textbackslash #1}}}}
 \newlist{cslist}{description}1
 \setlist[cslist]{%
-  style=nextline,itemsep=\medskipamount,listparindent=1zw,
-  font=\normalfont\mdseries, leftmargin=2zw}
-\def\csitem[#1]{\item[\llap{$\blacktriangleright$~}\let\.=\ind@cs#1]}
+  itemsep=\medskipamount,listparindent=1zw,
+  font=\normalfont\mdseries, leftmargin=2zw,
+  before=\advance\@listdepth\@ne,after=\advance\@listdepth\m@ne
+}
+\def\csitem[#1]{\item[\llap{$\blacktriangleright$~}\let\.=\ind@cs#1]\leavevmode\par}
 \def\emph#1{{\bfseries\sffamily\gtfamily\mathversion{bold}#1}}
-\def\listx{\def\makelabel{\hbox to 1em{\hfil\textbullet\hfil}}\def\@{\hfill}
-\labelwidth=13zw\leftmargin15zw\itemindent=0zw}
-\def\paragraph#1{\par\medskip\par\noindent\emph{■#1}\par\nobreak}
-\def\Pkg#1{\textsf{#1}}
+\setlist{leftmargin=2zw}
+
 \catcode`\<=13
 \xspcode`\\=3
 \xspcode`\*=3
@@ -48,65 +47,24 @@
 \def\dbend{\raise0pt\hbox{\man\char'177}}
 \AtBeginDvi{\special{pdf:mapfile otf-ipaex.map}}
 
-\newenvironment{multilist}[2]%
- {$$\setbox\z@=\hbox\bgroup  % catch some funny things -> \mathord
-  \let\a=\empty
-  \let\b=\empty
-  \count@=\z@
-  \toks@={#2}%
-  \def\item##1\cr
-   {\ifnum \count@=\z@
-      \count@=#1%
-      \expandafter\def\expandafter\b\expandafter{\b\y{}}%
-    \fi
-    \advance\count@ by\m@ne
-    \expandafter\def\expandafter\a\expandafter{\a\x{##1}}}%
-  \ignorespaces}%
- {\loop
-  \ifnum \count@>\z@
-    \expandafter\def\expandafter\a\expandafter{\a\expandafter\z\b\relax}%
-    \advance\count@ by\m@ne
-  \repeat
-  \def\x##1{\expandafter\y\b\relax{##1}}%
-  \def\y\y##1##2\relax##3%
-   {\ifx @##1@%
-      \def\b{##2\y{##3}}%
-    \else
-      \def\b{##2\y{##1&##3}}%
-    \fi}%
-  \def\z\y##1##2\relax{\def\b{##2\y{##1}}}%
-  \a
-  \def\x
-   {\expandafter\egroup\expandafter\halign\expandafter\bgroup
-    \expandafter&\the\toks@\cr}%
-  \def\y##1{\expandafter\def\expandafter\x\expandafter{\x##1\cr}}%
-  \b
-  \x\egroup $$}
-
-\makeatletter
-\def\hex#1{%
-{\count@=#1\@tempcnta=#1\@tempcntb=\@tempcnta\relax
-\divide\@tempcntb by 16%
-\ifnum\count@=0\else
-  \multiply\@tempcntb by16%
-  \advance\@tempcnta-\@tempcntb
-  \divide\@tempcntb by16%
-  \hex{\the\@tempcntb}%
-  \ifcase\@tempcnta\relax 0\or1\or2\or3\or4\or5\or6\or
-    7\or8\or9\or A\or B\or C\or D\or E\pr F\fi
-\fi}}
-\clubpenalty=8000\widowpenalty=8000
-
 \normalsize
 \bigskipamount=\baselineskip
 \medskipamount=.5\baselineskip
 \smallskipamount=.25\baselineskip
 
 \usepackage{etoolbox}
-\patchcmd\@verbatim\@totalleftmargin{\dimexpr\@totalleftmargin+3zw\relax}{}{}
+\patchcmd\@verbatim\@totalleftmargin{\dimexpr\@totalleftmargin+2zw\relax}{}{}
 
 \newenvironment{dangerous}{%
-  \par\small\leftskip=\dimexpr\textwidth-44zw\relax\@totalleftmargin=\leftskip
+  \ifnum\@listdepth>\z@
+    \GenericError{}{Do not use `dangerous' environment inside any list}{}{}
+  \fi
+  \par\medskip
+  \@tempdima=\dimexpr\textwidth-2zw\relax\small
+  \divide\@tempdima by\dimexpr1zw\relax\@tempcnta=\@tempdima
+  \leftskip=\dimexpr\textwidth-\@tempcnta zw\relax
+    \@totalleftmargin\dimexpr\leftskip+0zw
+    \linewidth=\dimexpr\@tempcnta zw-0zw
   \parindent1zw\noindent\kern-\leftskip\hbox to\leftskip{\dbend\hss}%
   \everypar{\everypar{}}\ignorespaces
 }{\par\medskip}
@@ -134,6 +92,11 @@
     \expandafter\HyRef@autosetref\csname r@#2\endcsname{#2}{#1}%
   \endgroup\textcompwordmark %欧文ゴースト
 }
+
+%%%%%%%% macros for index (from doc.sty)
+\newif\ifscan@allowed
+\def\pfill{\unskip~\dotfill\penalty500\strut\nobreak
+	  \dotfill~\nobreak}
 
 \makeatother
 %%%%%%%%%%%%%%%%
@@ -246,27 +209,49 @@ e-mail: \texttt{issue(at)texjp.org}}}
 \csitem[\.{kanjiskip}=<skip>]
 連続する和文文字間に標準で入るグルーを設定する．段落途中でこの値を変えても影響はなく，
 段落終了時の値が段落全体にわたって用いられる．
-\begin{itemize}
- \item 同じ和文フォントで和文文字が連続する場合には，和文フォントメトリック由来の空白（グ
-       ルーやカーン）が挿入されることがあるが，特にメトリック側にそのような設定が
-       されていない場合に\.{kanjiskip}が自動挿入される．
-       % （異なる和文フォントの和文文字が連続している場合の説明を入れる）
- \item 連続する和文文字間に挿入される\.{kanjiskip}は，ノードの形では扱われず，
-      行分割やボックスの寸法確定の際に暗黙のうちに算入されるだけである．
-一方，水平ボックス(\.{hbox})が和文文字で開始/終了しており，そのボックスの直前/直後が和
-       文文字であった場合には\.{kanjiskip}が明示的なノードとして挿入される．
-\end{itemize}
-しばしば
-\begin{verbatim}
-\hbox to 10zw{\kanjiskip=0pt plus 1fil あ「い」うえ，お}
-\end{verbatim}
-のように\.{kanjiskip}に無限の伸長度を持たせることで均等割付を行おうとするコードを見かける
-が，連続する和文文字の間にはメトリック由来の空白と\.{kanjiskip}は同時には入らないので，
-上に書いたコードは不適切である．
-
-\csitem[\.{xkanjiskip}]
-
 \end{cslist}
+
+\begin{dangerous}
+ 和文文字を表すノードが連続した場合，その間に\.{kanjiskip}があるものとして行分割やボック
+ スの寸法計算が行われる．\.{kanjiskip}の大部分はこのように暗黙のうちに挿入されるものである
+ ので，\.{lastskip}などで取得することはできない．
+
+ その一方で，ノードの形で明示的に挿入される\.{kanjiskip}も存在する．このようになるのは次の
+ 場合である：
+ \begin{itemize}
+  \item 水平ボックス(\.{hbox})が和文文字で開始しており，そのボックスの直前が和
+	文文字であった場合，ボックスの直前に\.{kanjiskip}が挿入される．
+  \item 水平ボックス(\.{hbox})が和文文字で終了しており，そのボックスの直後が和
+	文文字であった場合，ボックスの直後に\.{kanjiskip}が挿入される．
+  \item 連続した和文文字の間にペナルティがあった場合，暗黙の\.{kanjiskip}が
+	挿入されないので明示的にノードが作られる．
+ \end{itemize}
+  しばしば
+  
+  \medskip\noindent
+  \begin{minipage}{.6\linewidth}
+	\begin{verbatim}
+	\hbox to 15zw{%
+	  \kanjiskip=0pt plus 1fil 
+	  あ「い」うえ，お}
+	\end{verbatim}
+  \end{minipage}
+  \begin{minipage}{.3\linewidth}
+	\hbox to 15zw{%
+	  \kanjiskip=0pt plus 1fil 
+	  あ「い」うえ，お}
+  \end{minipage}\medskip
+  
+  \noindent
+  のように\.{kanjiskip}に無限の伸長度を持たせることで均等割付を行おうとするコードを見かける
+  が，連続する和文文字の間にはメトリック由来の空白と\.{kanjiskip}は同時には入らないので，
+  上に書いたコードは不適切である．
+\end{dangerous}
+
+\begin{cslist}
+\csitem[\.{xkanjiskip}]
+\end{cslist}
+
 
 \.{xspcode}
 \.{inhibitxspcode}
@@ -292,6 +277,17 @@ e-mail: \texttt{issue(at)texjp.org}}}
 \emph{DtoU方向}\footnote{下から上(Down to Up)であろう．}の3つである．
 また数式モード中で作られたボックスは数式ディレクションというまた別の状態になる．
 横組での数式ディレクション（横数式ディレクション）と
+\begin{dangerous}
+あああああああああああああああああああああああああああああ
+あああああああああああああああああああああああああああああ
+あああああああああああああああああああああああああああああ
+あああああああああああああああああああああああああああああ
+あああああああああああああああああああああああああああああ
+\begin{itemize}
+ \item いいいいいいいいいいいいいいいいいいいいいいいいいい
+いいいいいいいいいいいいいいいいいいいいいい
+\end{itemize}
+\end{dangerous}
 DtoU方向での数式ディレクションはそれぞれ非数式の場合と区別はないが，
 縦組での数式ディレクション（\emph{縦数式ディレクション}）では横組を時計回りに
 90度回転させたような状態となる．
@@ -444,7 +440,7 @@ p3.1.2で復活したという経緯がある．}．
 内部整数を引数にとるが，実行結果は\emph{文字列}であることに注意．
 また，\pTeX はJIS X 0213には対応せず，JIS X 0208の範囲のみ扱える．
 
-\medskip
+\medskip\noindent
 \begin{minipage}{.6\linewidth}
 \begin{verbatim}
     \newcount\hoge
@@ -455,13 +451,11 @@ p3.1.2で復活したという経緯がある．}．
 \end{verbatim}
 \end{minipage}
 \begin{minipage}{.3\linewidth}
-{
-  \newcount\hoge
-  \hoge="2423 %"
-  \the\hoge, \kansuji\hoge\\
-  \jis\hoge, \char\jis\hoge\\
-  \kansuji1701
-}
+    \newcount\hoge
+    \hoge="2423 
+    \the\hoge, \kansuji\hoge\\
+    \jis\hoge, \char\jis\hoge\\
+    \kansuji1701
 \end{minipage}\medskip
 
 \section{長さ単位}
@@ -477,8 +471,8 @@ H
   \url{https://github.com/texjporg/platex/issues/22}
 \end{thebibliography}
 
+\newpage
 \printindex
 
-\newpage
 
 \end{document}
