@@ -1,5 +1,5 @@
 %#!make ptex-manual.pdf
-\documentclass[a4paper,11pt]{jsarticle}
+\documentclass[a4paper,11pt,nomag]{jsarticle}
 \usepackage[textwidth=42zw,lines=40,truedimen,centering]{geometry}
 %\usepackage{amsmath,mathtools,amssymb,multicol,comment}
 \usepackage{array}\usepackage[arrow]{xy}
@@ -500,10 +500,36 @@ p3.1.2で復活したという経緯がある．}．
 
 \section{長さ単位}
 
-zw
-zh
-Q
-H
+\pTeX では\TeX82に加えて以下の単位が使用可能である：
+\begin{cslist}
+ \csitem[\texttt{zw}\index{\texttt{zw}}]
+現在の和文フォント（通常の縦組のときは縦組用フォント，それ以外のときは横組用フォント）
+における「全角幅」．例えばこの文書の本文では
+$1\,\mathrm{zw} = \makeatletter\strip@pt\dimexpr 1zw\,\mathrm{pt}$である．
+
+ \csitem[\texttt{zh}]
+現在の和文フォント（通常の縦組のときは縦組用フォント，それ以外のときは横組用フォント）
+における「全角高さ」．例えばこの文書の本文では
+$1\,\mathrm{zh} = \makeatletter\strip@pt\dimexpr 1zh\,\mathrm{pt}$である．
+\end{cslist}
+
+\begin{dangerous}
+ より正確に言えば，\texttt{zw}, \texttt{zh}はそれぞれ
+ 標準の文字クラス（文字クラス0）に属する和文文字の幅，高さと深さの和を表す．
+
+ {\makeatletter\jfont\test=min10\test\xdef\mzw{\strip@pt\dimexpr1zw}\xdef\mzh{\strip@pt\dimexpr1zh}}%
+ ただ，\pTeX の標準和文フォントメトリックの一つである\texttt{min10.tfm}では，
+ $1\,\mathrm{zw}=\mzw\,\mathrm{pt}$, 
+ $1\,\mathrm{zh}=\mzh\,\mathrm{pt}$となっており，両者の値は一致していない．
+ JISフォントメトリックでも同様の寸法となっており，
+ 単位\texttt{zh}を使うことは……．% どういう言い回しにするのが良い？
+\end{dangerous}
+
+\begin{cslist}
+ \csitem[\texttt{Q}, \texttt{H}]
+両者とも$0.25\,\mathrm{mm}$~($7227/10160\,\mathrm{sp}$)を意味する．
+\end{cslist}
+
 
 \begin{thebibliography}{99}
  \bibitem{tatemath} aminophen, 「縦数式ディレクションとベースライン補正」，
