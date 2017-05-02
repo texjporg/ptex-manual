@@ -11,7 +11,6 @@
 \usepackage{newpxmath}
 \usepackage[dvipdfmx]{hyperref}
 \usepackage{pxjahyper}
-\usepackage[bold,deluxe]{otf}
 \usepackage{hologo}
 \usepackage{makeidx}\makeindex
 
@@ -503,14 +502,14 @@ p3.1.2で復活したという経緯がある．}．
 \pTeX では\TeX82に加えて以下の単位が使用可能である：
 \begin{cslist}
  \csitem[\texttt{zw}\index{\texttt{zw}}]
-現在の和文フォント（通常の縦組のときは縦組用フォント，それ以外のときは横組用フォント）
-における「全角幅」．例えばこの文書の本文では
-$1\,\mathrm{zw} = \makeatletter\strip@pt\dimexpr 1zw\,\mathrm{pt}$である．
+  現在の和文フォント（通常の縦組のときは縦組用フォント，それ以外のときは横組用フォント）
+  における「全角幅」．例えばこの文書の本文では
+  $1\,\mathrm{zw} = \makeatletter\strip@pt\dimexpr 1zw\,\mathrm{pt}$である．
 
- \csitem[\texttt{zh}]
-現在の和文フォント（通常の縦組のときは縦組用フォント，それ以外のときは横組用フォント）
-における「全角高さ」．例えばこの文書の本文では
-$1\,\mathrm{zh} = \makeatletter\strip@pt\dimexpr 1zh\,\mathrm{pt}$である．
+ \csitem[\texttt{zh}\index{\texttt{zh}}]
+  現在の和文フォント（通常の縦組のときは縦組用フォント，それ以外のときは横組用フォント）
+  における「全角高さ」．例えばこの文書の本文では
+  $1\,\mathrm{zh} = \makeatletter\strip@pt\dimexpr 1zh\,\mathrm{pt}$である．
 \end{cslist}
 
 \begin{dangerous}
@@ -521,13 +520,21 @@ $1\,\mathrm{zh} = \makeatletter\strip@pt\dimexpr 1zh\,\mathrm{pt}$である．
  ただ，\pTeX の標準和文フォントメトリックの一つである\texttt{min10.tfm}では，
  $1\,\mathrm{zw}=\mzw\,\mathrm{pt}$, 
  $1\,\mathrm{zh}=\mzh\,\mathrm{pt}$となっており，両者の値は一致していない．
- JISフォントメトリックでも同様の寸法となっており，
- 単位\texttt{zh}を使うことは……．% どういう言い回しにするのが良い？
+ JISフォントメトリックでも同様の寸法となっている．
+ % 単位\texttt{zh}を使うことは……．% どういう言い回しにするのが良い？
+ % -- 以下のようにしてみました．どうでしょう？（山下）
+ 一方，実際の表示に使われる和文フォントの多くは，$1\,\mathrm{zw}=1\,\mathrm{zh}$，
+ すなわち正方形のボディに収まるようにデザインされているから，これと合致しない．
+ したがって，単位\texttt{zh}はあまり意味のある値とはいえない．
+
+ なお，japanese-otf（OTFパッケージ）が用いているフォントメトリックは
+ $1\,\mathrm{zw}=1\,\mathrm{zh}$である．
 \end{dangerous}
 
 \begin{cslist}
- \csitem[\texttt{Q}, \texttt{H}]
-両者とも$0.25\,\mathrm{mm}$~($7227/10160\,\mathrm{sp}$)を意味する．
+ \csitem[\texttt{Q}\index{\texttt{Q}}, \texttt{H}\index{\texttt{H}}]
+  両者とも$0.25\,\mathrm{mm}$~($7227/10160\,\mathrm{sp}$)を意味する．
+  写植機における文字の大きさの単位であるQ数（級数）と，字送り量や行送り量の単位である歯数に由来する．
 \end{cslist}
 
 
