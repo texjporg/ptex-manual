@@ -108,7 +108,7 @@
 \author{日本語\TeX 開発コミュニティ\null
 \thanks{\url{https://texjp.org},\ 
 e-mail: \texttt{issue(at)texjp.org}}}
-\date{version p3.7.1，\today}
+\date{version p3.7.2，\today}
 \maketitle
 
 \tableofcontents
@@ -326,8 +326,21 @@ DtoU方向での数式ディレクションはそれぞれ非数式の場合と�
   カレントの和文フォントは縦組では縦組用フォント，
   横組およびDtoU方向では横組用フォントになる．
 
-  ディレクションの変更は，作成中のリストやボックスに何も入力されていない
-  状態でのみ許される．違反した場合，
+  組方向の変更は，作成中のリストやボックスに何も入力されていない
+  状態でのみ許される．より詳細には，
+\begin{itemize}
+  \item 非制限水平モード（行分割される段落），数式モード（文中，別行問わず）
+  での実行は禁止．
+  \item 外部垂直モードの場合は，次の2点が同時に満たされる場合のみ実行可能：
+  \begin{itemize}
+    \item current pageの中身には\verb|box|, \verb|rule|, \verb|insertion|は
+    なく，|mark|, |whatsit|のみ(\verb|page_contents=empty|)
+    \item recent contributionの中身にも\verb|box|, \verb|rule|,
+    \verb|insertion|はない（ページビルダーの過程で，先頭にある\verb|glue|,
+    \verb|kern|, \verb|penalty|は破棄されるので無視して良い）
+  \end{itemize}
+\end{itemize}
+  違反した場合，
 \begin{verbatim}
 ! Use `\tate' at top of list.
 \end{verbatim}
