@@ -29,11 +29,14 @@
 \setlist[cslist]{%
   itemsep=\medskipamount,listparindent=1zw,
   font=\normalfont\mdseries, leftmargin=2zw,
-  before=\advance\@listdepth\@ne,after=\advance\@listdepth\m@ne
+  before=\advance\@listdepth\@ne,
+  after=\advance\@listdepth\m@ne
 }
-\def\csitem[#1]{\item[\llap{$\blacktriangleright$~}\let\.=\ind@cs#1]\leavevmode\par}
+\def\csitem[#1]{\item[\llap{$\blacktriangleright$~}\let\.=\ind@cs#1]
+      \leavevmode\par\nopagebreak}
 \def\emph#1{{\bfseries\sffamily\gtfamily\mathversion{bold}#1}}
 \setlist{leftmargin=2zw}
+\setlist[description]{labelwidth=2zw,labelindent=1zw}
 
 \catcode`\<=13
 \xspcode`\\=3
@@ -92,11 +95,12 @@
   \endgroup\textcompwordmark %欧文ゴースト
 }
 
+\usepackage{shortvrb}
+\MakeShortVerb*{|}
 %%%%%%%% macros for index (from doc.sty)
 \newif\ifscan@allowed
 \def\pfill{\unskip~\dotfill\penalty500\strut\nobreak
-	  \dotfill~\nobreak}
-
+         \dotfill\nobreak}
 \makeatother
 %%%%%%%%%%%%%%%%
 
@@ -131,7 +135,8 @@ e-mail: \texttt{issue(at)texjp.org}}}
 ペナルティとは，行分割時やページ分割時に
 「その箇所がブレークポイントとしてどの程度適切であるか」を示す
 一般的な評価値である（適切であれば負値，不適切であれば正値
-とする）．}という概念を和文の禁則処理にも適用しているためである．
+とする）．絶対値が10000以上のペナルティは無限大として扱われる．}%
+という概念を和文の禁則処理にも適用しているためである．
 
 行頭禁則と行末禁則を実現する方法として，\pTeX では「禁則テーブル」が
 用意されている．このテーブルには
@@ -153,26 +158,23 @@ e-mail: \texttt{issue(at)texjp.org}}}
 \csitem[\.{prebreakpenalty} <16-bit number>=<number>]
   指定した文字の前方にペナルティを挿入する．
   正の値を与えると行頭禁則の指定にあたる．
-  例えば\verb|\prebreakpenalty`。=10000|とすれば，句点の
+  例えば|\prebreakpenalty`。=10000|とすれば，句点の
   直前に10000のペナルティが付けられ，行頭禁則文字の対象となる．
 
 \csitem[\.{postbreakpenalty} <16-bit number>=<number>]
   指定した文字の後方にペナルティを挿入する．
   正の値を与えると行末禁則の指定にあたる．
-  例えば\verb|\postbreakpenalty`（=10000|とすれば，始め丸括弧の
+  例えば|\postbreakpenalty`（=10000|とすれば，始め丸括弧の
   直後に10000のペナルティが付けられ，行末禁則文字の対象となる．
 \end{cslist}
 
-全角文字，半角文字の区別無しに指定できる．また，同一の文字に対して
+和文文字，欧文文字の区別無しに指定できる．また，同一の文字に対して
 両方のペナルティを同時に与えるような指定はできない
 （もし両方指定された場合，後から指定されたものに置き換えられる）．
-``\verb|{}|''によるグルーピング規則が適用される．
-指定できる文字数は最大で256文字までである．
-
-この禁則テーブルからの登録の削除は
-ペナルティ値0を設定することによって行われる．
-グローバルレベルでの設定でなければ，このテーブルの領域は
-解放されないことに注意．
+``|{}|''によるグルーピング規則が適用される．
+禁則テーブルには256文字分の領域しかないので，
+禁則ペナルティを指定できる文字数は最大で256文字までである．
+禁則テーブルからの登録の削除はペナルティ値0を設定することによって行われる．
 
 % [TODO] ハッシュ関数の説明は jtex.tex にあるが，転記するか？
 %% 別になくてもいいんじゃないんですか？（北川）
@@ -251,12 +253,52 @@ e-mail: \texttt{issue(at)texjp.org}}}
 
 \begin{cslist}
 \csitem[\.{xkanjiskip}]
-
+  和文文字と欧文文字の間に標準で入るグルーを設定する．
+  段落途中でこの値を変えても影響はなく，
+  段落終了時の値が段落全体にわたって用いられる．  
 \end{cslist}
+\begin{dangerous}
+  \.{kanjiskip}と異なり，\.{xkanjiskip}はノードの形で挿入される．
+  この挿入処理は段落の行分割処理の直前や，|\hbox|を閉じるときに行われるので，
+  「どこに\.{xkanjiskip}が入っているか」を知るためには現在の段落や|\hbox|を
+  終了させる必要がある．
+\end{dangerous}
 
+\begin{cslist}
+\csitem[\.{xspcode}<8-bit number>=<0--3>]
+  コード番号が<8-bit number>の欧文文字の周囲に\.{xkanjiskip}が
+  挿入可能が否かを0--3の値で指定する．それぞれの意味は次の通り：
+  \begin{description}
+    \item[0] 欧文文字の前側，後側ともに\.{xkanjiskip}の挿入を禁止する．
+    \item[1] 欧文文字の前側にのみ\.{xkanjiskip}の挿入を許可する．後側は禁止．
+    \item[2] 欧文文字の後側にのみ\.{xkanjiskip}の挿入を許可する．前側は禁止．
+    \item[3] 欧文文字の前側，後側ともに\.{xkanjiskip}の挿入を許可する．
+  \end{description}
+  \pTeX の標準値は，数字0--9と英文字A--Z, a--zに対する値は3（両側許可），
+  その他の文字に対しては0（両側禁止）．
 
-\.{xspcode}
-\.{inhibitxspcode}
+\csitem[\.{inhibitxspcode}<16-bit number>=<0--3>]
+  コード番号が<16-bit number>の和文文字の周囲に\.{xkanjiskip}が
+  挿入可能が否かを0--3の値で指定する．それぞれの意味は次の通り：
+  \begin{description}
+    \item[0] 和文文字の前側，後側ともに\.{xkanjiskip}の挿入を禁止する．
+    \item[1] 和文文字の後側にのみ\.{xkanjiskip}の挿入を許可する．前側は禁止．
+    \item[2] 和文文字の前側にのみ\.{xkanjiskip}の挿入を許可する．後側は禁止．
+    \item[3] 和文文字の前側，後側ともに\.{xkanjiskip}の挿入を許可する．
+  \end{description}
+  この\.{inhibitxspcode}の設定値の情報は256文字分のテーブルに格納されている，
+  未登録時は3（両側許可）であるとみなされ，また
+  3が指定されるとテーブルからの削除が行われる．
+\end{cslist}
+\begin{dangerous}
+  \.{xspmode}と\.{inhibitxspmode}では，一見すると
+  設定値1と2の意味が反対のように感じるかもしれない．しかし，実は両者とも
+  \begin{quote}
+    1: 「和文文字→欧文文字」の場合のみ許可．「欧文文字→和文文字」の場合は禁止．\\
+    2: 「欧文文字→和文文字」の場合のみ許可．「和文文字→欧文文字」の場合は禁止．
+  \end{quote}
+  となっている．
+\end{dangerous}
 
 \.{autospacing}
 \.{noautospacing}
@@ -326,28 +368,47 @@ DtoU方向での数式ディレクションはそれぞれ非数式の場合と�
   カレントの和文フォントは縦組では縦組用フォント，
   横組およびDtoU方向では横組用フォントになる．
 
-  組方向の変更は，作成中のリストやボックスに何も入力されていない
+  組方向の変更は，原則として作成中のリストやボックスに何のノードも作られていない
   状態でのみ許される．より詳細には，
 \begin{itemize}
-  \item 非制限水平モード（行分割される段落），数式モード（文中，別行問わず）
-  での実行は禁止．
-  \item 外部垂直モードの場合は，次の2点が同時に満たされる場合のみ実行可能：
-  \begin{itemize}
-    \item current pageの中身には\verb|box|, \verb|rule|, \verb|insertion|は
-    なく，|mark|, |whatsit|のみ(\verb|page_contents=empty|)
-    \item recent contributionの中身にも\verb|box|, \verb|rule|,
-    \verb|insertion|はない（ページビルダーの過程で，先頭にある\verb|glue|,
-    \verb|kern|, \verb|penalty|は破棄されるので無視して良い）
-  \end{itemize}
-\end{itemize}
-  違反した場合，
+  \item 制限水平モード(|\hbox|)，内部垂直モード(|\vbox|)では，
+  上記に述べた原則通り．
+\begin{verbatim}
+  \hbox{\hsize=20em\tate ……}
+\end{verbatim}
+  のように，ノードが作られない代入文などは組方向変更前に実行しても良い．
+
+  違反すると次のようなエラーが出る．
 \begin{verbatim}
 ! Use `\tate' at top of list.
 \end{verbatim}
-  のようなエラーが出る．
+
+  \item 非制限水平モード（行分割される段落）や，
+  数式モード（文中数式，ディスプレイ数式問わず）
+  での実行は禁止．
+
+  \item 外部垂直モードの場合は，次の2点が同時に満たされる場合のみ実行可能である．
+  \begin{itemize}
+    \item current pageの中身にはボックス，罫線(|\hrule|)，
+    insertion~(|\insert|)はない．
+    言い換えれば，current pageの中身はあっても
+    マーク(|\mark|)かwhatsitのみ
+    \footnote{current pageの中身にグルー，カーン，ペナルティがあるのは，
+      それらの前にボックス，罫線，insertionが存在する場合にのみである．}．
+    \item recent contributionの中身にもボックス，罫線，
+    insertionはない．
+  \end{itemize}
+
+  違反すると次のようなエラーが出る．
+\begin{verbatim}
+! Use `\tate' at top of the page.
+\end{verbatim}
+
+\end{itemize}
 
   また，ボックスを\.{copy}したり中身を\.{unhbox}や\.{unvbox}で取り出し
-  たりする場合は，同じ組方向のボックス内でなければならない．
+  たりする場合は，同じ組方向のボックス内でなければならない
+  \footnote{数式ディレクションか否かは異なっていても良い．}．
   違反した場合，
 \begin{verbatim}
 ! Incompatible direction list can't be unboxed.
@@ -396,9 +457,10 @@ DtoU方向での数式ディレクションはそれぞれ非数式の場合と�
 \section{和文フォント}
 
 \begin{cslist}
-\csitem[\.{jfam}=<0--15>]
+\csitem[\.{jfam}=<number>]
 現在の和文数式フォントファミリの番号を格納する
-\footnote{\epTeX, \eupTeX では欧文の\.{fam}と共に0--255に範囲が拡張されている．}．
+\footnote{\pTeX,~\upTeX では0--15の範囲が許される．
+  \epTeX, \eupTeX では欧文の\.{fam}と共に0--255に範囲が拡張されている．}．
 現在の欧文数式ファミリの番号を格納する\.{fam}と原理的に同じ番号を指定することは
 原理的には可能だが，数式ファミリは和文・欧文共用であるので実際には
 異なる値を指定することになる．
@@ -462,11 +524,11 @@ p3.1.2で復活したという経緯がある．}．
 \csitem[\.{kuten} <16-bit number>]
   区点コードから内部コードへの変換を行う．
   16進4桁の上2桁が区，下2桁が点であると解釈する．
-  たとえば，\verb|\char\kuten"253C|は，「\char\kuten"253C」（37区60点）である．
+  たとえば，|\char\kuten"253C|は，「\char\kuten"253C」（37区60点）である．
 
 \csitem[\.{jis} <16-bit number>, \.{euc} <16-bit number>, \.{sjis} <16-bit number>]
   それぞれJISコード，EUCコード，Shift\_JISコードから内部コードへの変換を行う．
-  たとえば，\verb|\char\jis"346E|，\verb|\char\euc"B0A5|，\verb|\char\sjis"8A79|は，
+  たとえば，|\char\jis"346E|，|\char\euc"B0A5|，|\char\sjis"8A79|は，
   それぞれ「\char\jis"346E」，「\char\euc"B0A5」，「\char\sjis"8A79」である．
 
 \csitem[\.{kansuji} <number>, \.{kansujichar} <0--9>=<16-bit number>]
