@@ -97,10 +97,10 @@
 
 \usepackage{shortvrb}
 \MakeShortVerb*{|}
-%%%%%%%% macros for index (from doc.sty)
+%%%%%%%% macros for index (simplified from doc.sty)
 \newif\ifscan@allowed
-\def\pfill{\unskip~\dotfill\penalty500\strut\nobreak
-         \dotfill\nobreak}
+\def\dotfill{\leaders\hbox to.6em{\hss .\hss}\hskip\z@ plus1fill}%
+\def\pfill{\unskip~\dotfill\nobreak}
 \makeatother
 %%%%%%%%%%%%%%%%
 
@@ -121,7 +121,6 @@ e-mail: \texttt{issue(at)texjp.org}}}
 
 % jtex.tex の「ラインブレーク」を簡略化
 \section{禁則}
-
 欧文と和文の処理で見かけ上最も大きな違いは，行分割処理であろう．
 \begin{itemize}
 \item 欧文中での行分割は，ハイフネーション処理等の
@@ -174,7 +173,11 @@ e-mail: \texttt{issue(at)texjp.org}}}
 ``|{}|''によるグルーピング規則が適用される．
 禁則テーブルには256文字分の領域しかないので，
 禁則ペナルティを指定できる文字数は最大で256文字までである．
-禁則テーブルからの登録の削除はペナルティ値0を設定することによって行われる．
+禁則テーブルからの登録の削除はペナルティ値0を\emph{グローバルに}設定することによって行われ
+る\footnote{0をローカルに設定した場合でも，その設定が最も外側のグループ
+（\eTeX 拡張でいう\.{currentgrouplevel}が0のとき）には削除される．
+「ローカルで削除された場所に別の禁則ペナルティ設定がグローバルで行われる」ことが
+おこらないようにするため，最外グループ以外での0設定ではテーブルから削除されない．}．
 
 % [TODO] ハッシュ関数の説明は jtex.tex にあるが，転記するか？
 %% 別になくてもいいんじゃないんですか？（北川）
@@ -287,8 +290,10 @@ e-mail: \texttt{issue(at)texjp.org}}}
     \item[3] 和文文字の前側，後側ともに\.{xkanjiskip}の挿入を許可する．
   \end{description}
   この\.{inhibitxspcode}の設定値の情報は256文字分のテーブルに格納されている，
-  未登録時は3（両側許可）であるとみなされ，また
-  3が指定されるとテーブルからの削除が行われる．
+  未登録時は3（両側許可）であるとみなされる．
+
+  禁則ペナルティと同様に，デフォルト値の3をグローバルに設定すると
+  テーブルからの登録が削除される．
 \end{cslist}
 \begin{dangerous}
   \.{xspmode}と\.{inhibitxspmode}では，一見すると
@@ -300,13 +305,49 @@ e-mail: \texttt{issue(at)texjp.org}}}
   となっている．
 \end{dangerous}
 
-\.{autospacing}
-\.{noautospacing}
-\.{autoxspacing}
-\.{noautoxspacing}
-\.{showmode}
+\begin{cslist}
+\csitem[\.{autospacing}, \.{noautospacing}]
+連続する和文文字間に\.{kanjiskip}で指定されただけのグルーを挿入する(\.{autospacing})か
+挿入しない(\.{noautospacing})を設定する．
+段落途中でこの値を変えても影響はなく，段落終了時の値が段落全体にわたって用いられる．
+\csitem[\.{autoxspacing}, \.{noautoxspacing}]
+和文文字と欧文文字の間に\.{xkanjiskip}で指定されただけのグルーを挿入する(\.{autoxspacing})か
+挿入しない(\.{noautoxspacing})を設定する．
+段落途中でこの値を変えても影響はなく，段落終了時の値が段落全体にわたって用いられる．
+\end{cslist}
 
-\.{inhibitglue}
+どちらの設定も標準では有効(\.{autospacing}, \.{autoxspacing})である．
+\begin{dangerous}
+ すでに述べたように，\.{kanjiskip}の一部と\.{xkanjiskip}はノードの形で挿入される．
+ \.{noautospacing}や\.{noautoxspacing}を指定しても，このノードの形での挿入自体は行われる
+（ただノードが\.{kanjiskip}や\.{xkanjiskip}の代わりに長さ0のグルーを表すだけ）．
+
+ これにより，例えば\.{noautoxspacing}状況下で「\verb+あa+」と入力しても
+ 間に長さ0のグルーがあるため「あ」と「a」の間で改行可能となることに注意．
+\end{dangerous}
+
+\begin{cslist}
+ \csitem[\.{showmode}] \.{kanjiskip}の挿入や\.{xkanjiskip}の挿入が有効になっているか否かを
+\begin{verbatim}
+> auto spacing mode;
+> no auto xspacing mode.
+\end{verbatim}
+という形式（上の例では\.{autospacing}かつ\.{noautoxspacing}の状況）で端末やログに表示する．
+
+\csitem[\.{inhibitglue}] この命令が実行された位置において，メトリック由来の空白の挿入を禁
+ 止する．以下の2点に注意．
+\begin{itemize}
+ \item メトリック由来の空白が挿入されないだけであり，
+その代わりに\.{kanjiskip}や\.{xkanjiskip}が挿入されることは禁止していない．
+\item 本命令は現在が（非限定，限定問わず）水平モードのときしか効力を発揮しない．
+段落が和文文字「\verb+【+」で始まり，その文字の直前にメトリック由来の空白が入ることを抑止
+      したい場合は，次のように一旦段落を開始してから\.{inhibitglue}を実行する必要がある．
+\begin{verbatim}
+\leavevmode\inhibitglue 【
+\end{verbatim}
+\end{itemize}
+\end{cslist}
+
 
 \section{組方向}
 
@@ -414,7 +455,13 @@ DtoU方向での数式ディレクションはそれぞれ非数式の場合と�
 ! Incompatible direction list can't be unboxed.
 \end{verbatim}
   なるエラーが出る．
+\end{cslist}
+\begin{dangerous}
+ \.{discretionary}命令では\.{discretionary\{<pre>\}\{<post>\}\{<nobreak>\}}と3つの引数を指
+ 定するが，この3引数の中で組方向を変更することはできない（常に周囲の組方向が使われる）．
+\end{dangerous}
 
+\begin{cslist}
 \csitem[\.{iftdir}, \.{ifydir}, \.{ifddir}, \.{ifmdir}]
   現在の組方向を判定する．\.{iftdir}, \.{ifydir}, \.{ifddir}はそれぞれ
   縦組，横組，DtoU方向であるかどうかを判定する（数式ディレクションであるかは問わない）．
