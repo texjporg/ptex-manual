@@ -206,8 +206,15 @@ e-mail: \texttt{issue(at)texjp.org}}}
 
 \section{文字間のスペース}
 
+
 % [TODO] 禁則処理だけでは美しい行分割ができないのでスペーシングの
 % 調節が必要，という流れとするとよさそう？
+
+[TODO] 和文処理に関わる空白のあらまし
+\begin{itemize}
+ \item メトリック由来空白の挿入処理は展開不能トークンが来たら中断
+ \item 展開不能トークンや欧文文字は「文字クラス0」扱い．「\verb+）\relax（+」の例
+\end{itemize}
 
 \begin{cslist}
 \csitem[\.{kanjiskip}=<skip>]
@@ -333,18 +340,25 @@ e-mail: \texttt{issue(at)texjp.org}}}
 という形式（上の例では\.{autospacing}かつ\.{noautoxspacing}の状況）で端末やログに表示する．
 
 \csitem[\.{inhibitglue}] この命令が実行された位置において，メトリック由来の空白の挿入を禁
- 止する．以下の2点に注意．
+ 止する．以下の点に注意．
 \begin{itemize}
  \item メトリック由来の空白が挿入されないだけであり，
-その代わりに\.{kanjiskip}や\.{xkanjiskip}が挿入されることは禁止していない．
-\item 本命令は現在が（非限定，限定問わず）水平モードのときしか効力を発揮しない．
-段落が和文文字「\verb+【+」で始まり，その文字の直前にメトリック由来の空白が入ることを抑止
-      したい場合は，次のように一旦段落を開始してから\.{inhibitglue}を実行する必要がある．
+       その代わりに\.{kanjiskip}や\.{xkanjiskip}が挿入されることは禁止していない．
+ \item 本命令は現在が（非限定，限定問わず）水平モードのときしか効力を発揮しない．
+       段落が和文文字「\verb+【+」で始まり，その文字の直前にメトリック由来の空白が入ることを抑止
+       したい場合は，次のように一旦段落を開始してから\.{inhibitglue}を実行する必要がある．
 \begin{verbatim}
 \leavevmode\inhibitglue 【
 \end{verbatim}
 \end{itemize}
 \end{cslist}
+\begin{dangerous}
+ p\LaTeX~2017-??-??以降では，\.{inhibitglue}の短縮として\.{\char`\<}が次のように定義されている
+（\.{protected}は\eTeX 拡張の機能だが，現在では\LaTeX 自体が\eTeX 拡張を要求している）．
+\begin{verbatim}
+\protected\def\<{\ifvmode\leavevmode\fi\inhibitglue}
+\end{verbatim}
+\end{dangerous}
 
 
 \section{組方向}
