@@ -112,7 +112,7 @@
 \author{日本語\TeX 開発コミュニティ\null
 \thanks{\url{https://texjp.org},\ 
 e-mail: \texttt{issue(at)texjp.org}}}
-\date{version p3.7.2，\today}
+\date{version p3.8.0，\today}
 \maketitle
 
 \tableofcontents
@@ -312,11 +312,11 @@ e-mail: \texttt{issue(at)texjp.org}}}
 
 \begin{cslist}
 \csitem[\.{autospacing}, \.{noautospacing}]
-連続する和文文字間に\.{kanjiskip}で指定されただけのグルーを挿入する(\.{autospacing})か
+連続する和文文字間に，標準で\.{kanjiskip}で指定されただけのグルーを挿入する(\.{autospacing})か
 挿入しない(\.{noautospacing})を設定する．
 段落途中でこの値を変えても影響はなく，段落終了時の値が段落全体にわたって用いられる．
 \csitem[\.{autoxspacing}, \.{noautoxspacing}]
-和文文字と欧文文字の間に\.{xkanjiskip}で指定されただけのグルーを挿入する(\.{autoxspacing})か
+和文文字と欧文文字の間に，標準で\.{xkanjiskip}で指定されただけのグルーを挿入する(\.{autoxspacing})か
 挿入しない(\.{noautoxspacing})を設定する．
 段落途中でこの値を変えても影響はなく，段落終了時の値が段落全体にわたって用いられる．
 \end{cslist}
@@ -327,7 +327,7 @@ e-mail: \texttt{issue(at)texjp.org}}}
  \.{noautospacing}や\.{noautoxspacing}を指定しても，このノードの形での挿入自体は行われる
 （ただノードが\.{kanjiskip}や\.{xkanjiskip}の代わりに長さ0のグルーを表すだけ）．
 
- これにより，例えば\.{noautoxspacing}状況下で「\verb+あa+」と入力しても
+ これにより，例えば\.{noautoxspacing}状況下で「\hbox{\noautoxspacing\verb+あa+}」と入力しても
  間に長さ0のグルーがあるため「あ」と「a」の間で改行可能となることに注意．
 \end{dangerous}
 
@@ -669,6 +669,20 @@ p3.1.2で復活したという経緯がある．}．
  \csitem[\texttt{Q}\index{Q=\texttt{Q}}, \texttt{H}\index{H=\texttt{H}}]
   両者とも$0.25\,\mathrm{mm}$~($7227/10160\,\mathrm{sp}$)を意味する．
   写植機における文字の大きさの単位であるQ数（級数）と，字送り量や行送り量の単位である歯数に由来する．
+\end{cslist}
+
+\section{バージョン番号}
+
+\begin{cslist}
+  \csitem[\.{ptexversion}, \.{ptexminorversion}, \.{ptexrevision}]
+  \pTeX のバージョン番号はp$x{.}y{.}z$の形式となっており，それらを取得するための命令である．
+  \.{ptexversion}, \.{ptexminorversion}は
+  それぞれ$x$,~$y$の値を内部整数で返し，\.{ptexrevision}はその後ろの「${.}z$」を文字列で返す．
+  従って，全部合わせた\pTeX のバージョン番号は
+\begin{verbatim}
+\number\ptexversion.\number\ptexminorversion\ptexrevision
+\end{verbatim}
+  で取得できる．\pTeX~p3.8.0で導入された．
 \end{cslist}
 
 
