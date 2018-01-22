@@ -119,6 +119,12 @@ e-mail: \texttt{issue(at)texjp.org}}}
 
 \newpage
 
+%%%%%
+\part{\pTeX の日本語組版と追加プリミティブ}
+
+ここでは，\pTeX の日本語組版の概略と，それを実現するために導入された
+プリミティブを説明する．
+
 % jtex.tex の「ラインブレーク」を簡略化
 \section{禁則}
 欧文と和文の処理で見かけ上最も大きな違いは，行分割処理であろう．
@@ -353,7 +359,7 @@ e-mail: \texttt{issue(at)texjp.org}}}
 \end{itemize}
 \end{cslist}
 \begin{dangerous}
- p\LaTeX~2017-??-??以降では，\.{inhibitglue}の短縮として\.{\char`\<}が次のように定義されている
+ p\LaTeX~2017-10-28以降では，\.{inhibitglue}の短縮として\.{\char`\<}が次のように定義されている
 （\.{protected}は\eTeX 拡張の機能だが，現在では\LaTeX 自体が\eTeX 拡張を要求している）．
 \begin{verbatim}
 \protected\def\<{\ifvmode\leavevmode\fi\inhibitglue}
@@ -365,7 +371,7 @@ e-mail: \texttt{issue(at)texjp.org}}}
 
 % ptexdoc.tex の「ディレクション」を簡略化
 従来の\TeX では，字送り方向が水平右向き（→），行送り方向が垂直下向き（↓）
-に固定されていた。\pTeX では，\TeX の状態として“組方向（ディレクション）”
+に固定されていた．\pTeX では，\TeX の状態として“組方向（ディレクション）”
 を考え，ディレクションによって字送り方向と行送り方向を変えることにしてある．
 なお，行は水平ボックス(horizontal box)，ページは垂直ボックス(vertical box)である
 という点は，\pTeX でも従来の\TeX と同様である．
@@ -684,6 +690,29 @@ p3.1.2で復活したという経緯がある．}．
 \end{verbatim}
   で取得できる．\pTeX~p3.8.0で導入された．
 \end{cslist}
+
+\newpage
+
+%%%%%
+\part{オリジナルの\TeX 互換プリミティブの動作}
+
+オリジナルの\TeX に存在したプリミティブの2バイト以上のコードへの
+対応状況を説明する．
+% 海外の LaTeX パッケージ作者にとってはこちらの情報が大事なはず．
+
+% これは対応しているはず；他にもあるか？
+\.{char}
+
+% これは jtexdoc.tex によると日本語化されていないと明記あり
+% 他にもあるか？
+% 2016 年以前の「上位バイト」な挙動も合わせて書くか？
+\.{catcode}
+\.{sfcode}
+\.{mathcode}
+\.{delcode}
+\.{mathchardef}
+\.{lccode}
+\.{uccode}
 
 
 \begin{thebibliography}{99}
