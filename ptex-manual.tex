@@ -224,24 +224,24 @@ e-mail: \texttt{issue(at)texjp.org}}}
 
 \begin{cslist}
 \csitem[\.{kanjiskip}=<skip>]
-連続する和文文字間に標準で入るグルーを設定する．段落途中でこの値を変えても影響はなく，
-段落終了時の値が段落全体にわたって用いられる．
+  連続する和文文字間に標準で入るグルーを設定する．段落途中でこの値を変えても影響はなく，
+  段落終了時の値が段落全体にわたって用いられる．
 \end{cslist}
 
 \begin{dangerous}
- 和文文字を表すノードが連続した場合，その間に\.{kanjiskip}があるものとして行分割やボック
- スの寸法計算が行われる．\.{kanjiskip}の大部分はこのように暗黙のうちに挿入されるものである
- ので，\.{lastskip}などで取得することはできない．
+  和文文字を表すノードが連続した場合，その間に\.{kanjiskip}があるものとして行分割や
+  ボックスの寸法計算が行われる．\.{kanjiskip}の大部分はこのように暗黙のうちに挿入
+  されるものであるので，\.{lastskip}などで取得することはできない．
 
- その一方で，ノードの形で明示的に挿入される\.{kanjiskip}も存在する．このようになるのは次の
- 場合である：
+  その一方で，ノードの形で明示的に挿入される\.{kanjiskip}も存在する．
+  このようになるのは次の場合である：
  \begin{itemize}
-  \item 水平ボックス(\.{hbox})が和文文字で開始しており，そのボックスの直前が和
-	文文字であった場合，ボックスの直前に\.{kanjiskip}が挿入される．
-  \item 水平ボックス(\.{hbox})が和文文字で終了しており，そのボックスの直後が和
-	文文字であった場合，ボックスの直後に\.{kanjiskip}が挿入される．
+  \item 水平ボックス(\.{hbox})が和文文字で開始しており，そのボックスの直前が
+    和文文字であった場合，ボックスの直前に\.{kanjiskip}が挿入される．
+  \item 水平ボックス(\.{hbox})が和文文字で終了しており，そのボックスの直後が
+    和文文字であった場合，ボックスの直後に\.{kanjiskip}が挿入される．
   \item 連続した和文文字の間にペナルティがあった場合，暗黙の\.{kanjiskip}が
-	挿入されないので明示的にノードが作られる．
+    挿入されないので明示的にノードが作られる．
  \end{itemize}
 \end{dangerous}
 \begin{dangerous}
@@ -249,22 +249,22 @@ e-mail: \texttt{issue(at)texjp.org}}}
   
   \medskip\noindent
   \begin{minipage}{.6\linewidth}
-	\begin{verbatim}
-	\hbox to 15zw{%
-	  \kanjiskip=0pt plus 1fil 
-	  あ「い」うえ，お}
-	\end{verbatim}
+  \begin{verbatim}
+  \hbox to 15zw{%
+    \kanjiskip=0pt plus 1fil
+    あ「い」うえ，お}
+  \end{verbatim}
   \end{minipage}
   \begin{minipage}{.3\linewidth}
-	\hbox to 15zw{%
-	  \kanjiskip=0pt plus 1fil 
-	  あ「い」うえ，お}
-  \end{minipage}\medskip
-  
+  \hbox to 15zw{%
+    \kanjiskip=0pt plus 1fil
+    あ「い」うえ，お}
+  \end{minipage}
+
   \noindent
-  のように\.{kanjiskip}に無限の伸長度を持たせることで均等割付を行おうとするコードを見かける
-  が，連続する和文文字の間にはメトリック由来の空白と\.{kanjiskip}は同時には入らないので，
-  上に書いたコードは不適切である．
+  のように\.{kanjiskip}に無限の伸長度を持たせることで均等割付を行おうとする
+  コードを見かけるが，連続する和文文字の間にはメトリック由来の空白と
+  \.{kanjiskip}は同時には入らないので，上に書いたコードは不適切である．
 \end{dangerous}
 
 \begin{cslist}
@@ -318,49 +318,52 @@ e-mail: \texttt{issue(at)texjp.org}}}
 
 \begin{cslist}
 \csitem[\.{autospacing}, \.{noautospacing}]
-連続する和文文字間に，標準で\.{kanjiskip}で指定されただけのグルーを挿入する(\.{autospacing})か
-挿入しない(\.{noautospacing})を設定する．
-段落途中でこの値を変えても影響はなく，段落終了時の値が段落全体にわたって用いられる．
+  連続する和文文字間に，標準で\.{kanjiskip}で指定されただけのグルーを
+  挿入する(\.{autospacing})か挿入しない(\.{noautospacing})を設定する．
+  段落途中でこの値を変えても影響はなく，段落終了時の値が段落全体にわたって用いられる．
 \csitem[\.{autoxspacing}, \.{noautoxspacing}]
-和文文字と欧文文字の間に，標準で\.{xkanjiskip}で指定されただけのグルーを挿入する(\.{autoxspacing})か
-挿入しない(\.{noautoxspacing})を設定する．
-段落途中でこの値を変えても影響はなく，段落終了時の値が段落全体にわたって用いられる．
+  和文文字と欧文文字の間に，標準で\.{xkanjiskip}で指定されただけのグルーを
+  挿入する(\.{autoxspacing})か挿入しない(\.{noautoxspacing})を設定する．
+  段落途中でこの値を変えても影響はなく，段落終了時の値が段落全体にわたって用いられる．
 \end{cslist}
 
 どちらの設定も標準では有効(\.{autospacing}, \.{autoxspacing})である．
 \begin{dangerous}
- すでに述べたように，\.{kanjiskip}の一部と\.{xkanjiskip}はノードの形で挿入される．
- \.{noautospacing}や\.{noautoxspacing}を指定しても，このノードの形での挿入自体は行われる
-（ただノードが\.{kanjiskip}や\.{xkanjiskip}の代わりに長さ0のグルーを表すだけ）．
+  すでに述べたように，\.{kanjiskip}の一部と\.{xkanjiskip}はノードの形で挿入される．
+  \.{noautospacing}や\.{noautoxspacing}を指定しても，このノードの形での挿入自体は行われる
+ （ただノードが\.{kanjiskip}や\.{xkanjiskip}の代わりに長さ0のグルーを表すだけ）．
 
- これにより，例えば\.{noautoxspacing}状況下で「\hbox{\noautoxspacing\verb+あa+}」と入力しても
- 間に長さ0のグルーがあるため「あ」と「a」の間で改行可能となることに注意．
+  これにより，例えば\.{noautoxspacing}状況下で「\hbox{\noautoxspacing\verb+あa+}」と
+  入力しても，間に長さ0のグルーがあるため「あ」と「a」の間で改行可能となることに注意．
 \end{dangerous}
 
 \begin{cslist}
- \csitem[\.{showmode}] \.{kanjiskip}の挿入や\.{xkanjiskip}の挿入が有効になっているか否かを
+\csitem[\.{showmode}]
+  \.{kanjiskip}の挿入や\.{xkanjiskip}の挿入が有効になっているか否かを
 \begin{verbatim}
 > auto spacing mode;
 > no auto xspacing mode.
 \end{verbatim}
-という形式（上の例では\.{autospacing}かつ\.{noautoxspacing}の状況）で端末やログに表示する．
+  という形式（上の例では\.{autospacing}かつ\.{noautoxspacing}の状況）で端末やログに表示する．
 
-\csitem[\.{inhibitglue}] この命令が実行された位置において，メトリック由来の空白の挿入を禁
- 止する．以下の点に注意．
+\csitem[\.{inhibitglue}]
+  この命令が実行された位置において，メトリック由来の空白の挿入を禁止する．以下の点に注意．
 \begin{itemize}
  \item メトリック由来の空白が挿入されないだけであり，
        その代わりに\.{kanjiskip}や\.{xkanjiskip}が挿入されることは禁止していない．
  \item 本命令は現在が（非限定，限定問わず）水平モードのときしか効力を発揮しない．
        段落が和文文字「\verb+【+」で始まり，その文字の直前にメトリック由来の空白が入ることを抑止
        したい場合は，次のように一旦段落を開始してから\.{inhibitglue}を実行する必要がある．
+ \item 数式モード内では単に無視されます。 % という挙動になっているらしい。
 \begin{verbatim}
 \leavevmode\inhibitglue 【
 \end{verbatim}
 \end{itemize}
 \end{cslist}
 \begin{dangerous}
- p\LaTeX~2017-10-28以降では，\.{inhibitglue}の短縮として\.{\char`\<}が次のように定義されている
-（\.{protected}は\eTeX 拡張の機能だが，現在では\LaTeX 自体が\eTeX 拡張を要求している）．
+  p\LaTeX~2017-10-28以降では，\.{inhibitglue}の短縮として\.{\char`\<}が次のように
+  定義されている（\.{protected}は\eTeX 拡張の機能だが，現在では\LaTeX 自体が
+  \eTeX 拡張を要求している）．
 \begin{verbatim}
 \protected\def\<{\ifvmode\leavevmode\fi\inhibitglue}
 \end{verbatim}
@@ -449,13 +452,13 @@ DtoU方向での数式ディレクションはそれぞれ非数式の場合と�
   \item 外部垂直モードの場合は，次の2点が同時に満たされる場合のみ実行可能である．
   \begin{itemize}
     \item current pageの中身にはボックス，罫線(|\hrule|)，
-    insertion~(|\insert|)はない．
-    言い換えれば，current pageの中身はあっても
-    マーク(|\mark|)かwhatsitのみ
-    \footnote{current pageの中身にグルー，カーン，ペナルティがあるのは，
+      insertion~(|\insert|)はない．
+      言い換えれば，current pageの中身はあっても
+      マーク(|\mark|)かwhatsitのみ
+      \footnote{current pageの中身にグルー，カーン，ペナルティがあるのは，
       それらの前にボックス，罫線，insertionが存在する場合にのみである．}．
     \item recent contributionの中身にもボックス，罫線，
-    insertionはない．
+      insertionはない．
   \end{itemize}
 
   違反すると次のようなエラーが出る．
@@ -523,28 +526,29 @@ DtoU方向での数式ディレクションはそれぞれ非数式の場合と�
 
 \begin{cslist}
 \csitem[\.{jfam}=<number>]
-現在の和文数式フォントファミリの番号を格納する
-\footnote{\pTeX,~\upTeX では0--15の範囲が許される．
+  現在の和文数式フォントファミリの番号を格納する
+  \footnote{\pTeX,~\upTeX では0--15の範囲が許される．
   \epTeX, \eupTeX では欧文の\.{fam}と共に0--255に範囲が拡張されている．}．
-現在の欧文数式ファミリの番号を格納する\.{fam}と原理的に同じ番号を指定することは
-原理的には可能だが，数式ファミリは和文・欧文共用であるので実際には
-異なる値を指定することになる．
+  現在の欧文数式ファミリの番号を格納する\.{fam}と原理的に同じ番号を指定することは
+  原理的には可能だが，数式ファミリは和文・欧文共用であるので実際には
+  異なる値を指定することになる．
 
-欧文フォントが設定されている数式ファミリの番号を\.{jfam}に指定し，数式中で和文文字を記述すると
+  欧文フォントが設定されている数式ファミリの番号を\.{jfam}に指定し，
+  数式中で和文文字を記述すると
 \begin{verbatim}
 ! Not two-byte family.
 \end{verbatim}
-というエラーが発生する．逆に，和文フォントが設定されているファミリの番号を
-\.{fam}に指定し，数式中に欧文文字を記述すると
+  というエラーが発生する．逆に，和文フォントが設定されているファミリの番号を
+  \.{fam}に指定し，数式中に欧文文字を記述すると
 \begin{verbatim}
 ! Not one-byte family.
 \end{verbatim}
-というエラーが発生する．
+  というエラーが発生する．
 
 \csitem[\.{jfont}, \.{tfont}]
-欧文フォントを定義したり，現在の欧文フォントを取得する\.{font}の和文版である．
-一応\.{jfont}が「和文の横組用フォント」の，\.{tfont}が「和文の縦組用フォント」のために
-用いる命令である．
+  欧文フォントを定義したり，現在の欧文フォントを取得する\.{font}の和文版である．
+  一応\.{jfont}が「和文の横組用フォント」の，\.{tfont}が「和文の縦組用フォント」のために
+  用いる命令である．
 \begin{itemize}
  \item フォントを定義する際は，欧文フォント・和文の横組用フォント・
        和文の縦組用のフォントのいずれも
@@ -555,25 +559,25 @@ DtoU方向での数式ディレクションはそれぞれ非数式の場合と�
 \end{itemize}
 
 \csitem[\.{kcatcode}<16-bit number>=<16--18>]
-\pTeX では，和文文字に16~($\mathit{kanji}$), 17~($\mathit{kana}$), 
-18~($\mathit{other\_kchar}$)のいずれかのカテゴリーコードを割り当てている．
-これらの値による動作の違いは次のようになる：
+  \pTeX では，和文文字に
+  16~($\mathit{kanji}$), 17~($\mathit{kana}$), 18~($\mathit{other\_kchar}$)の
+  いずれかのカテゴリーコードを割り当てている．
+  これらの値による動作の違いは次のようになる：
 \begin{itemize}
- \item \TeX82では，「複数文字からなる命令」(control word)には
-カテゴリーコードが11~($\mathit{letter}$)の文字しか使用できないことになっていたが，
-\pTeX では16,~17の和文文字も合わせて使用することが出来る．
-
-カテゴリーコードが18の和文文字はcontrol word中には使用できない
-\footnote{\.{」}のように一文字命令(control symbol)としての使用は可能である．}．
- \item 前で説明した\.{jcharwidowpenalty}は，カテゴリーコードが16,~17の和文文字の前にのみ
-挿入されうるもので，カテゴリーコードが18の和文文字の前には挿入されない．
+  \item \TeX82では，「複数文字からなる命令」(control word)には
+    カテゴリーコードが11~($\mathit{letter}$)の文字しか使用できないことになっていたが，
+    \pTeX では16,~17の和文文字も合わせて使用することが出来る．
+    カテゴリーコードが18の和文文字はcontrol word中には使用できない
+    \footnote{\.{」}のように一文字命令(control symbol)としての使用は可能である．}．
+  \item 前で説明した\.{jcharwidowpenalty}は，カテゴリーコードが16,~17の和文文字の前にのみ
+    挿入されうるもので，カテゴリーコードが18の和文文字の前には挿入されない．
 \end{itemize}
 
-\.{kcatcode}はDVI中の上位バイト（すなわち，JISコードでいう区ごと）に値が設定可能である．
-初期状態では1,~2, 7--15, 85--94区の文字が18，3--6区の文字が17，16--84区の文字が16である．
+  \.{kcatcode}はDVI中の上位バイト（すなわち，JISコードでいう区ごと）に値が設定可能である．
+  初期状態では1,~2, 7--15, 85--94区の文字が18，3--6区の文字が17，16--84区の文字が16である．
 \end{cslist}
 \begin{dangerous}
- \upTeX においては，\.{kcatcode}は大きく仕様変更されている．
+  \upTeX においては，\.{kcatcode}は大きく仕様変更されている．
 \end{dangerous}
 
 \section{文字コード変換，漢数字}
@@ -653,26 +657,24 @@ p3.1.2で復活したという経緯がある．}．
 \end{cslist}
 
 \begin{dangerous}
- より正確に言えば，\texttt{zw}, \texttt{zh}はそれぞれ
- 標準の文字クラス（文字クラス0）に属する和文文字の幅，高さと深さの和を表す．
+  より正確に言えば，\texttt{zw}, \texttt{zh}はそれぞれ
+  標準の文字クラス（文字クラス0）に属する和文文字の幅，高さと深さの和を表す．
 
- {\makeatletter\jfont\test=min10\test\xdef\mzw{\strip@pt\dimexpr1zw}\xdef\mzh{\strip@pt\dimexpr1zh}}%
- ただ，\pTeX の標準和文フォントメトリックの一つである\texttt{min10.tfm}では，
- $1\,\mathrm{zw}=\mzw\,\mathrm{pt}$, 
- $1\,\mathrm{zh}=\mzh\,\mathrm{pt}$となっており，両者の値は一致していない．
- JISフォントメトリックでも同様の寸法となっている．
- % 単位\texttt{zh}を使うことは……．% どういう言い回しにするのが良い？
- % -- 以下のようにしてみました．どうでしょう？（山下）
- 一方，実際の表示に使われる和文フォントの多くは，$1\,\mathrm{zw}=1\,\mathrm{zh}$，
- すなわち正方形のボディに収まるようにデザインされているから，これと合致しない．
- したがって，単位\texttt{zh}はあまり意味のある値とはいえない．
+  {\makeatletter\jfont\test=min10\test\xdef\mzw{\strip@pt\dimexpr1zw}\xdef\mzh{\strip@pt\dimexpr1zh}}%
+  ただ，\pTeX の標準和文フォントメトリックの一つである\texttt{min10.tfm}では，
+  $1\,\mathrm{zw}=\mzw\,\mathrm{pt}$, $1\,\mathrm{zh}=\mzh\,\mathrm{pt}$と
+  なっており，両者の値は一致していない．
+  JISフォントメトリックでも同様の寸法となっている．
+  一方，実際の表示に使われる和文フォントの多くは，$1\,\mathrm{zw}=1\,\mathrm{zh}$，
+  すなわち正方形のボディに収まるようにデザインされているから，これと合致しない．
+  したがって，単位\texttt{zh}はあまり意味のある値とはいえない．
 
- なお，japanese-otf（OTFパッケージ）が用いているフォントメトリックは
- $1\,\mathrm{zw}=1\,\mathrm{zh}$である．
+  なお，japanese-otf（OTFパッケージ）が用いているフォントメトリックは
+  $1\,\mathrm{zw}=1\,\mathrm{zh}$である．
 \end{dangerous}
 
 \begin{cslist}
- \csitem[\texttt{Q}\index{Q=\texttt{Q}}, \texttt{H}\index{H=\texttt{H}}]
+\csitem[\texttt{Q}\index{Q=\texttt{Q}}, \texttt{H}\index{H=\texttt{H}}]
   両者とも$0.25\,\mathrm{mm}$~($7227/10160\,\mathrm{sp}$)を意味する．
   写植機における文字の大きさの単位であるQ数（級数）と，字送り量や行送り量の単位である歯数に由来する．
 \end{cslist}
@@ -680,7 +682,7 @@ p3.1.2で復活したという経緯がある．}．
 \section{バージョン番号}
 
 \begin{cslist}
-  \csitem[\.{ptexversion}, \.{ptexminorversion}, \.{ptexrevision}]
+\csitem[\.{ptexversion}, \.{ptexminorversion}, \.{ptexrevision}]
   \pTeX のバージョン番号はp$x{.}y{.}z$の形式となっており，それらを取得するための命令である．
   \.{ptexversion}, \.{ptexminorversion}は
   それぞれ$x$,~$y$の値を内部整数で返し，\.{ptexrevision}はその後ろの「${.}z$」を文字列で返す．
