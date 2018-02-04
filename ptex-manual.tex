@@ -351,10 +351,10 @@ e-mail: \texttt{issue(at)texjp.org}}}
 \begin{itemize}
  \item メトリック由来の空白が挿入されないだけであり，
        その代わりに\.{kanjiskip}や\.{xkanjiskip}が挿入されることは禁止していない．
- \item 本命令は現在が（非限定，限定問わず）水平モードのときしか効力を発揮しない．
+ \item 本命令は現在が（非限定，限定問わず）水平モードのときしか効力を発揮しない
+       （数式モードでも効かない）．
        段落が和文文字「\verb+【+」で始まり，その文字の直前にメトリック由来の空白が入ることを抑止
        したい場合は，次のように一旦段落を開始してから\.{inhibitglue}を実行する必要がある．
- \item 数式モード内では単に無視されます。 % という挙動になっているらしい。
 \begin{verbatim}
 \leavevmode\inhibitglue 【
 \end{verbatim}
