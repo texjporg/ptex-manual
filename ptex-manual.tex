@@ -48,7 +48,7 @@
 \font\man=manfnt at 10pt
 \def\dbend{\raise0pt\hbox{\man\char'177}}
 \AtBeginDvi{\special{pdf:mapfile otf-ipaex.map}}
-
+\def\>{\ifhmode\hskip\xkanjiskip\fi}
 \normalsize
 \bigskipamount=\baselineskip
 \medskipamount=.5\baselineskip
@@ -56,6 +56,11 @@
 
 \usepackage{etoolbox}
 \patchcmd\@verbatim\@totalleftmargin{\dimexpr\@totalleftmargin+2zw\relax}{}{}
+\patchcmd\quote{\list{}}{\par\medskip\list{\topsep\z@}}{}{}
+\patchcmd\endquote{\endlist}{\endlist\medskip}{}{}
+\patchcmd\@verbatim{\trivlist}{\trivlist\addvspace\medskipamount}{}{}
+\patchcmd\endverbatim{\endtrivlist}{\endtrivlist\addvspace\medskipamount}{}{}
+\expandafter\let\csname endverbatim*\endcsname =\endverbatim
 
 \newenvironment{dangerous}{%
   \ifnum\@listdepth>\z@
@@ -112,7 +117,7 @@
 \author{日本語\TeX 開発コミュニティ\null
 \thanks{\url{https://texjp.org},\ 
 e-mail: \texttt{issue(at)texjp.org}}}
-\date{version p3.8.0，\today}
+\date{version p\the\ptexversion.\the\ptexminorversion\ptexrevision，\today}
 \maketitle
 
 \tableofcontents
@@ -179,7 +184,7 @@ e-mail: \texttt{issue(at)texjp.org}}}
 禁則テーブルには256文字分の領域しかないので，
 禁則ペナルティを指定できる文字数は最大で256文字までである．
 
-禁則テーブルからの登録の削除はペナルティ値0をグローバルに（つまり，|\global|を用いて）
+禁則テーブルからの登録の削除はペナルティ値0をグローバルに（つまり，\.{global}を用いて）
 設定することによって行われる\footnote{0をローカルに設定した場合でも，その設定が最も外側のグループ
 （\eTeX 拡張でいう\.{currentgrouplevel}が0のとき）には削除される．
 「ローカルで削除された場所に別の禁則ペナルティ設定がグローバルで行われる」ことが
@@ -246,15 +251,15 @@ e-mail: \texttt{issue(at)texjp.org}}}
 \end{dangerous}
 \begin{dangerous}
   しばしば
-  
-  \medskip\noindent
+
+  \medskip
   \begin{minipage}{.6\linewidth}
   \begin{verbatim}
   \hbox to 15zw{%
     \kanjiskip=0pt plus 1fil
     あ「い」うえ，お}
   \end{verbatim}
-  \end{minipage}
+  \end{minipage}\hfill
   \begin{minipage}{.3\linewidth}
   \hbox to 15zw{%
     \kanjiskip=0pt plus 1fil
@@ -275,8 +280,8 @@ e-mail: \texttt{issue(at)texjp.org}}}
 \end{cslist}
 \begin{dangerous}
   \.{kanjiskip}と異なり，\.{xkanjiskip}はノードの形で挿入される．
-  この挿入処理は段落の行分割処理の直前や，|\hbox|を閉じるときに行われるので，
-  「どこに\.{xkanjiskip}が入っているか」を知るためには現在の段落や|\hbox|を
+  この挿入処理は段落の行分割処理の直前や，\.{hbox}を閉じるときに行われるので，
+  「どこに\.{xkanjiskip}が入っているか」を知るためには現在の段落や\.{hbox}を
   終了させる必要がある．
 \end{dangerous}
 
@@ -359,6 +364,10 @@ e-mail: \texttt{issue(at)texjp.org}}}
 \leavevmode\inhibitglue 【
 \end{verbatim}
 \end{itemize}
+% ======== inhibit_flag_list branch
+\csitem[\.{disinhibitglue}]
+  この命令が実行された位置において，\.{inhibitglue}を無効化する．
+% ========
 \end{cslist}
 \begin{dangerous}
   p\LaTeX~2017-10-28以降では，\.{inhibitglue}の短縮として\.{\char`\<}が次のように
@@ -369,6 +378,47 @@ e-mail: \texttt{issue(at)texjp.org}}}
 \end{verbatim}
 \end{dangerous}
 
+% ======== inhibit_flag_list branch
+\pTeX~p3.*.*では，\.{inhibitglue}の有効範囲について大きな変更が行われた．
+これより前の\pTeX では\.{inhibitglue}が有効か否かを表すフラグは一つの
+グローバル変数であったが，\pTeX~p3.*.*では\.{spacefactor}の扱いに倣い，
+各リストごとにフラグを持つようになり，以下のような仕様となった：
+
+\begin{itemize}
+ \item 和文文字トークン$t$の直後にある\.{inhibitglue}は，
+  $t$の直後のJFMグルーの挿入を抑止する．
+ \item リストに文字，ボックス，罫線，insertionなどのノードを追加した場合には
+  \.{inhibitglue}は無効状態へとリセットされる．
+ \item ノードを生成しない命令（\.{relax}や\>|{}|，それに代入命令など）によっては
+  \.{inhibitglue}の状態はリセットされない．
+\end{itemize}
+
+\begin{dangerous}
+  この仕様を理解すれば，
+  
+  \begin{quote}
+  \noindent
+  \begin{minipage}{.6\linewidth}
+  \verb+）\inhibitglue\relax・あ+
+  \end{minipage}\hfill
+  \begin{minipage}{.3\linewidth}
+  ）\inhibitglue\relax・あ
+  \end{minipage}
+  \end{quote}
+  
+  によって「）」と「・」の間に空白が入らないことが理解できるだろう．
+  \begin{enumerate}
+	\item 「）」の直後にある\.{inhibitglue}のため，本来ならば
+	（「）」と「\.{relax}」の間に入る）二分空きは入らない．
+	\item \.{relax}によって\.{inhibitglue}は無効化されない．
+	\item 従って，本来ならば「\.{relax}」と「・」の間に挿入される
+	四分空きも，結果的には挿入されないこととなる．
+	\item 「・」がノードとして現在のリストに追加されることで
+	\.{inhibitglue}は無効状態にリセットされる．
+	従って，「・」と「あ」の間にはJFM通り四分空きがきちんと挿入される．
+  \end{enumerate}
+\end{dangerous}
+% ========
 
 \section{組方向}
 
@@ -433,7 +483,7 @@ DtoU方向での数式ディレクションはそれぞれ非数式の場合と�
   組方向の変更は，原則として作成中のリストやボックスに何のノードも作られていない
   状態でのみ許される．より詳細には，
 \begin{itemize}
-  \item 制限水平モード(|\hbox|)，内部垂直モード(|\vbox|)では，
+  \item 制限水平モード(\.{hbox})，内部垂直モード(\.{vbox})では，
   上記に述べた原則通り．
 \begin{verbatim}
   \hbox{\hsize=20em\tate ……}
@@ -451,10 +501,10 @@ DtoU方向での数式ディレクションはそれぞれ非数式の場合と�
 
   \item 外部垂直モードの場合は，次の2点が同時に満たされる場合のみ実行可能である．
   \begin{itemize}
-    \item current pageの中身にはボックス，罫線(|\hrule|)，
-      insertion~(|\insert|)はない．
+    \item current pageの中身にはボックス，罫線(\.{hrule})，
+      insertion~(\.{insert})はない．
       言い換えれば，current pageの中身はあっても
-      マーク(|\mark|)かwhatsitのみ
+      マーク(\.{mark})かwhatsitのみ
       \footnote{current pageの中身にグルー，カーン，ペナルティがあるのは，
       それらの前にボックス，罫線，insertionが存在する場合にのみである．}．
     \item recent contributionの中身にもボックス，罫線，
