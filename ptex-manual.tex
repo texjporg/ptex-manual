@@ -48,7 +48,7 @@
 \font\man=manfnt at 10pt
 \def\dbend{\raise0pt\hbox{\man\char'177}}
 \AtBeginDvi{\special{pdf:mapfile otf-ipaex.map}}
-
+\def\>{\ifhmode\hskip\xkanjiskip\fi}
 \normalsize
 \bigskipamount=\baselineskip
 \medskipamount=.5\baselineskip
@@ -56,6 +56,11 @@
 
 \usepackage{etoolbox}
 \patchcmd\@verbatim\@totalleftmargin{\dimexpr\@totalleftmargin+2zw\relax}{}{}
+\patchcmd\quote{\list{}}{\par\medskip\list{\topsep\z@}}{}{}
+\patchcmd\endquote{\endlist}{\endlist\medskip}{}{}
+\patchcmd\@verbatim{\trivlist}{\trivlist\addvspace\medskipamount}{}{}
+\patchcmd\endverbatim{\endtrivlist}{\endtrivlist\addvspace\medskipamount}{}{}
+\expandafter\let\csname endverbatim*\endcsname =\endverbatim
 
 \newenvironment{dangerous}{%
   \ifnum\@listdepth>\z@
@@ -112,7 +117,7 @@
 \author{日本語\TeX 開発コミュニティ\null
 \thanks{\url{https://texjp.org},\ 
 e-mail: \texttt{issue(at)texjp.org}}}
-\date{version p3.8.0，\today}
+\date{version p\the\ptexversion.\the\ptexminorversion\ptexrevision，\today}
 \maketitle
 
 \tableofcontents
@@ -179,7 +184,7 @@ e-mail: \texttt{issue(at)texjp.org}}}
 禁則テーブルには256文字分の領域しかないので，
 禁則ペナルティを指定できる文字数は最大で256文字までである．
 
-禁則テーブルからの登録の削除はペナルティ値0をグローバルに（つまり，|\global|を用いて）
+禁則テーブルからの登録の削除はペナルティ値0をグローバルに（つまり，\.{global}を用いて）
 設定することによって行われる\footnote{0をローカルに設定した場合でも，その設定が最も外側のグループ
 （\eTeX 拡張でいう\.{currentgrouplevel}が0のとき）には削除される．
 「ローカルで削除された場所に別の禁則ペナルティ設定がグローバルで行われる」ことが
@@ -246,15 +251,15 @@ e-mail: \texttt{issue(at)texjp.org}}}
 \end{dangerous}
 \begin{dangerous}
   しばしば
-  
-  \medskip\noindent
+
+  \medskip
   \begin{minipage}{.6\linewidth}
   \begin{verbatim}
   \hbox to 15zw{%
     \kanjiskip=0pt plus 1fil
     あ「い」うえ，お}
   \end{verbatim}
-  \end{minipage}
+  \end{minipage}\hfill
   \begin{minipage}{.3\linewidth}
   \hbox to 15zw{%
     \kanjiskip=0pt plus 1fil
@@ -275,8 +280,8 @@ e-mail: \texttt{issue(at)texjp.org}}}
 \end{cslist}
 \begin{dangerous}
   \.{kanjiskip}と異なり，\.{xkanjiskip}はノードの形で挿入される．
-  この挿入処理は段落の行分割処理の直前や，|\hbox|を閉じるときに行われるので，
-  「どこに\.{xkanjiskip}が入っているか」を知るためには現在の段落や|\hbox|を
+  この挿入処理は段落の行分割処理の直前や，\.{hbox}を閉じるときに行われるので，
+  「どこに\.{xkanjiskip}が入っているか」を知るためには現在の段落や\.{hbox}を
   終了させる必要がある．
 \end{dangerous}
 
@@ -369,7 +374,6 @@ e-mail: \texttt{issue(at)texjp.org}}}
 \end{verbatim}
 \end{dangerous}
 
-
 \section{組方向}
 
 % ptexdoc.tex の「ディレクション」を簡略化
@@ -433,7 +437,7 @@ DtoU方向での数式ディレクションはそれぞれ非数式の場合と�
   組方向の変更は，原則として作成中のリストやボックスに何のノードも作られていない
   状態でのみ許される．より詳細には，
 \begin{itemize}
-  \item 制限水平モード(|\hbox|)，内部垂直モード(|\vbox|)では，
+  \item 制限水平モード(\.{hbox})，内部垂直モード(\.{vbox})では，
   上記に述べた原則通り．
 \begin{verbatim}
   \hbox{\hsize=20em\tate ……}
@@ -451,10 +455,10 @@ DtoU方向での数式ディレクションはそれぞれ非数式の場合と�
 
   \item 外部垂直モードの場合は，次の2点が同時に満たされる場合のみ実行可能である．
   \begin{itemize}
-    \item current pageの中身にはボックス，罫線(|\hrule|)，
-      insertion~(|\insert|)はない．
+    \item current pageの中身にはボックス，罫線(\.{hrule})，
+      insertion~(\.{insert})はない．
       言い換えれば，current pageの中身はあっても
-      マーク(|\mark|)かwhatsitのみ
+      マーク(\.{mark})かwhatsitのみ
       \footnote{current pageの中身にグルー，カーン，ペナルティがあるのは，
       それらの前にボックス，罫線，insertionが存在する場合にのみである．}．
     \item recent contributionの中身にもボックス，罫線，
