@@ -1,26 +1,26 @@
 # ptex-manual
 
-This is a project of preparing a manual of pTeX.
-This repository will be only temporary.
+This is a project of preparing a manual of Japanese pTeX.
+Currently only Japanese version available.
 
-## このリポジトリの目的
+## この pTeX マニュアルについて
 
 [ptex-base issue #2](https://github.com/texjporg/ptex-base/issues/2)
 での議論を機に，pTeX のドキュメント化を進めようという取り組みです。
-手始めにプリミティブの一覧を作成しようと考えています。
+まだ作成途中ですのでご注意ください。
 
-最終的には
-[ptex-base repository](https://github.com/texjporg/ptex-base)
-の一部に含める予定ですが，そちらは ISO-2022-JP エンコーディングにしているため
-GitHub 上で文字化けして読みづらくなっています。
-そこで，新規ドキュメントの準備をある程度こちらのリポジトリ
+## Repository
+
+The bundle is maintained on GitHub:
 https://github.com/texjporg/ptex-manual
-で行い，一定の成果物となった段階で ptex-base リポジトリにインストールします。
-UTF-8 encoding なので，GitHub で読みやすくなっています。
 
 ## License
 
 The bundle may be distributed and/or modified under the terms of
 the 3-clause BSD license (see [LICENSE](./LICENSE)).
+
+## Release Date
+
+$RELEASEDATE
 
 Japanese TeX Development Community
