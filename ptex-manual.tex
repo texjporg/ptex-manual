@@ -375,7 +375,7 @@ This is pTeX, Version 3.14159265-p3.8.0 (utf8.euc) (TeX Live 2018)
 \end{dangerous}
 
 \begin{cslist}
-\csitem[\.{xkanjiskip}]
+\csitem[\.{xkanjiskip}=<skip>]
   和文文字と欧文文字の間に標準で入るグルーを設定する．
   段落途中でこの値を変えても影響はなく，
   段落終了時の値が段落全体にわたって用いられる．  
@@ -687,7 +687,7 @@ DtoU方向での数式ディレクションはそれぞれ非数式の場合と�
 ベースライン補正量をどうするかを常に気にしないといけない．
 例えば次のコードを考える：
 \begin{verbatim}
- \ybaselineshift=10pt\scriptbaselineshifyfactor=700
+ \ybaselineshift=10pt\scriptbaselineshiftfactor=700
  漢字pqr$a\hbox{xあ}^{%
   b\hbox{\scriptsize yう}
    \hbox{\scriptsize\ybaselineshift=7pt zえ}
