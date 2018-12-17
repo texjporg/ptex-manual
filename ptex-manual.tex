@@ -2,7 +2,8 @@
 \documentclass[a4paper,11pt,nomag]{jsarticle}
 \usepackage[textwidth=42zw,lines=40,truedimen,centering]{geometry}
 \usepackage{amsmath}
-\usepackage{array}\usepackage[arrow]{xy}
+\usepackage{array}\usepackage[all]{xy}
+\SelectTips{cm}{}
 %\usepackage[dvipdfmx]{graphicx}
 \usepackage[T1]{fontenc}
 \usepackage{booktabs,enumitem,multicol}
@@ -134,6 +135,10 @@
     \fi
   \fi}
 
+\def\tsp{_{\mbox{\fontsize\sf@size\z@\ttfamily \char32}}}
+\def\tpar{_{\mbox{\fontsize\sf@size\z@\ttfamily \string\par}}}
+\def\tign{_{\mbox{\fontsize\sf@size\z@\selectfont --}}}
+
 
 \usepackage{shortvrb}
 \MakeShortVerb*{|}
@@ -166,6 +171,58 @@ e-mail: \texttt{issue(at)texjp.org}}}
 
 ここでは，\pTeX の日本語組版の概略と，それを実現するために導入された
 プリミティブを説明する．
+
+\section{和文文字の入力と\.{kcatcode}}
+\TeX82では，各文字に0--15のカテゴリーコードを割り当てており，
+\TeX82の入力プロセッサは「どのカテゴリーコードの文字が来たか」で状態が遷移する
+有限オートマトンとして記述できる(\cite{topic})．
+\pTeX では，和文文字は16, 17, 18のカテゴリーコードの3つのいずれかが
+割り当てられており，\pTeX の入力プロセッサの状態遷移図は
+\autoref{fig:ptex_input}のように\TeX82のそれを拡張したものになっている．
+
+\begin{figure}[b]
+\[
+\entrymodifiers={++[o][F-]}
+\xymatrix{%
+  *\txt{}&*\txt{}&*\txt{}&*\txt{}\\
+  *\txt{}\ar[r]&
+  \textit{N} \ar@(ur,ul)[rr]^{1,2,7,13,E}
+  \ar[u]^{5\tpar, 14}
+  \ar@(d,l)[]^{9\tign,10\tign}
+  \ar@/_3em/[ddrr]^(0.55){J}
+  \ar[dr]^(0.4){0}&*\txt{}
+  &\textit{M}
+  \ar[u]^-{5\tsp,14}\ar@/_.5em/[dd]_(0.7){J}
+  \ar@/_3em/[lldd]_(0.85){10}
+  \ar@(u,r)[]^{1,2,7,9\tign,13,E}
+  \ar@/_1ex/[dl]_0&*\txt{}\\
+  *\txt{}&*\txt{}&*+[F-]\txt{\mbox{制御綴読み取り}}
+  \ar@{-->}@/^.5em/[dl]\ar@{-->}@/_1ex/[ur]\\
+  *\txt{}&
+  \textit{S}\ar@/^.5em/[ur]^-(0.4){0}
+  \ar[d]^-{5,14}
+  \ar@(d,l)^{9\tign,10\tign}
+  \ar@(d,d)@/_3em/[rr]_{J}
+  \ar@/_3em/[uurr]_(0.3){1,2,7,13,E}&*\txt{}&
+  \textit{K}\ar[ul]^(0.3){0}\ar@/_.5em/[uu]_{7,13,E}
+  \ar@/^1.5em/[ll]^{10}
+  \ar@(d,r)[]_{1,2,9\tign,J}
+  \ar[d]_-{5,14}
+  &*\txt{}\\
+  *\txt{}&*\txt{}&*\txt{}&*\txt{}  
+%  
+}
+\]
+\begin{itemize}
+  \item 矢印の上下に書いた数字はカテゴリーコードを表す．
+  \item ``E''はカテゴリーコード3, 4, 6, 8, 11, 12の文字達を，
+  ``J''は和文文字を表す．
+  \item ``$5\tpar$''のような下付き添字は「挿入するトークン」を表している．
+  但し，``$9\tign$'', ``$10\tign$''はその文字を無視することを示している．
+\end{itemize}
+\caption{\pTeX の入力プロセッサの状態遷移図}
+\label{fig:ptex_input}
+\end{figure}
 
 \section{文字コードの指定}
 \TeX82では「文字コードの範囲」は0--255であった．
@@ -957,6 +1014,8 @@ p3.1.2で復活したという経緯がある．}．
  \bibitem{tatemath} aminophen, 「縦数式ディレクションとベースライン補正」，
   2016/09/05,\\
   \url{https://github.com/texjporg/platex/issues/22}
+ \bibitem{topic} Victor Eijkhout, \textit{\TeX\ by Topic, A \TeX nician's Reference},
+  Addison-Wesley, 1992. \url{https://www.eijkhout.net/texbytopic/texbytopic.html}
 \end{thebibliography}
 
 \newpage
