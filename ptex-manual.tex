@@ -1048,11 +1048,11 @@ p3.1.2で復活したという経緯がある．}．
 \begin{cslist}
  \csitem[\.{char} <character code>, 
    \.{chardef} <control sequence>=<character code>]
- 引数として0--255に加えて和文文字の内部コードも指定できる．
- 和文文字の内部コードを指定した場合は和文文字を出力する．
-\csitem[\.{accent} <character code>=<character>]
- |\accent|プリミティブにおいても，アクセントの部分に和文文字の内部コードを指定できるほか，
- アクセントのつく親文字を和文文字にすることもできる．
+  引数として0--255に加えて和文文字の内部コードも指定できる．
+  和文文字の内部コードを指定した場合は和文文字を出力する．
+ \csitem[\.{accent} <character code>=<character>]
+  |\accent|プリミティブにおいても，アクセントの部分に和文文字の内部コードを指定できるほか，
+  アクセントのつく親文字を和文文字にすることもできる．
 \end{cslist}
 
  \begin{itemize}
@@ -1068,6 +1068,13 @@ p3.1.2で復活したという経緯がある．}．
 	       （ただし|\kanjiskip|, |\xkanjiskip|は挿入されうる）．
 	\end{itemize}
  \end{itemize}
+
+\begin{cslist}
+ \csitem[\.{if} <token$_1$> <token$_2$>, \.{ifcat} <token$_1$> <token$_2$>]
+  文字トークンを指定する場合，その文字コードは\TeX82では0--255のみが許されるが，
+  \pTeX では和文文字トークンも指定することができる．
+  [TODO] どの条件を満たすときにtrueになるか？
+\end{cslist}
 
 \begin{thebibliography}{99}
  \bibitem{topic} Victor Eijkhout, \textit{\TeX\ by Topic, A \TeX nician's Reference},
