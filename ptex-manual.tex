@@ -1073,8 +1073,38 @@ p3.1.2で復活したという経緯がある．}．
  \csitem[\.{if} <token$_1$> <token$_2$>, \.{ifcat} <token$_1$> <token$_2$>]
   文字トークンを指定する場合，その文字コードは\TeX82では0--255のみが許されるが，
   \pTeX では和文文字トークンも指定することができる．
-  [TODO] どの条件を満たすときにtrueになるか？
+
+  |\if|による判定では，欧文文字トークン・和文文字トークンともに
+  その文字コードが比較される．
+  |\ifcat|による判定では，欧文文字トークンについては|\catcode|，
+  和文文字トークンについては|\kcatcode|が比較される．
+  % [TODO] TeX Live 2018 の upTeX では，
+  % ^^ab 形式での文字コード指定は欧文扱いされるので，
+  % \ifcat 判定では \catcode が読み出される．
+  % 例えば \showthe\kcatcode`^^b0 では 18 が返るが，
+  % 和文扱いはされないことに注意．
+  % https://github.com/texjporg/tex-jp-build/issues/68
 \end{cslist}
+
+\begin{dangerous}
+\TeX bookには，オリジナルの\TeX における|\if|と|\ifcat|の説明として
+\begin{quote}
+If either token is a control sequence,
+\TeX\ considers it to have character code 256 and category code 16,
+unless the current equivalent of that control sequence
+has been |\let| equal to a non-active character token.
+\end{quote}
+とある．すなわち
+\begin{quote}
+|\if|や|\ifcat|の判定では（実装の便宜上）
+コントロールシークエンスは文字コード256，
+カテゴリーコード16を持つとみなされる
+\end{quote}
+というのである．ところが，tex.webの実装はこの通りでなく，
+コントロールシークエンスをカテゴリーコード0とみなしている．
+そのため，\pTeX 系列において和文文字トークンの|\kcatcode|の値が
+16である場合も，|\ifcat|判定でコントロールシークエンスと混同されることはない．
+\end{dangerous}
 
 \begin{thebibliography}{99}
  \bibitem{topic} Victor Eijkhout, \textit{\TeX\ by Topic, A \TeX nician's Reference},
