@@ -174,17 +174,21 @@ e-mail: \texttt{issue(at)texjp.org}}}
 
 \section{\pTeX で利用可能な文字}
 
-\TeX82は，扱える文字コードの範囲は0--255であった．
-\pTeX では，これに加えてJIS X 0208の範囲の文字を扱うことができる．
-
-\pTeX が扱う文字集合は，欧文文字と和文文字に区別される．
+\TeX82で扱える文字コードの範囲は0--255であった．
+\pTeX ではこれに加えてJIS X 0208の文字も利用可能であり，
+以上の文字集合が欧文文字と和文文字に区別されて扱われる．
 
 [TODO] 欧文文字とは何か，和文文字とは何か
 
-入力ファイルの文字コードがUTF-8の場合，JIS X 0208にない文字は
-UTF-8のバイト列として読み込まれる．
+% https://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=460#p2422
+% あたりによると，以下のようになるが，今も正しいのか？
+%
+% \pTeX への入力は，「7ビットASCII文字集合」に「ISO-2022-JP (jis)，EUC-JP (euc)，
+% Shift-JIS (sjis)またはUTF-8 (utf8)のいずれかでエンコードされた
+% JIS X 0208の文字集合」を加えたものとして解釈される．
 
-\pTeX の内部コードはEUC-JPかShift-JISのいずれかである．和文文字の内部コードとして
+\pTeX は，入力をEUC-JPまたはShift-JISのいずれか（後述）の
+内部コードに変換して取り扱う．和文文字の内部コードとして
 許される整数は$256c_1+c_2$，但し$c_i\in C_i$であり，ここで
 \begin{description}
  \item[内部コードがEUC-JPのとき]
@@ -195,7 +199,18 @@ UTF-8のバイト列として読み込まれる．
 \end{description}
 である．
 
-\pTeX の内部コードは\pTeX 起動時のバナーから分かる．例えば
+% この内部コードのパターンに合えば和文文字として扱われ，
+% 合わなければ欧文文字として扱われる，でよい？
+
+% http://tutimura.ath.cx/ptexlive/?ptexenc%2FDetails
+% http://ajt.ktug.org/assets/2008/5/1/0201tsuchimura_kuroki.pdf
+% https://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=460
+
+入力ファイルの文字コードがUTF-8の場合，JIS X 0208にない文字は
+UTF-8のバイト列として読み込まれる．
+
+\pTeX の入力ファイルの文字コードと内部コードは\pTeX 起動時の
+バナーから分かる．例えば
 \begin{verbatim}
 This is pTeX, Version 3.14159265-p3.8.0 (utf8.euc) (TeX Live 2018)
 (preloaded format=ptex)
