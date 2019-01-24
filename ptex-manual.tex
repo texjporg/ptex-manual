@@ -172,6 +172,76 @@ e-mail: \texttt{issue(at)texjp.org}}}
 ここでは，\pTeX の日本語組版の概略と，それを実現するために導入された
 プリミティブを説明する．
 
+\section{\pTeX で利用可能な文字}
+
+\TeX82は，扱える文字コードの範囲は0--255であった．
+\pTeX では，これに加えてJIS X 0208の範囲の文字を扱うことができる．
+
+\pTeX が扱う文字集合は，欧文文字と和文文字に区別される．
+
+[TODO] 欧文文字とは何か，和文文字とは何か
+
+入力ファイルの文字コードがUTF-8の場合，JIS X 0208にない文字は
+UTF-8のバイト列として読み込まれる．
+
+\pTeX の内部コードはEUC-JPかShift-JISのいずれかである．和文文字の内部コードとして
+許される整数は$256c_1+c_2$，但し$c_i\in C_i$であり，ここで
+\begin{description}
+ \item[内部コードがEUC-JPのとき]
+    $C_1=C_2=\{\hex{a1},\dots,\hex{fe}\}$.
+ \item[内部コードがShift-JISのとき]
+    $C_1=\{\hex{81},\dots,\hex{9f}\}\cup\{\hex{e0},\dots,\hex{fc}\}$,\\
+    $C_2=\{\hex{40},\dots,\hex{7e}\}\cup\{\hex{80},\dots,\hex{fc}\}$.
+\end{description}
+である．
+
+\pTeX の内部コードは\pTeX 起動時のバナーから分かる．例えば
+\begin{verbatim}
+This is pTeX, Version 3.14159265-p3.8.0 (utf8.euc) (TeX Live 2018)
+(preloaded format=ptex)
+\end{verbatim}
+というバナーの場合は，|(utf8.euc)| から
+\begin{itemize}
+ \item 入力ファイルの（既定）文字コードはUTF-8（但し，JIS X 0208の範囲内）
+ \item \pTeX の内部コードはEUC-JP
+\end{itemize}
+という情報が見て取れる．入力ファイルの文字コードと内部コードが同じ場合は，
+\begin{verbatim}
+This is pTeX, Version 3.14159265-p3.8.0 (sjis) (TeX Live 2018)
+(preloaded format=ptex)
+\end{verbatim}
+のように表示される（この例は，入力ファイルの文字コードと内部コードが
+ともにShift-JISの場合）．
+
+[TODO] \pTeX の内部コードはEUC-JPかShift-JISのいずれかであるが，
+DVIファイル内の和文文字コードとしてはJISコードを出力する．
+
+\section{文字コードの取得と指定}
+
+\pTeX でも\TeX82と同様に，
+バッククオート(|`|)を使って「|`あ|」のようにして和文文字の内部コードを
+内部整数として得ることができる．欧文文字については，1文字の制御綴を
+代わりに指定することができた（例えば，「|`b|」と「|`\b|」は同じ意味だった）が，
+同じことを和文文字に対して「|`\あ|」などと行うことはできない．
+
+\pTeX では「文字コードを引数にとるプリミティブ」といっても，状況によって
+\begin{itemize}
+ \item 欧文文字の文字コード0--255をとる（例：|\catcode|）
+ \item 和文文字の内部コードをとる（例：|\inhibitxspcode|）
+ \item 上記2つのどちらでもとれる（例：|\prebreakpenalty|）
+\end{itemize}
+のいずれの場合もありうる．
+
+\medskip
+
+本ドキュメントでは上のどれかを明示するために，以下のような記法を採用する．
+\begin{description}
+ \item[<8-bit number>] 0--255の範囲内の整数
+ \item[<kanji code>] 和文文字の内部コード
+ \item[<character code>] 0--255の範囲内の整数，および和文文字の内部コード
+ \item[<16-bit number>] 0--65535の範囲内の整数
+\end{description}
+
 \section{和文文字と\.{kcatcode}}
 \TeX82では，各文字に0--15のカテゴリーコードを割り当てており，
 \TeX82の入力プロセッサは「どのカテゴリーコードの文字が来たか」で状態が遷移する
@@ -273,54 +343,6 @@ e-mail: \texttt{issue(at)texjp.org}}}
 
  なお，\upTeX においては，|\kcatcode|は大きく仕様変更されている．
 \end{dangerous}
-
-\section{文字コードの指定}
-\TeX82では「文字コードの範囲」は0--255であった．
-一方，\pTeX では「文字コードを引数にとるプリミティブ」といっても，状況によって
-\begin{itemize}
- \item 欧文文字の文字コード0--255をとる（例：|\catcode|）
- \item 和文文字の内部コードをとる（例：|\inhibitxspcode|）
- \item 上記2つのどちらでもとれる（例：|\prebreakpenalty|）
-\end{itemize}
-のいずれの場合もありうる．
-
-\medskip
-
-本ドキュメントでは上のどれかを明示するために，以下のような記法を採用する．
-\begin{description}
- \item[<8-bit number>] 0--255の範囲内の整数
- \item[<kanji code>] 和文文字の内部コード
- \item[<character code>] 0--255の範囲内の整数，および和文文字の内部コード
- \item[<16-bit number>] 0--65535の範囲内の整数
-\end{description}
-
-\pTeX の内部コードはEUC-JPかShift-JISのいずれかである．和文文字の内部コードとして
-許される整数は$256c_1+c_2$，但し$c_i\in C_i$であり，ここで
-\begin{description}
- \item[内部コードがEUC-JPのとき] $C_1=C_2=\{\hex{a1},\dots,\hex{fe}\}$.
- \item[内部コードがShift-JISのとき] 
-	    $C_1=\{\hex{81},\dots,\hex{9f}\}\cup\{\hex{e0},\dots,\hex{fc}\}$,\\
-	    $C_2=\{\hex{40},\dots,\hex{7e}\}\cup\{\hex{80},\dots,\hex{fc}\}$.
-\end{description}
-である．
-\begin{dangerous}
-\pTeX の内部コードは\pTeX 起動時のバナーから分かる．例えば
-\begin{verbatim}
-This is pTeX, Version 3.14159265-p3.8.0 (utf8.euc) (TeX Live 2018)
-(preloaded format=ptex)
-\end{verbatim}
-というバナーの場合は，|(utf8.euc)| から
-\begin{itemize}
- \item 入力ファイルの（既定）文字コードはUTF-8（但し，JIS X 0208の範囲内）
- \item \pTeX の内部コードはEUC-JP
-\end{itemize}
-という情報が見て取れる．
-\end{dangerous}
-
-\TeX82と同様に，バッククオート(|`|)を使って「|`あ|」のようにして和文文字の内部コードを
-内部整数として得ることができる．欧文文字については，1文字の制御綴を
-代わりに指定することができた（例えば，「|`b|」と「|`\b|」は同じ意味だった）が，
-同じことを和文文字に対して「|`\あ|」などと行うことはできない．
 
 % jtex.tex の「ラインブレーク」を簡略化
 \section{禁則}
