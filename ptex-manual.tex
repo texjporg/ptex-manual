@@ -357,7 +357,15 @@ DVIファイル内の和文文字コードとしてはJISコードを出力す�
     「|\】|」のように一文字命令（コントロールシンボル）に使用することはできる
     \footnote{「|\】|」のように和文文字からなるコントロールシンボルを文字列化する際に，
     バージョンp3.7.2以前の\pTeX では「|\】 |」と後ろに余計な空白文字を補ってしまうという問題があった．
-    \TeX~Live 2018の\pTeX~p3.8.1でこの問題は修正された．}．
+    \TeX~Live 2018の\pTeX~p3.8.1でこの問題は修正された(\cite{build37})．
+
+	また，バージョンp3.8.1以前では
+	「|\】|」のような和文のコントロールシンボルで行が終わった場合，「|\!|」のような
+	欧文コントロールシンボルと同様に改行由来の空白が追加されてしまい，
+	和文文字直後の改行は何も発生しないという原則に反していたが，
+	こちらは\TeX~Live 2019の\pTeX~p3.8.2で修正された(\cite{build37})．
+	
+  }．
   \item 後で説明する|\jcharwidowpenalty|は，カテゴリーコードが16,~17の和文文字の前にのみ
     挿入されうるもので，カテゴリーコードが18の和文文字の前には挿入されない．
   \item 欧文文字は\TeX82と同様に1つの文字トークンはカテゴリーコード$c$と文字コード$s$の組
@@ -625,7 +633,7 @@ DVIファイル内の和文文字コードとしてはJISコードを出力す�
 \begin{itemize}
  \item メトリック由来の空白が挿入されないだけであり，
        その代わりに|\kanjiskip|や|\xkanjiskip|が挿入されることは禁止していない．
- \item 本命令は現在が（非限定，限定問わず）水平モードのときしか効力を発揮しない
+ \item 本命令は現在のモードが（非限定，限定問わず）水平モードのときしか効力を発揮しない
        （数式モードでも効かない）．
        段落が和文文字「\verb+【+」で始まり，その文字の直前にメトリック由来の空白が入ることを抑止
        したい場合は，次のように一旦段落を開始してから|\inhibitglue|を実行する必要がある．
@@ -633,7 +641,39 @@ DVIファイル内の和文文字コードとしてはJISコードを出力す�
 \leavevmode\inhibitglue 【
 \end{verbatim}
 \end{itemize}
+  以前の\pTeX では「この命令が実行された位置」が何を指すのか大雑把でわかりにくかったが，
+  \TeX~Live 2019の\pTeX~p3.8.2以降では，明確に\emph{新たなノードが追加されない限り}，と
+  定めた(\cite{build28,forum_2566})．すなわち，
+  \begin{enumerate}
+	\item |\inhibitglue|は，ノード挿入処理を行う命令
+	(|\null|,~|\hskip|, |\kern|, |\vrule|,~\dots)が後ろに来た場合は無効化される．
+	\item 一方，|\relax|やレジスタへの代入などのノードを作らない処理では無効化されない．
+	\item |\inhibitglue|の効果は別レベルのリストには波及しない．
+  \end{enumerate}
 \end{cslist}
+\begin{dangerous}
+  以上の説明の具体例を以下に示す：
+
+  \medskip\noindent
+  \begin{minipage}[t]{.8\linewidth}
+  \begin{verbatim}
+    ）\vrule（\\
+    ）\vrule\inhibitglue（\\
+    ）\inhibitglue\vrule（\\
+    ）\inhibitglue\relax（\\
+    ）\relax\inhibitglue（\\ % 「）」「\relax」間で二分空きが入る
+    あ\setbox0=\hbox{\inhibitglue}（
+  \end{verbatim}
+  \end{minipage}\hfill
+  \begin{minipage}[t]{.1\linewidth}
+    ）\vrule（\\
+    ）\vrule\inhibitglue（\\
+    ）\inhibitglue\vrule（\\
+    ）\inhibitglue\relax（\\
+    ）\relax\inhibitglue（\\
+    あ\setbox0=\hbox{\inhibitglue}（
+  \end{minipage}
+\end{dangerous}
 \begin{dangerous}
   p\LaTeX~2017-10-28以降では，|\inhibitglue|の短縮として|\<|が次のように
   定義されている（|\protected|は\eTeX 拡張の機能だが，現在では\LaTeX 自体が
@@ -642,6 +682,13 @@ DVIファイル内の和文文字コードとしてはJISコードを出力す�
 \protected\def\<{\ifvmode\leavevmode\fi\inhibitglue}
 \end{verbatim}
 \end{dangerous}
+\begin{cslist}
+\csitem[\.{disinhibitglue}]
+  |\inhibitglue|の効果を無効化（つまり，メトリック由来の空白の挿入を許可）する．
+  \pTeX~p3.8.2で新しく追加された．
+\end{cslist}
+
+
 
 \section{組方向}
 
@@ -1172,12 +1219,21 @@ has been |\let| equal to a non-active character token.
  \bibitem{tatemath} aminophen, 「縦数式ディレクションとベースライン補正」，
   2016/09/05,\\
   \url{https://github.com/texjporg/platex/issues/22}
+ \bibitem{build28} h-kitagawa, 「[ptex] |\inhibitglue|の効力」，
+  2017/09/20,\\
+  \url{https://github.com/texjporg/tex-jp-build/issues/28}
  \bibitem{build36} aminophen, 「欧文文字の|\kansujichar|，|\inhibitxspcode|」，
   2017/11/26,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/36}
+ \bibitem{build37} aminophen，「和文のコントロールシンボル」，
+  2017/11/29,\\
+  \url{https://github.com/texjporg/tex-jp-build/issues/37}
  \bibitem{build55} aminophen，「[(u)pTeX] 内部コードの -kanji-internal オプション」，
   2018/04/03,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/55}
+ \bibitem{forum_2566} aminophen, 「\TeX~Live 2019 での |\inhibitglue| の挙動変更【予定】」，
+  2019/02/06,\\
+  \url{https://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=2566}
 \end{thebibliography}
 
 \newpage
