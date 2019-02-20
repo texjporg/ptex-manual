@@ -20,21 +20,21 @@ ptex-manual.dvi: ptex-manual.tex
 #	makeindex -s gind.ist -o ptex-manual.ind ptex-manual.idx
 	mendex -U -s gind.ist -o ptex-manual.ind ptex-manual.idx
 	platex $(KANJI) ptex-manual.tex
-#	rm -f *.aux *.log *.toc *.idx *.ind *.ilg *.out
+	rm -f *.aux *.log *.toc *.idx *.ind *.ilg *.out
 
 uptex-manual.dvi: uptex-manual.tex
 	uplatex $(KANJI) uptex-manual.tex
 	uplatex $(KANJI) uptex-manual.tex
 	upmendex -s gind.ist -o uptex-manual.ind uptex-manual.idx
 	uplatex $(KANJI) uptex-manual.tex
-#	rm -f *.aux *.log *.toc *.idx *.ind *.ilg *.out
+	rm -f *.aux *.log *.toc *.idx *.ind *.ilg *.out
 
 eptexdoc.dvi: eptexdoc.tex fam256p.tex fam256d.tex
 	platex $(KANJI) eptexdoc.tex
 	platex $(KANJI) eptexdoc.tex
 	mendex -U -s gind.ist eptexdoc.idx
 	platex $(KANJI) eptexdoc.tex
-#	rm -f *.aux *.log *.toc *.idx *.ind *.ilg *.out
+	rm -f *.aux *.log *.toc *.idx *.ind *.ilg *.out
 
 .SUFFIXES: .tex .dvi .pdf
 .tex.dvi:
@@ -45,6 +45,13 @@ eptexdoc.dvi: eptexdoc.tex fam256p.tex fam256d.tex
 .dvi.pdf:
 	dvipdfmx $(FONTMAP) $<
 
-.PHONY: clean
+.PHONY: install clean
+install:
+	mkdir -p ${TEXMF}/doc/ptex/ptex-manual
+	cp ./LICENSE ${TEXMF}/doc/ptex/ptex-manual/
+	cp ./README* ${TEXMF}/doc/ptex/ptex-manual/
+	cp ./Makefile ${TEXMF}/doc/ptex/ptex-manual/
+	cp ./*.tex ${TEXMF}/doc/ptex/ptex-manual/
+	cp ./*.pdf ${TEXMF}/doc/ptex/ptex-manual/
 clean:
 	rm -f $(DVITARGET) $(PDFTARGET)
