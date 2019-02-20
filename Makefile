@@ -11,32 +11,29 @@ KANJI = -kanji=utf8
 FONTMAP = -f ipaex.map -f ptex-ipaex.map -f uptex-ipaex.map
 TEXMF = $(shell kpsewhich -var-value=TEXMFHOME)
 
-.PHONY: all
+default: $(DVITARGET)
 all: $(PDFTARGET)
 
-ptex-manual.pdf: ptex-manual.tex
+ptex-manual.dvi: ptex-manual.tex
 	platex $(KANJI) ptex-manual.tex
 	platex $(KANJI) ptex-manual.tex
 #	makeindex -s gind.ist -o ptex-manual.ind ptex-manual.idx
 	mendex -U -s gind.ist -o ptex-manual.ind ptex-manual.idx
 	platex $(KANJI) ptex-manual.tex
-	dvipdfmx $(FONTMAP) ptex-manual
 #	rm -f *.aux *.log *.toc *.idx *.ind *.ilg *.out
 
-uptex-manual.pdf: uptex-manual.tex
+uptex-manual.dvi: uptex-manual.tex
 	uplatex $(KANJI) uptex-manual.tex
 	uplatex $(KANJI) uptex-manual.tex
 	upmendex -s gind.ist -o uptex-manual.ind uptex-manual.idx
 	uplatex $(KANJI) uptex-manual.tex
-	dvipdfmx $(FONTMAP) uptex-manual
 #	rm -f *.aux *.log *.toc *.idx *.ind *.ilg *.out
 
-eptexdoc.pdf: eptexdoc.tex fam256p.tex fam256d.tex
+eptexdoc.dvi: eptexdoc.tex fam256p.tex fam256d.tex
 	platex $(KANJI) eptexdoc.tex
 	platex $(KANJI) eptexdoc.tex
 	mendex -U -s gind.ist eptexdoc.idx
 	platex $(KANJI) eptexdoc.tex
-	dvipdfmx $(FONTMAP) eptexdoc.dvi
 #	rm -f *.aux *.log *.toc *.idx *.ind *.ilg *.out
 
 .SUFFIXES: .tex .dvi .pdf
