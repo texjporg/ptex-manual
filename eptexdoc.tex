@@ -1,0 +1,1064 @@
+%#!make eptexdoc.pdf
+\documentclass[a4paper,11pt]{jsarticle}
+\input fam256p.tex
+\usepackage[textwidth=42zw,lines=40,truedimen,centering]{geometry}
+\usepackage{amsmath,mathtools,amssymb,multicol,comment}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage[T1]{fontenc}
+\usepackage{booktabs,enumitem}
+\usepackage{lmodern}
+\usepackage[dvipdfmx,hyperfootnotes=false]{hyperref}
+\usepackage{pxjahyper}
+\usepackage[bold,deluxe]{otf}
+\usepackage{hologo}
+\usepackage{makeidx}\makeindex
+
+%%%%%%%%%%%%%%%%
+\makeatletter
+\newcommand{\OMEGA}{$\Omega$}
+\protected\def\epTeX{$\varepsilon$\nobreakdash-\pTeX}
+\protected\def\eTeX{$\varepsilon$\nobreakdash-\TeX}
+\def\upTeX{u\pTeX}\def\pTeX{p\kern-.15em\TeX}
+\def\NTS{\leavevmode\hbox{$\cal N\kern-0.35em\lower0.5ex\hbox{$\cal T$}%
+  \kern-0.2emS$}\,}
+\def\headfont{\normalfont\mathversion{bold}\gtfamily\bfseries}
+\def\node#1{\textit{#1}}
+\def\.#1{\texorpdfstring{%
+     \leavevmode\hbox{\texttt{\textbackslash#1}}\ifmmode\else\textcompwordmark\fi}{\textbackslash #1}}
+\let\orig@cs=\.
+\def\ind@cs#1{\orig@cs{#1}\indcs{#1}}
+\def\indcs#1{\index{{\texttt{\textbackslash #1}}}}
+\newlist{cslist}{description}1
+\setlist[cslist]{%
+  style=nextline,itemsep=\medskipamount,listparindent=1zw,
+  font=\normalfont\mdseries}
+\def\csitem[#1]{\item[\llap{$\blacktriangleright$~}\let\.=\ind@cs#1]}
+\def\emph#1{{\bfseries\gtfamily\mathversion{bold}#1}}
+\def\listx{\def\makelabel{\hbox to 1em{\hfil\textbullet\hfil}}\def\@{\hfill}
+\labelwidth=13zw\leftmargin15zw\itemindent=0zw}
+\def\paragraph#1{\par\medskip\par\noindent\emph{■#1}\par\nobreak}
+\def\Pkg#1{\textsf{#1}}
+\catcode`\<=13
+\xspcode`\\=3
+\xspcode`\*=3
+\xspcode`\-=3
+\xspcode23=3 % \textcompwordmark
+\def<#1>{\ensuremath{\langle\hbox{\normalfont\itshape #1\/}\rangle}}
+
+\font\man=manfnt at 10pt
+\def\dbend{\raise0pt\hbox{\man\char'177}}
+\AtBeginDvi{\special{pdf:mapfile otf-ipaex.map}}
+\def\delbit#1#2{\underbracket[0.4pt]{#1}_{\text{#2}}}
+
+\def\TeXXeT{\TeX-\reflectbox{\bfseries\TeX-}}
+
+\newenvironment{multilist}[2]%
+ {$$\setbox\z@=\hbox\bgroup  % catch some funny things -> \mathord
+  \let\a=\empty
+  \let\b=\empty
+  \count@=\z@
+  \toks@={#2}%
+  \def\item##1\cr
+   {\ifnum \count@=\z@
+      \count@=#1%
+      \expandafter\def\expandafter\b\expandafter{\b\y{}}%
+    \fi
+    \advance\count@ by\m@ne
+    \expandafter\def\expandafter\a\expandafter{\a\x{##1}}}%
+  \ignorespaces}%
+ {\loop
+  \ifnum \count@>\z@
+    \expandafter\def\expandafter\a\expandafter{\a\expandafter\z\b\relax}%
+    \advance\count@ by\m@ne
+  \repeat
+  \def\x##1{\expandafter\y\b\relax{##1}}%
+  \def\y\y##1##2\relax##3%
+   {\ifx @##1@%
+      \def\b{##2\y{##3}}%
+    \else
+      \def\b{##2\y{##1&##3}}%
+    \fi}%
+  \def\z\y##1##2\relax{\def\b{##2\y{##1}}}%
+  \a
+  \def\x
+   {\expandafter\egroup\expandafter\halign\expandafter\bgroup
+    \expandafter&\the\toks@\cr}%
+  \def\y##1{\expandafter\def\expandafter\x\expandafter{\x##1\cr}}%
+  \b
+  \x\egroup $$}
+
+\makeatletter
+\def\hex#1{%
+{\count@=#1\@tempcnta=#1\@tempcntb=\@tempcnta\relax
+\divide\@tempcntb by 16%
+\ifnum\count@=0\else
+  \multiply\@tempcntb by16%
+  \advance\@tempcnta-\@tempcntb
+  \divide\@tempcntb by16%
+  \hex{\the\@tempcntb}%
+  \ifcase\@tempcnta\relax 0\or1\or2\or3\or4\or5\or6\or
+    7\or8\or9\or A\or B\or C\or D\or E\pr F\fi
+\fi}}
+\clubpenalty=8000\widowpenalty=8000
+
+\normalsize
+\bigskipamount=\baselineskip
+\medskipamount=.5\baselineskip
+\smallskipamount=.25\baselineskip
+
+\usepackage{etoolbox}
+\newenvironment{curve}{%
+  \par\medskip
+  \bgroup\small\leftskip=\dimexpr\textwidth-44zw\relax\@totalleftmargin=\leftskip
+  \parindent1zw\noindent\kern-\leftskip\hbox to\leftskip{\dbend\hss}%
+  \bigskipamount=\baselineskip
+  \medskipamount=.5\baselineskip
+  \smallskipamount=.25\baselineskip
+  \everypar{\everypar{}}\ignorespaces
+}{\par\egroup\medskip}
+
+\renewenvironment{theindex}{%
+    \def\presectionname{}\def\postsectionname{}%
+    \section*{\indexname}
+    \@mkboth{\indexname}{\indexname}%
+    \plainifnotempty % \thispagestyle{plain}
+    \parindent\z@
+    \parskip\z@ \@plus .3\p@\relax
+    \let\item\@idxitem
+    \raggedright
+    \begin{multicols}{2}
+  }{
+    \end{multicols}
+    \clearpage
+  }
+
+\patchcmd\@verbatim\@totalleftmargin{\dimexpr\@totalleftmargin+2zw\relax}{}{}
+\patchcmd\quote{\list{}}{\par\list{\topsep\medskipamount}}{}{}
+\patchcmd\@verbatim{\trivlist}{\trivlist\addvspace\medskipamount\noautoxspacing}{}{}
+\patchcmd\endverbatim{\endtrivlist}{\endtrivlist\addvspace\medskipamount}{}{}
+\expandafter\let\csname endverbatim*\endcsname =\endverbatim
+\patchcmd\verb{\ifmmode\hbox\else\leavevmode\vadjust{}\fi\bgroup}
+  {\ifmmode\else\leavevmode\vadjust{}\fi\hbox
+  \bgroup\textcompwordmark\noautoxspacing\noautospacing}{}{}
+\patchcmd\verb@egroup{\egroup}{\egroup\textcompwordmark}{}{}
+
+\usepackage{shortvrb}
+\MakeShortVerb*{|}
+%%%%%%%% macros for index (simplified from doc.sty)
+\newif\ifscan@allowed
+\def\dotfill{\leaders\hbox to.6em{\hss .\hss}\hskip\z@ plus1fill}%
+\def\pfill{\unskip~\dotfill\nobreak}
+
+\long\def\@footnotetext{%
+  \insert\footins\bgroup
+    \normalfont\footnotesize
+    \interlinepenalty\interfootnotelinepenalty
+    \splittopskip\footnotesep
+    \splitmaxdepth \dp\strutbox \floatingpenalty \@MM
+    \hsize\columnwidth \@parboxrestore
+    \protected@edef\@currentlabel{%
+       \csname p@footnote\endcsname\@thefnmark
+    }%
+    \color@begingroup
+      \@makefntext{%
+        \rule\z@\footnotesep\ignorespaces}%
+      \futurelet\next\fo@t}
+\def\fo@t{\ifcat\bgroup\noexpand\next \let\next\f@@t
+                                \else \let\next\f@t\fi \next}
+\def\f@@t{\bgroup\aftergroup\@foot\let\next}
+\def\f@t#1{#1\@foot}
+\def\@foot{\@finalstrut\strutbox\color@endgroup\egroup
+  \ifx\pltx@foot@penalty\@undefined\else
+    \ifhmode\null\fi
+    \ifnum\pltx@foot@penalty=\z@\else
+      \penalty\pltx@foot@penalty
+      \pltx@foot@penalty\z@
+    \fi
+  \fi}
+
+{\lccode`\!=`\_
+\lowercase{%
+\protected\gdef\_{\ifdefstrequal{\f@family}{\ttdefault}{!}%
+  {\leavevmode\vrule width .45em height -.2ex depth .3ex\relax}%
+}}
+}
+\makeatother
+%%%%%%%%%%%%%%%%
+\frenchspacing
+\begin{document}
+\title{\emph{\epTeX について}}
+\author{北川 弘典\null
+\thanks{\url{http://osdn.jp/projects/eptex/wiki/},\ 
+e-mail: \texttt{h\_kitagawa2001(at)yahoo.co.jp}}}
+\date{version 190131，\today}
+\maketitle
+\tableofcontents
+
+\newpage
+\section{はじめに}
+\epTeX は，東京大学理学部数学科3年生対象の2007年度の授業「計算数学II」
+\footnote{\url{http://ks.ms.u-tokyo.ac.jp/}．}において北川が作成したプログ
+ラムである．もともとは\pTeX~3.1.10を基盤として，\eTeX~2.2相当の機能や
+10進21桁の浮動小数点演算を追加したものであったが，今では次の点が変わっている．
+\begin{itemize}
+  \item \TeX~Live~2011に取り込まれるにあたり，
+  \eTeX をベースにして，その上に\pTeX 拡張やその他追加機能を載せる方針へと
+  変更された．
+  \item 浮動小数点演算の機能は\epTeX~090927から削除されている
+  \footnote{%
+  \TeX ソース中で浮動小数点演算を行う手段としては，例えば\LaTeX3の
+  機能(\Pkg{l3fp})や，\Pkg{xint}パッケージバンドルがあるので，
+  そちらを利用して欲しい．}．
+\end{itemize}
+
+製作の動機や作業過程などについては，詳しくは\cite{h7k}を参照して欲しいけ
+れども，大雑把に言うと，動機は以下のように要約できる．
+\begin{itemize}
+\item \pTeX は，\TeX が持っている「レジスタ1種類につき256個まで」という
+      制限をひきずっており，現状でも非常に多数のパッケージを読み込ませた
+      りすると制限にぶち当たってしまう．
+\item 一方，\eTeX 拡張ではこれが「レジスタ1種類につき32768個まで」と緩和
+      されており，欧文で標準となっている\hologo{pdfTeX}やその後継の\hologo{LuaTeX}，
+      及び\hologo{XeTeX}でも
+      \eTeX の機能が取り込まれている．
+\item そうすると，\pTeX だけが制限をレジスタ制限を引きずっているのは世界
+      から取り残されることになるのではないか．
+\end{itemize}
+
+\section{\eTeX 拡張について}
+前に述べたように，\eTeX は\TeX の拡張の一つである．\eTeX のマニュアル
+\cite{etexman}には，開発目的が以下のように述べられている．
+
+\begin{quotation}
+The \NTS\ project intends to develop an `New Typesetting System' (\NTS)
+that will eventually replace today's \TeX3.  The \NTS\ program will
+include many features missing in \TeX, but there will also exist a mode
+of operation that is 100\% compatible with \TeX3.  It will, necessarily,
+require quite some time to develop \NTS\ to maturity and make it widely
+available.
+
+Meanwhile \eTeX\ intends to fill the gap between \TeX3 and the future
+\NTS. It consists of a series of features extending the capabilities of
+\TeX3.
+\end{quotation}
+
+\NTS がどうなったのか僕は知らない．しかし，少なくとも\eTeX 拡張自体は実用
+的な物であり，そのせいか$\aleph$~(Aleph), \hologo{pdfTeX}, \hologo{XeTeX}などの他の拡張
+にもマージされており，ほとんどの人が\eTeX 拡張を使うことができるようになっ
+ている\footnote{\LaTeXe~2017-01-01からは，\LaTeXe のフォーマット作成段階から
+\eTeX 拡張が必須となった(\cite{l2e26})．}．
+
+\eTeX 拡張で追加される機能について，詳しくは\cite{etexman}を参照して欲し
+いが，\cite{h7k}中の4.2節「\eTeX の機能」から一部改変して引用する．
+
+\begin{quotation}
+\eTeX にはCompatibility modeとExtended modeの2つが存在し，前者では\eTeX
+特有の拡張は無効になるのでつまらない．後者がおもしろい．
+
+拡張機能を使うにはファイル名を渡すときに\texttt{*}をつけるか
+コマンドラインオプションとして\texttt{-etex}スイッチをつければいい
+が，\eTeX 拡張に関わる追加マクロは当然ながらそれだけで
+は駄目である．「plainマクロ for \eTeX」（\texttt{etex.fmt}というのが一番マシ
+かな）では自動的に追加マクロである\texttt{etex.src}が呼ばれる．\LaTeX 下では
+ちょうど\texttt{etex.src}に対応した\Pkg{etex}パッケージを読み込む必要がある．
+
+\paragraph{レジスタの増加}
+最初に述べたように，\TeX では6種類のレジスタが各256個ずつ利用できる．それ
+ぞれのレジスタには\.{dimen75}などのように0--255の番号で指定できる
+他，予め別名の定義をしておけばそれによって指定することもできる．これらの
+いくつかは特殊な用途に用いられる（例えば\.{count0}はページ番号などの
+ように）ことになっているので，さらにuser が使えるレジスタは減少する．
+
+\eTeX では，追加のレジスタとして番号で言うと256--32767が使用できるよ
+うになった．上のpdfによると最初の0--255と違って若干の制限はあるようだ
+が，それは些細な話である．追加された（各種類あたり）$32768-256=32512$個の
+レジスタは，メモリの効率を重視するためsparse registerとして，つまり，必要
+な時に始めてツリー構造の中で確保されるようになっている．
+
+\paragraph{式が使用可能に}
+\TeX における数量の計算は充実しているとは言い難い．例えば，
+\[
+\hbox{|\dimen123|}\leftarrow\frac12(\hbox{|\dimen42|}+\hbox{|\@tempdima|})
+\]
+という計算を元々の\TeX で書こうとすると，
+\begin{verbatim}
+\dimen123=\dimen42
+\advance\dimen123by\@tempdima
+\dimen123=0.5\@tempdima
+\end{verbatim}
+のように書かないといけない．代入，加算代入，乗算代入，除算代入ぐらいしか
+演算が用意されていない状態になっている（上のコードのように，$d_2\mathrel{+\!\!=}
+0.8 d_1$というような定数倍を冠することは平気）．
+
+\eTeX では，そのレジスタの演算に，他のプログラミング言語で使われているよ
+うな数式の表現が使えるようになった．上のPDFでは実例として
+\begin{verbatim}
+\ifdim \dimexpr (2pt-5pt)*\numexpr 3-3*13/5\relax + 34pt/2<\wd20
+\end{verbatim}
+が書かれている．これは，\def\mpt{\,\mathrm{pt}}
+{\catcode`\<12\[
+ 32\mpt=(2\mpt-5\mpt)\left(3-\mathop{\mathrm{div}}(3\cdot 13,5)\right)
++\frac{34\mpt}{2}<\text{{\tt \char'134 box20}の幅}
+\]}
+が真か偽かを判定していることになる．
+
+\paragraph{\.{middle} primitive}
+\TeX に\.{left}, \.{right}というprimitiveがあり，それを使えば括
+弧の大きさが自動調整されるのはよく知られている．\eTeX では，
+さらに\.{middle}\indcs{middle}\ primitiveが追加された．
+
+具体例を述べる．
+{\catcode`\|12
+\def\set#1#2{\setbox0=\hbox{$\displaystyle #1,#2$}%
+\left\{\, \vphantom{\copy0}#1 \,\right|\!\left.\, \vphantom{\copy0}#2 \,\right\}}
+\def\eset#1#2{\left\{\, #1 \,\middle|\, #2 \,\right\}}
+\[ \set{n+\frac12}{n\in \omega} \eset{n+\frac12}{n\in \omega} \]}
+これは以下のsourceで出力したものである：
+
+{\narrowbaselines
+\begin{verbatim}
+\def\set#1#2{\setbox0=\hbox{$\displaystyle #1,#2$}%
+  \left\{\, \vphantom{\copy0}#1 \,\right|\!\left.\, %
+  \vphantom{\copy0}#2 \,\right\}}
+\def\eset#1#2{\left\{\, #1 \,\middle|\, #2 \,\right\}}
+\[ \set{n+\frac12}{n\in \omega} \eset{n+\frac12}{n\in \omega} \]
+\end{verbatim}}
+両方とも集合の表記を行うコマンドである．\TeX 流の\.{set}では2つの
+\.{left}, \.{right}の組で実現させなければならず，そのために{\catcode`\|=12$|$}の
+左側と右側に入る式の最大寸法を測定するという面倒な方法を使っている．その
+上，この定義では\.{textstyle}以下の数式（文中数式とか）ではそのま
+ま使えず，それにも対応させようとすると面倒になる．一方，\eTeX 流の
+\.{eset}では，何も考えずに
+\.{left}, \.{middle}, \.{right}だけで実現できる．
+
+\paragraph{\TeXXeT\ \textmd{(\texttt{TeX-{}-XeT})}}
+left-to-rightとright-to-leftを混植できるという機能であるらしい．
+ヘブライ語あたりの組版に使えるらしいが，よく知らない．
+ここでのRtoLはLtoRに組んだものを逆順にしているだけのような
+気がする．
+
+\medskip
+
+とりあえず一目につきそうな拡張機能といったらこれぐらいだろうか．他にも
+tracing機能や条件判断文の強化などあるが，そこら辺はパッとしないのでここ
+で紹介するのは省略することにしよう．
+\end{quotation}
+
+\epTeX ではここに述べた代表的な機能を含め，ほとんどすべての機能を実装して
+いるつもりである
+\footnote{%
+  さらに，レジスタの個数については，各種類65536個まで使えるようになっている（次節参照）．
+}．ただ，\TeXXeT を和文で使うと約物
+の位置がずれたり空白がおかしかったりするけれども，そこの修正は大変に思え
+るし，苦労して実装する意味があるのか疑問なので放置している．
+
+\medskip
+
+\pTeX 拡張では，\TeX と比較して\node{dir\_node}と\node{disp\_node}という2種類のノードが
+追加された．前者は，現在のリストの中に違う組方向のboxを挿入する際に寸法を補正するために作られ，
+\.{hbox}や\.{vbox}のコンテナとなっている．
+また後者は，欧文文字のベースライン補正のために使われる．
+
+\epTeX~110102 まではこれらのノードも\.{lastnodetype}の値として出力させるようにした．
+しかし，両者ともに\epTeX が自動的に挿入する（ユーザーが意識する必要はない）ノードであることから，
+\epTeX~110227以降では\node{dir\_node}と\node{disp\_node}は
+\.{lastnodetype}\indcs{lastnodetype}の対象とする「最後のノード」とはならないようにしている
+\footnote{%
+  最後のノードが\node{dir\_node}であった場合，\.{lastnodetype}はそのノードが格納している
+  \node{hlist\_node}か\node{vlist\_node}の種類を返す．
+}．
+\begin{multilist}{3}{\hfil\hskip1.5zw#:&\quad#\qquad\hfil}
+\item $-1$&none (empty list)\cr\item 0&char node\cr\item 1&hlist node\cr
+\item 2&vlist node\cr\item 3&rule node\cr\item 4&ins node\cr
+\item 5&mark node\cr\item 6&adjust node\cr\item 7&ligature node\cr
+\item 8&disc node\cr\item 9&whatsit node\cr\item 10&math node\cr
+\item 11&glue node\cr\item 12&kern node\cr\item 13&penalty node\cr
+\item 14&unset node\cr\item 15&math mode nodes\cr
+\end{multilist}
+
+\vskip-\baselineskip
+
+\.{currentiftype}\indcs{currentiftype}における条件判断文とそれを表す数字との対応は，以
+下のようになっている．21--28が，\pTeX 拡張で追加された条件判断文に対応する．
+29の\.{ifpdfprimitive}は\hologo{pdfTeX}由来のプリミティブ（後述）である．
+\begin{multilist}{3}{\hfil\hskip1.5zw#:&\quad#\qquad\hfil}
+\item 1&\.{if}\cr\item 2&\.{ifcat}\cr\item 3&\.{ifnum}\cr\item 4&\.{ifdim}\cr
+\item 5&\.{ifodd}\cr\item 6&\.{ifvmode}\cr\item 7&\.{ifhmode}\cr
+\item 8&\.{ifmmode}\cr\item 9&\.{ifinner}\cr\item 10&\.{ifvoid}\cr
+\item 11&\.{ifhbox}\cr\item 12&\.{ifvbox}\cr\item 13&\.{ifx}\cr
+\item 14&\.{ifeof}\cr\item 15&\.{iftrue}\cr\item 16&\.{iffalse}\cr
+\item 17&\.{ifcase}\cr\item 18&\.{ifdefined}\cr\item 19&\.{ifcsname}\cr
+\item 20&\.{iffontchar}\cr\item \bf 21&\.{iftdir}\cr\item \bf 22&\.{ifydir}\cr
+\item \bf 23&\.{ifddir}\cr\item \bf 24&\.{ifmdir}\cr\item \bf 25&\.{iftbox}\cr
+\item \bf 26&\.{ifybox}\cr\item \bf 27&\.{ifdbox}\cr\item \bf 28&\.{ifmbox}\cr
+\item \bf 29&\.{ifpdfprimtive}\cr
+\end{multilist}
+
+\section{\OMEGA 由来の機能（旧名称：\texttt{FAM256}パッチ）}
+\epTeX には，掲示板\TeX\ Q\ \&\ Aの山本氏の書き込み
+\cite{yamamoto}に刺激されて作った，本節でに説明する\OMEGA の一部
+機能を使えるようにするパッチが存在する．
+これは\texttt{FAM256}パッチと呼ばれ，今までは
+「\epTeX 本体とは一応別扱いで，\epTeX の配布，及び
+W32\TeX, \TeX~Liveのバイナリでは標準で有効になっていただけ」という扱いであったが，
+それでは利用者が混乱するので
+\emph{「\texttt{FAM256}パッチは\epTeX~160201以降からは切り離さない」}
+とここで宣言する．
+本ドキュメントの最後のページ\footnote{ただし，ソースファイルで言えば{\tt
+fam256d.tex}（本文）と\texttt{fam256p.tex}（preamble部）に対応する．}にちょっ
+としたサンプルを載せてある．
+
+本節で述べる追加機能は extendend modeでなくても有効になっている．
+ただし，後に説明する「レジスタが各種類65536個まで」は，
+extended modeの時に限り有効になる．
+
+\paragraph{数式フォント制限の緩和}
+\OMEGA の大きな特徴としては，\TeX 内部のデータ構造を倍の領域を用いるよう
+に改変し\footnote{詳しい話は\texttt{texk/web2c/texmfmem.h}中の共用体%
+\texttt{memoryword}の定義を参照．大雑把に言うと，1つの「メモリ要素」に2つの32\,bit整
+数を同時に格納できるようになっている．}，\TeX に従来から存在し
+ていた「256個制限」を$2^{16}$個にまで緩和したことが挙げられる．同様に，
+\OMEGA では（\cite{yamamoto}にもあるように）数式フォントを同時に256個まで
+用いることができ，各フォントも65536文字まで許されるようになっている．
+
+\medskip
+
+\epTeX では，中途半端だが，数式フォント1つあたり
+の使用可能文字数は256個のままで，同時に数式フォントを256個まで使えるよう
+にしている．基本的には\OMEGA と同様の方法を用いているが，
+内部でのデータ構造に違いがある（数字はすべてbit幅）：
+\begin{center}
+\small\baselineskip=1.5zw
+\begin{tabular}{crrrrr}%
+\toprule
+    &category&family&char&\multicolumn{1}{c}{math code}
+    &\multicolumn{1}{c}{delimiter code}\\\midrule
+\TeX82&3&4&8 &$3+4+8=15$ &$3+\delbit{4+8}{small}+\delbit{4+8}{large}=27$\\
+\OMEGA&3&8&16&$3+8+16=27$&$(3+\delbit{8+16}{small},\delbit{8+16}{large})=(27,24)$\\
+\epTeX&3&8&8 &$3+8+8=21$&$(3+\delbit{8+8}{small},\delbit{8+8}{large})=(19,16)$\\\bottomrule
+\end{tabular}
+\end{center}
+
+\def\bits#1{<\textup{#1}-bit\ number>}
+\TeX に本来あったプリミティブは互換性維持のために同じ動作とする必要があるので，
+16番から255番のフォントを利用する際には別のプリミティブが必要となる．（実装自
+体に\OMEGA の流儀を使っているから）
+ここでは，\OMEGA のプリミティブ名を流用することにした．
+すなわち，以下のプリミティブが追加されている\footnote{\OMEGA では\bits{8}のところが\bits{16}に
+なっている．}．
+\begin{cslist}[itemsep=\dimexpr-\baselineskip+\medskipamount]
+\csitem[\.{omathcode} \bits{8}\texttt{=}\bits{27}]\ 
+\csitem[\.{omathcode} \bits{8}]\ 
+\csitem[\.{omathchar} \bits{27}]\ 
+\csitem[\.{omathaccent} \bits{27}]\ 
+\csitem[\.{omathchardef} <control sequence>\texttt{=}\bits{27}]\ 
+\csitem[\.{odelcode} \bits{8}\texttt{=}\bits{27}\ \bits{24}]\ 
+\csitem[\.{odelimiter} \bits{27}\ \bits{24}]\ 
+\csitem[\.{oradical} \bits{27}\ \bits{24}]\ 
+\end{cslist}
+\vspace{-\baselineskip}
+ここで，27\,bitとか24\,bitの自然数の意味については，上の表の
+\OMEGA の行を参照して欲しい．上に書いた内部のデータ構造から推測できる通り，
+\.{omathchar}等のcharacter codeの指定に使われる16\,bitの数値のうち実際に使われるのは下位
+8\,bitであり，上位8\,bitは無視される．
+例えば，|\omathchar"4012345|と|\omathchar"4010045|は内部表現としては全く同じである．
+
+なお，|\odelcode|~\bits 8として
+delimiter codeを取得しようとしても，現時点のパッチでは，うまく動作しない
+\footnote{51\,bit自然数を返さないといけないですからねえ．やる気があれば
+検討してみます．}．
+
+\medskip
+\LaTeX において数式フォントを同時に16個以上使うには，|\omathchar|%
+などのプリミティブに対応したマクロを使う必要がある．
+最近の\pLaTeX（2016/11/29以降）はこれを部分的にサポートしていて，
+\emph{\.{DeclareMathAlphabet}で使うことのできる数式用アルファベットの
+上限だけは}256個に拡張されている．
+% もちろんこれには最近の\LaTeX（2015/01/01以降）が必要である．
+% また，少し前（2016/09/08以前）の\pLaTeX であれば
+% \begin{verbatim}
+% \makeatletter
+% \mathchardef\e@mathgroup@top=256
+% \makeatother
+% \end{verbatim}
+% をプリアンブルに記述する必要があった．
+だが，これだけでは記号類の定義に用いられる
+|\DeclareMathSymbol|や|\DeclareMathDelimiter|が|\omathchar|や
+|\odelcode|を使用しないので不十分である．
+実験的と書かれてはいるが，
+山本氏による「最低限のパッケージ」\cite{yamamoto3}，またはこれを
+最新の\LaTeX に追随してまとめ直された\Pkg{mathfam256}パッケージ
+\footnote{\url{https://ctan.org/pkg/mathfam256}．}を
+使うのが手っ取り早いような気がする．
+
+\paragraph{無限のレベル}
+\TeX では，glueの伸縮量に\texttt{fil}, \texttt{fill}, \texttt{filll}
+という3つの無限大のレベルが存在し，\texttt{l}が多いほど無限大のオーダーが高くなっていた．
+\OMEGA では，「inter-letter spacingのために」\texttt{fi}という，有限と
+\texttt{fil}の中間にあたる無限大のレベルが付け加えられた．そこで，この無限大レベル
+\texttt{fi}も採用することにした．
+
+\medskip
+
+実装方法は，大まかには\OMEGA で\texttt{fi}の実装を行っているchange file\
+\texttt{omfi.ch}の通りであるのだが，これに\pTeX や\eTeX に伴う少々の修正を行っている．
+\begin{itemize}
+\item プリミティブ|\pagefistretch|, |\hfi|, |\vfi|を新たに定義している
+\footnote{%
+      |\hfi|, |\vfi|については\cite{omegaman}に記述があるが，
+      \TeX~Liveに収録されている$\aleph$（\OMEGA は\TeX~Liveに収録されていない）では
+      実装されていない．|\pagefistretch|を実装したのは北川の完全な勘違いである．
+}．
+\item |\gluestretchorder|, |\glueshrinkorder|の動作を\eTeX のそれと合わせた．
+      具体的には，ある適当なglue~|\someglue|の伸び量を<stretch>とおくとき，
+\[
+ \hbox{|\gluestretchorder\someglue|}=
+\begin{cases}
+0&<stretch>\text{が高々\texttt{fi}レベルの量}\\
+1&<stretch>\text{がちょうど\texttt{fil}レベルの無限量}\\
+2&<stretch>\text{がちょうど\texttt{fill}レベルの無限量}\\
+3&<stretch>\text{がちょうど\texttt{filll}レベルの無限量}
+\end{cases}
+\]
+となっている．内部では\texttt{fi}レベルが1，\texttt{fil}レベルが2，……として処
+      理している．
+\end{itemize}
+
+\paragraph{レジスタについて}
+\OMEGA では（前にも書いたが）データ構造の変更が行われ，それによってレジ
+スタが各種類あたり65536個使えるようになっている．
+
+一方，\eTeX では，256番以降のレジスタを専用のsparse treeに格納することにより，
+32767番までのレジスタの使用を可能にしていた．このツリー構造を分析してみる
+と，65536個までレジスタを拡張するのはさほど難しくないことのよう
+に思われた．具体的には，ツリーの階層を1つ増やしてみた（だから，おそらく
+各種類あたり$16\cdot 32768=524288$個まで使えるとは思うが，これはきりが悪
+い）．
+そこで，\epTeX では\eTeX 流の方法を用いながらも，レジスタをさ
+らに65536個まで増やしている．
+
+\section{\hologo{pdfTeX}由来の機能}
+開発中の\LaTeX 3では，\eTeX 拡張の他に，\hologo{pdfTeX}で導入された
+\.{pdfstrcmp}（又はその同等品）が必要となっており，もはや純粋な\eTeX ですら
+\LaTeX 3を利用することはできない状況である (\cite{expl31,expl32,expl33})．
+その他にも，\hologo{pdfTeX}由来のいくつかのプリミティブ(\cite{pdftexman})の実装が
+日本の\TeX ユーザからあり，
+ほとんど\hologo{pdfTeX}における実装をそのまま真似する形で実装している．
+
+現在の\epTeX で利用できる\hologo{pdfTeX}由来のプリミティブの一覧を以下に示す．
+これらはextended modeでないと利用できない．
+
+\begin{cslist}
+ \csitem [\.{pdfstrcmp} <general text> <general text>]
+  2つの引数を文字列化したものを先頭バイトから比較し，
+  結果を$-1$（第1引数の方が先），0（等しい），1（第2引数の方が先）として文字列で返す．
+  
+  比較する文字列中に和文文字がある場合には，（\epTeX の内部漢字コードにかかわらず）
+  UTF-8で符号化して比較する．
+  そのため，例えば
+\begin{verbatim}
+\pdfstrcmp{あ}{^^e3^^81^^83} % 「あ」はUTF-8でE38182
+\end{verbatim}
+  の実行結果は
+    {\ifdefined\UseRawInputEncoding\UseRawInputEncoding\fi
+    $\pdfstrcmp{あ}{^^e3^^81^^83}$}%
+  である\footnote{%
+    \LaTeX~2018-04-01以降では標準でUTF-8入力となった（|\usepackage[utf8]{inputenc}|が自動
+    で行われていることに相当する）関係上，本文に述べた入力例を実行する際には
+    |\UseRawInputEncoding|の実行が必要になる．
+  }．
+
+ \csitem[\.{pdfpagewidth}, \.{pdfpageheight}]
+  ページの「幅」「高さ」を表す内部長さであるが，
+  \emph{ここで言う「幅」は「字送り方向」のことではなく，物理的な意味である}．
+
+  この2つの内部長さを設定するだけではdviに何の影響も与えない．
+  すぐ後で述べる\.{pdflastxpos}, \.{pdflastypos}による出力位置の取得
+  の際の原点位置を設定するためだけに使われ，初期値は0である．
+
+  用紙サイズの指定には伝統的にpapersize specialが利用されてきた．それを考慮して，
+  papersize specialがdvi中に書き出される時，\epTeX にはその内容を解釈して
+  自動的に\.{pdfpagewidth}, \.{pdfpageheight}の値を設定する機能がある
+  \footnote{%
+  papersize specialで指定した長さは常に\texttt{true}付きで解釈するのが慣習と
+  なっているが，\epTeX~180901より前では\texttt{true}なしの寸法として解釈するという
+  バグが存在した．}%
+  \footnote{%
+  dviwareによって正確な書式は異なるようだが，\epTeX~180901が解釈するpapersize specialは
+  以下の文法に沿ったものになっている：
+\def\<#1>{\langle\mbox{#1}\rangle}
+\begin{align*}
+  \<special> &\longrightarrow \texttt{papersize=}\<length>\texttt{,}\<length>\\
+  \<length>  &\longrightarrow \<decimal> 
+    \<optional~\texttt{true}>\<physical unit>\\
+  \<decimal> &\longrightarrow \texttt{.} \mid \<digit>\<decimal> \mid
+    \<decimal>\<digit>
+\end{align*}
+  負の符号や小数点としての「\texttt{,}」，そして一切の空白を許容しないところに
+  注目してほしい．また，\texttt{zw},~\texttt{zh},~\texttt{em},~\texttt{ex}という
+  現在のフォントに依存する単位も使用不可能である．
+  }．\epTeX~180901より前ではこの機能は常に有効
+  であったが，\epTeX~180901以降では内部整数
+  \.{readpapersizespecial}\indcs{readpapersizespecial}（既定値は1）が正の場合のみ有効となる．
+ 
+ \csitem[\.{pdflastxpos}, \.{pdflastypos}]
+  \.{pdfsavepos}\indcs{pdfsavepos}が置かれた場所の，dviにおける出力位置を返す内部整数（読み取り専用）．
+  原点はページの（物理的な意味の）左下隅であり，$y$軸は（物理的な）上方向に向かって増加する．
+ \begin{itemize}
+  \item ページの物理的な幅と高さはすぐ上の\.{pdfpagewidth}, \.{pdfpageheight}で設定する．
+	これらの内部長さが0であった場合は，\.{shipout}されたボックスの寸法と
+	\.{hoffset}（または\.{voffset}）の値から自動的に計算される．
+  \item \pTeX では横組・縦組と組方向が複数あるので，\.{pdflastxpos}, \.{pdflastypos}の値の座標系を
+	「物理的な」向きとすべきか，それとも「組方向に応じた」向きとすべきかは悩みどころである．
+	\epTeX~110227以降，現在までのバージョンでは上記のように物理的な向きとしている．
+  \item \.{mag}を用いてページの拡大縮小を行い，かつ
+	dvipsやdvipdfmxを用いてPostScript,~pdfを生成した場合，\.{pdflast\{x,y\}pos}の原点は
+	ページの左下隅から左・上方向にそれぞれ$1\,\mathrm{in}-1\,\mathrm{truein}$%
+	移動したところになる
+	\footnote{これは\hologo{pdfTeX}のdviモードや\hologo{XeTeX}と同じ挙動である．}．
+ \end{itemize}
+  
+ \csitem[\.{pdfcreationdate}]
+  エンジン起動時の時刻を，\texttt{\pdfcreationdate}の形式で表した文字列に展開する．
+  これは\Pkg{standalone}パッケージを\epTeX で扱うために2013/06/05に実装されたプリミティブであるが，
+  現在時刻の「秒」まで得るためにも使用できる（\TeX 82では分単位でしか取得できない）．
+  
+  \epTeX においてプリミティブを実装した当初は「最初にこのプリミティブが実行された時刻を…」と
+  していたが，\epTeX~161030から\hologo{pdfTeX}と同じ挙動に修正した．
+
+ \csitem[\.{pdffilemoddate} <filename>, \.{pdffilesize} <filename>]
+  それぞれ<filename>の更新時刻（\.{pdfcreationdate}と同じ形式）と
+  ファイルサイズを表す文字列に展開する．
+  これらも\Pkg{standalone}パッケージのために\epTeX に実装されたプリミティブである．
+  
+ \csitem[\.{pdffiledump} \textrm{[}\texttt{offset} <offset>\textrm{]}%
+  \ \texttt{length} <length> <filename>]
+  <filename>で与えられたファイル名の<offset>バイト目（先頭は0）から<length>バイトを読み込み，
+  16進表記（大文字）したものに展開される．
+  
+  本プリミティブはHeiko Oberdiek氏による\Pkg{bmpsize}パッケージを\epTeX でも使うために
+  角藤さんが実装したものである(2014/05/06)．
+  
+ \csitem[\.{pdfshellescape}]
+  \.{write18}によるshell-escapeが利用可能になっているかを示す内部整数（読み取り専用）．
+  0ならば不許可，1ならば許可，2ならばrestricted shell-escape%
+  \footnote{あらかじめ「安全」と認められたプログラム（\texttt{texmf.cnf}中で指定する）
+    のみ実行を許可する仕組み．}%
+  である．
+  
+  本プリミティブは\TeX ユーザの集い2014でリクエストを受けて実装された(\cite{pdfse})．
+  
+ \csitem[\.{pdfmdfivesum} {[\texttt{file}]} <general text>]
+  引数<general text>のMD5ハッシュ値か，あるいは\texttt{file}が指定された場合は
+  ファイル名が<general text>のファイルのMD5ハッシュ値を計算する．
+
+  前者の「引数のMD5ハッシュ値を計算する」場合には，\.{pdfstrcmp}と同じように
+  和文文字をUTF-8で符号化してから計算する．
+
+  このプリミティブは\cite{xe5}以降の議論を元に，角藤さんがリクエストしたもので，
+  2015/07/04に\epTeX に実装されている．
+  
+ \csitem[\.{pdfpritimive}, \.{ifpdfprimitive}]
+  \.{pdfprimitive}は次に続く制御綴がプリミティブと同じ名称であった場合に，
+  プリミティブ本来の意味で実行させるものである．例えば
+\begin{verbatim}
+\pdfprimitive\par
+\end{verbatim}
+  は，\.{par}が再定義されていようが，本来の\.{par}の意味（段落終了）となる．
+  また，\.{ifpdfprimitive}は，次に続く制御綴が同名のプリミティブの意味を持っていれば
+  真，そうでなければ偽となる条件判断文である．
+
+  これらのプリミティブは2015/07/15版の\Pkg{expl3}パッケージで使われた
+  (\cite{15715})ことを受けて実装されたものだが，
+  現在ではこれらのプリミティブは使われていない．
+
+ \csitem[\.{pdfuniformdeviate} <number>, \.{pdfnormaldeviate}]
+  \.{pdfuniformdeviate}は，0以上<number>未満の一様分布に従う乱数（整数値）を生成する．
+  \.{pdfnormaldeviate}は，平均値0，標準偏差65536の正規分布に従う乱数（整数値）を生成する．
+  
+  現在の乱数生成の種の値は，\.{pdfrandomseed}\indcs{pdfrandomseed}で取得できる（読み取り専用）．
+  種の初期化にはシステムのマイクロ秒単位での現在時刻情報が使われる．また，種の値は
+  \.{pdfsetrandomseed} <number>\indcs{pdfsetrandomseed}によって特定の値に設定可能である．
+  
+  \LaTeX3のl3fpにおいて，2016/11/12あたりから実装された乱数生成機能(\cite{random})を
+  サポートするために\epTeX~161114から実装された．
+
+ \csitem[\.{pdfelapsedtime}, \.{pdfresettimer}]
+  \.{pdfelapsedtime}は，エンジン起動からの経過時間を``scaled seconds''すなわち
+  $1/65536$秒単位で返す．この値は\.{pdfresettimer}によって再び0にリセットできる．
+  すぐ上の乱数生成プリミティブと同時に実装された．
+
+ \csitem[\.{expanded} <general text>]
+  （\.{message}が行うのと同様に）<general text>を完全展開した結果のトークン列を返す．
+
+  この命令は元々は\hologo{pdfTeX}に実装計画があったそうである(\cite{expanded})が，
+  しばらくの間\hologo{LuaTeX}にのみ実装されていた命令であった．
+  しかし\cite{expanded1}をきっかけに，
+  \hologo{pdfTeX}, \epTeX, \hologo{XeTeX}で一斉に実装された．
+  \epTeX~180518以降で利用可能である．
+\end{cslist}
+
+\section{バージョン番号}
+\pTeX~p3.8.0に\.{ptexversion}が実装されたのと同時に，\epTeX でもバージョン番号を
+取得する\.{epTeXversion}プリミティブが\epTeX~180121から追加された．
+
+\begin{cslist}
+ \csitem[\.{epTeXversion}]
+  \epTeX のバージョン番号（例えば\the\epTeXversion）を内部整数で返す．\epTeX 起動時のバナーでは
+  \eTeX, \pTeX のバージョン番号も表示されるので，それを再現しようとすると以下のようになる．
+\begin{verbatim}
+This is e-pTeX, Version 3.14159265-%
+p\number\ptexversion.\number\ptexminorversion\ptexrevision-%
+\number\epTeXversion-\number\eTeXversion\eTeXrevision ...
+\end{verbatim}
+
+
+\end{cslist}
+
+
+\section{\.{lastnodechar}プリミティブ}
+本プリミティブは
+\TeX ユーザの集い2014でリクエストを受けて
+実装された(\cite{pdfse})プリミティブで，\epTeX~141119以降のextended modeで利用可能である．
+詳細な背景説明・仕様は\cite{lnc}に譲る．
+
+\pTeX では
+\begin{verbatim}
+これは，\textmc{『ほげ党宣言』}の……
+\end{verbatim}
+という入力からは
+\begin{quote}
+これは，\textmc{『ほげ党宣言』}の……
+\end{quote}
+という出力が得られ，コンマと二重鍵括弧の間が全角空きになってしまうことが以前から知られている．
+
+この現象は，（展開し続けた結果）「，」の直後のトークンが「『」ではないことによって，
+「，」の後の半角空きと，「『」の前の半角空きが両方
+入ってしまうという\pTeX の和文処理の仕様
+\footnote{%
+  \TeX82 の欧文のカーニングや合字処理も同じような仕様になっている．
+  例えば\texttt{W\.{relax}\ oWo}からはW\relax oWoという出力になり，
+  Wとoの間のカーニングが\.{relax}によって挿入されなくなったことがわかる．
+}による．
+min10フォントメトリックで「ちょっと」を組むと「ょっ」の間が詰まるという不具合は有名であるが，
+「|ちょ{}っと|」と空グループを挟むことで回避されるのも，同じ理由である．
+
+\medskip
+
+\.{lastnodechar}プリミティブは，
+上で述べた「書体変更命令を間に挟むと和文間グルーが『まともに』ならない」という状況を
+改善する助けになることを目指して実装された．
+
+\begin{cslist}
+  \csitem[\.{lastnodechar}]
+  現在構築中のリストの「最後のノード」が文字由来であれば，そのコード番号（内部コード）を内部整数として返す．
+  
+  上記「最後のノード」では，\pTeX によって自動挿入される
+  \begin{itemize}
+    \item JFMによって入るグルー
+    \item 行末禁則処理のために挿入されるペナルティ
+    \item 欧文文字のベースライン補正用のノード
+  \end{itemize}
+  は無視される．また，「最後のノード」が欧文文字のリガチャであった場合は，リガチャそれ自身のコード番号ではなく，
+  最後の構成要素の文字のコード番号を返す．「最後のノード」が文字を表すものでなかった場合は，$-1$が返る．
+\end{cslist}
+
+例えば，\.{lastnodechar}を使って
+\begin{verbatim}
+これは，\the\lastnodechar\textmc{『ほげ党宣言』}……
+\end{verbatim}
+と入力すると，
+\begin{quote}
+これは，\the\lastnodechar\textmc{『ほげ党宣言』}……
+\end{quote}
+のようになり，\.{lastnodechar}実行時の「最後のノード」（文字「，」を表す）の内部コード
+\footnote{%
+  内部コードがEUCの場合は$\texttt{"A1A4} = 41380$，SJISの場合は
+  $\texttt{"8143} = 33091$となる．
+}が得られる．これによって，\.{textmc}等の命令の直前の文字を知ることができるので，
+あとは\TeX マクロ側でなんとかできるだろう，という目論見である．
+
+
+また，上記の説明にあるとおり，
+\begin{verbatim}
+abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
+\end{verbatim}
+は
+\begin{quote}
+abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
+\end{quote}
+となり，見た目では同じ「fi」が\.{lastnodechar}実行時の「最後のノード」であるかのように見えても，
+それが合字の場合（左側）では\.{lastnodechar}の実行結果は最後の構成要素「i」のコード番号105となる．
+
+\begin{curve}
+  「|これは，|」とソース中に入力したときの
+  ノードの状態を\.{showlists}で調べてみると次のようになっており，
+  本当に一番最後のノードはJFMによって挿入される二分空きの空白
+  （「，」と通常の和文文字の間に入るはずのもの）であることがわかる．
+\begin{verbatim}
+### yoko direction, horizontal mode entered at line 465
+\hbox(0.0+0.0)x9.24683
+\JY1/hmc/m/it/10 こ
+\JY1/hmc/m/it/10 れ
+\JY1/hmc/m/it/10 は
+\penalty 10000(for kinsoku)
+\JY1/hmc/m/it/10 ，
+\glue(refer from jfm) 4.62341 minus 4.62341
+\end{verbatim}
+  しかし，数段落上の説明の通り，\.{lastnodechar}は\pTeX の和文処理によって自動的に挿入された
+  これらJFM由来の空白を無視する．
+\end{curve}
+
+「最後のノード」を見ているので，
+\begin{verbatim}
+これは，\relax\sffamily{}\the\lastnodechar\textmc{『ほげ党宣言』}……
+\end{verbatim}
+などとノードに関係しないものが途中にあっても，それは単純に無視されて
+\begin{quote}
+これは，\relax\sffamily{}\the\lastnodechar\textmc{『ほげ党宣言』}……
+\end{quote}
+となる．
+
+\section{\.{lastnodesubtype}プリミティブ}
+\cite{tjb28,plt63}などの議論で，「最後のグルーがJFMグルーだけ\.{unskip}する」処理の必要性が
+唱えられてきた．\epTeX にはもともと最後のノードの種別を返す\.{lastnodetype}プリミティブが
+あったが，これでは最後のノードがグルーであるかしかわからない．
+そのため，\epTeX~180226で\.{lastnodesubtype}プリミティブを追加した．
+
+\begin{cslist}
+ \csitem[\.{lastnodesubtype}]
+ 現在構築中のリストの「最後のノード」（\.{lastnodechar}プリミティブと同様）の
+ subtype値を内部整数として返す．
+\begin{itemize}
+ \item 「最後のノード」が文字ノードのときは0が返る．
+ \item 現在構築中のリストが空のときは$-1$が返る．
+\end{itemize}
+\end{cslist}
+
+実際に有用なのは，以下の場合であろう：
+ \begin{description}
+  \item[最後のノードがグルー($\.{lastnodetype}=11$)のとき]
+\begin{multilist}{3}{\hfil\hskip1.5em#:&\quad#\hfil}
+\item 0&明示的な\.{hskip}, \.{vskip}\cr
+\item 1&\.{lineskip}\cr
+\item 2&\.{baselineskip}\cr
+\item 3&\.{parskip}\cr
+\item 4&\.{abovedisplayskip}\cr
+\item 5&\.{belowdisplayskip}\cr
+\item 6&\.{abovedisplayshortskip}\cr
+\item 7&\.{belowdisplayshortskip}\cr
+\item 8&\.{leftskip}\cr
+\item 9&\.{rightskip}\cr
+\item 10&\.{topskip}\cr
+\item 11&\.{splittopskip}\cr
+\item 12&\.{tabskip}\cr
+\item 13&\.{spaceskip}\cr
+\item 14&\.{xspaceskip}\cr
+\item 15&\.{parfillskip}\cr
+\item 16&\.{kanjiskip}\cr
+\item 17&\.{xkanjiskip}\cr
+\item 18&\.{thinmuskip}\cr
+\item 19&\.{medmuskip}\cr
+\item 20&\.{thickmuskip}\cr
+\item 21&JFM由来グルー\cr
+\item 98&\.{nonscript}\cr
+\item 99&\.{mskip}\cr
+\item 100&\.{leaders}\cr
+\item 101&\.{cleaders}\cr
+\item 102&\.{xleaders}\cr
+\end{multilist}
+  \item[最後のノードがカーン($\.{lastnodetype}=12$)のとき]
+  \leavevmode
+\begin{multilist}{3}{\hfil\hskip1.5zw#:&\quad#\qquad\hfil}
+\item 0&カーニング\cr
+\item 1&明示的な\.{kern}\cr
+\item 2&アクセント由来\cr
+\item 3&イタリック補正\.{/}\cr
+\item 99&\.{mkern}\cr
+\end{multilist}
+  \item[最後のノードがペナルティ($\.{lastnodetype}=13$)のとき]
+  \leavevmode
+\begin{multilist}{2}{\hfil\hskip1.5zw#:&\quad#\qquad\hfil}
+\item 0&明示的な\.{penalty}\cr
+\item 1&\.{jcharwidowpenalty}\cr
+\item 2&禁則処理由来\cr
+\end{multilist}
+ \end{description}
+
+しかし，本プリミティブは
+\epTeX 内部で使用しているsubtypeの値をそのまま返すだけであるので，
+具体的な数値は将来変わる恐れがある．そのため，
+\begin{verbatim}
+\ifdefined\ucs\jfont\tenmin=upjisr-h at 9.62216pt
+\else\jfont\tenmin=min10\fi
+\tenmin\char\jis"214B\null\setbox0\lastbox%"
+\global\chardef\pltx@gluetype\lastnodetype
+\global\chardef\pltx@jfmgluesubtype\lastnodesubtype
+\end{verbatim}
+のように\TeX ソース内から取得・保存しておくことが望ましい．
+
+\medskip
+なお\pLaTeX~2018-04-01以降では，上記のコードを利用して
+「最後のグルーがJFMグルーのときだけ消す」命令|\removejfmglue|を
+\begin{verbatim}
+\protected\def\removejfmglue{%
+  \ifnum\lastnodetype=\pltx@gluetype\relax
+    \ifnum\lastnodesubtype=\pltx@jfmgluesubtype\relax
+      \unskip
+    \fi\fi}
+\end{verbatim}
+として定義している．
+
+\section{\.{epTeXinputencoding}プリミティブ}
+現在読み込んでいるファイルの文字コードを切り替えるプリミティブであり，
+2016/02/01に阿部紀行さんによって実装された．詳細は実装者の解説記事
+\cite{eptexinputenc}を参照してほしいが，おおまかに述べると以下のようになるだろう．
+
+\begin{cslist}
+  \csitem[\.{epTeXinputencoding} <encoding>]
+  現在読み込んでいるファイルの文字コードを<encoding>に変更する．
+  実際に変更されるのは「次の行」であり，また現在のファイルからさらに\.{input}等で
+  読まれたファイルには効力を及ぼさない．
+
+  <encoding>の値は，基本的には\pTeX の\texttt{-kanji}オプションで指定できる値
+  (\texttt{euc}, \texttt{sjis}, \texttt{jis}, \texttt{utf8})である．
+\end{cslist}
+
+\begin{comment}
+  \section{互換性}
+\eTeX, \pTeX との互換性をはかるのに有効な手段としては，まず\texttt{TRIP}
+testがある．\cite{h7k}にも書いたが，これは\TeX のソースの全行を実行する
+ようなテストソースであり，\texttt{TRIP} testの実行結果が違えば，どこかの
+動作が違っていることが分かるという仕掛けである．
+
+幸いにも，\epTeX の（compatibility modeにおける）\texttt{TRIP} testの実行結果は，\pTeX のそれとほとん
+ど同じであり，違う点は以下のみであった：
+\begin{itemize}
+\item \texttt{Memory usage}の違い：
+\begin{alltt}
+  Memory usage before: \(x\,\)&\(\,y\); after: \(z\,\)\&\(\,w\); still untouched: \(u\)
+\end{alltt}
+のところで，$x$, $z$が4多く，$u$が4少ない．
+\item （\texttt{FAM256}パッチのおかげで）数式フォントが256個同時に
+扱えるようになったことによる，エラーの未発生やエラーメッセージの違い．
+\item ログの最後に出てくる，メモリ総使用量．
+\end{itemize}
+また，extended modeと
+compatibility modeによる出力の違いを検証すると，Memory usageの違いやメモリ総使用量の他に
+は，\texttt{e-TRIP}の説明書p.\ 4の項目4.にある違いしか見受けられなかった，
+
+\par\vskip0.5\baselineskip\par
+
+次に，\eTeX には，\eTeX によって拡張された部分を調べる，同様の
+\texttt{e-TRIP} testが存在する．\pTeX 系列では，|\showbox|などでい
+ちいち組方向を表示するので，それを
+\begin{verbatim}
+  $ alias sep='sed "s/, yoko direction//;s/yoko direction, //;\
+    s/yoko(math) direction, //"'
+\end{verbatim}
+というaliasを利用することでlog fileから除去し，それと\eTeX での
+\texttt{e-TRIP} testの出力と比べた結果，
+\begin{itemize}
+\item Memory Usageの違い（略）
+\item レジスタの使用可能個数を65536個/種類としたことによるエラーの未発生
+\item （和文文字のため）character codeに256以上も許すことによる
+      エラーの未発生．
+\end{itemize}
+という違いを得た．
+
+\par\vskip0.5\baselineskip\par
+
+すると，最後に，\pTeX 特有の拡張部分のテストをしたくなるわけだが，北川の
+知る限りにおいては，そのようなテストソースは公式には存在しないようである．
+しかし，やはり気になる問題であり{\tiny （さる方面から圧力もきたので）}，
+個人的に作ってみたものが\texttt{ptex-qtrip}である．詳細な説明はそちらの
+ドキュメントに譲る．ともかく，これを動作させてlog fileを比べてみると，メ
+モリ関連や\texttt{FAM256}関連以外は
+\begin{verbatim}
+  -% split2 to -0.01802,6.94444 p=-10000
+  +% split2 to -0.01806,6.94444 p=-10000
+\end{verbatim}
+以外の違いしかなかった．わずか$0.00004$の違い（単位がもしpointだとしたら
+$3$\,sp）だが，どこか気になるところである．
+
+上の箇所もあるし，また\texttt{ptex-qtrip}自体がまだ完全なものではなのだ
+が，\pTeX と\epTeX は実用上においては互換と言えそうな気もしなくもない．
+
+\end{comment}
+
+\begin{thebibliography}{99}
+ \bibitem{h7k} 北川 弘典，「計算数学II　作業記録」，2008．\\
+  \url{https://osdn.jp/projects/eptex/document/resume/ja/1/resume.pdf}ほか，
+  本pdfと同じディレクトリにある\texttt{resume.pdf}がそれにあたる．
+ \bibitem{yamamoto} 山本 和義，「数式famの制限とluatex」，掲示板「\TeX\
+  Q\ \&\ A」，2009/02/12．\\
+  \url{http://oku.edu.mie-u.ac.jp/~okumura/texfaq/qa/52744.html}
+ \bibitem{yamamoto2} 山本 和義，「Re: 数式famの制限とluatex」，掲示板「\TeX\
+  Q\ \&\ A」，2009/02/16．
+  \url{http://oku.edu.mie-u.ac.jp/~okumura/texfaq/qa/52767.html}
+\bibitem{yamamoto3} 山本 和義，「数式fam拡張マクロ for e-pTeX等」，掲示板「\TeX\
+  Q\ \&\ A」，2009/02/21．
+  \url{http://oku.edu.mie-u.ac.jp/~okumura/texfaq/qa/52799.html}
+\bibitem{expl31} 河原，「パッケージとディストリビューションについて」，掲示板「\TeX\
+  Q\ \&\ A」，2010/12/16．
+  \url{http://oku.edu.mie-u.ac.jp/~okumura/texfaq/qa/55464.html}
+ \bibitem{expl32} 角藤 亮，「Re: パッケージとディストリビューションについて」，掲示板「\TeX\
+  Q\ \&\ A」，2010/12/19．
+  \url{http://oku.edu.mie-u.ac.jp/~okumura/texfaq/qa/55478.html}
+ \bibitem{expl33} zrbabbler，「LaTeX3 と expl3 パッケージ」，ブログ「マクロツイーター」内
+  ，2010/12/22．
+  \url{http://d.hatena.ne.jp/zrbabbler/20101222/1293050561}
+ \bibitem{strcmp} 角藤 亮，「Re: e-pTeX 101231」，掲示板「\TeX\
+  Q\ \&\ A」，2011/01/01．\\
+  \url{http://oku.edu.mie-u.ac.jp/~okumura/texfaq/qa/55528.html}
+ \bibitem{pdfse} Dora TeX，「Re: |\pdfshellescape|,
+  |\lastnodechar| の実装」，\TeX~Forum，2014/11/19．
+  \url{http://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=1435#p8053}
+ \bibitem{lnc} 北川 弘典，「|\lastnodechar| プリミティブについて」，2014/12/15．\\
+ \url{https://ja.osdn.net/projects/eptex/wiki/lastnodechar}
+ \bibitem{xe5} Joseph Wright, ``[XeTeX] |\(pdf)mdfivesum|'',
+  2015/07/01,\\
+  \url{http://tug.org/pipermail/xetex/2015-July/026044.html}
+ \bibitem{15715} tat tsan，「[expl3 / e(u)ptex] 2015/07/15 版 expl3 パッケージが
+  、(u)platex で通らない」，\TeX~Forum，2015/07/26．\\
+  \url{http://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=1632}
+ \bibitem{random} Joseph Wright, ``[tex-live] Random number primitives'',
+  2016/11/12,\\
+  \url{http://tug.org/pipermail/tex-live/2016-November/039436.html}
+ \bibitem{eptexinputenc} 阿部 紀行，「2016年2月2日」，2016/02/02．\\
+  \url{http://abenori.blogspot.jp/2016/02/e-ptexeptexinputencoding.html}．
+ \bibitem{etexman} The \NTS\!\ Team. \textit{The \eTeX\ manual} (v2.0). \\
+  |$TEXMFDIST/doc/etex/base/etex_man.pdf|
+ \bibitem{omegaman} J.\ Plaice, Y.\ Haralambous. \textit{Draft
+  documentation for the $\it\Omega$ system}, 1999.\\
+  |$TEXMFDIST/doc/omega/base/doc-1.8.tex|
+ \bibitem{pdftexman} H\`an Th\'{\^e} Th\`anh et al. \textit{The 
+	\hologo{pdfTeX}\ user manual}, 2015.\\
+	|$TEXMFDIST/doc/pdftex/manual/pdftex-a.pdf|
+\bibitem{l2e26}
+	The \LaTeX3 Project Team, \textit{\LaTeX\ News Issue 26}, 2017.\\
+	|$TEXMFDIST/source/latex/base/ltnews26.tex|, \\
+	\url{https://www.latex-project.org/news/latex2e-news/ltnews26.pdf}.
+\bibitem{tjb28} 北川 弘典，
+	「[ptex] |\inhibitglue|の効力」，2017/09/20．\\
+	\url{https://github.com/texjporg/tex-jp-build/issues/28}．
+\bibitem{plt63} Dora TeX，
+	「p 指定の tabular でのセル冒頭の |\relax\par|」，2018/02/19．\\
+	\url{https://github.com/texjporg/platex/issues/63}．
+ \bibitem{expanded1} Joseph Wright, 
+  ``[tex-live] Primitive parity, |\expanded| and |\Ucharcat|'',
+  2018/05/04,\\
+  \url{http://tug.org/pipermail/tex-live/2018-May/041599.html}
+\bibitem{expanded}
+  Joseph Wright, ``A `new' primitive: |\expanded|'', 2018/12/06.\\
+  \url{https://www.texdev.net/2018/12/06/a-new-primitive-expanded}
+\end{thebibliography}
+
+\newpage
+\printindex
+
+\newpage\scrollmode
+\input fam256d.tex
+
+\newpage
+\end{document}

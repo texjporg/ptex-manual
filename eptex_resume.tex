@@ -1,0 +1,1647 @@
+%#!eplatex resume.tex
+\documentclass[a4j,papersize]{jsarticle}
+\usepackage[all]{xy}
+\usepackage{moreverb,manfnt}
+\usepackage[14Q,20mm,ls175,nohiragino]{jd}
+\makeatletter
+\fpinit
+\tracingstats=1\xspcode'134=3
+\def\JTeX{J\TeX}
+\def\etrip{{\tt e-TRIP}}
+\def\trip{{\tt TRIP}}
+\def\mf{{\fontencoding{U}\fontfamily{manual}\selectfont METAFONT}}
+\renewcommand{\section}{%
+  \jd@startsection{section}{1}{\z@}{\z@}{3}{1.1zh}{1zh}%
+  {\normalfont\LARGE\headfont\raggedright}}
+\renewcommand{\subsection}{%
+  \jd@startsection{subsection}{2}{\z@}{\z@}{2}{1zh}{0.25zh}%
+  {\normalfont\large\headfont\raggedright}}
+\input shl-tab
+\newdimen\@baselineskip
+\def\WEB{\texttt{WEB}}
+\def\eTeX{$\epsilon$-\TeX}\def\pdfTeX{pdf\/\TeX}
+\def\epTeX{$\epsilon$-\pTeX}\def\peTeX{pe\TeX}
+\def\NTS{\leavevmode\hbox{$\cal N\kern-0.35em\lower0.5ex\hbox{$\cal T$}%
+  \kern-0.2emS$}\,}
+\def\XeTeX{\leavevmode
+  \setbox0=\hbox{X\lower.5ex
+  \hbox{\kern-.15em\reflectbox{E}}\kern-.1667em \TeX}%
+  \dp0=0pt \ht0=0pt \box0 } 
+% ↑ http://wiki.contextgarden.net/Talk:XeTeX のを改変
+
+% from etex_man.sty
+\DeclareFontShape{OT1}{cmr}{bxrev}{n}{<-> xbmc10}{} % for right-to-left text
+\DeclareTextFontCommand{\revrm}{\fontseries{bxrev}\fontshape{n}\selectfont}
+\def\TeXXeT{\TeX-\revrm{\TeXXeTstate=1\beginR\TeX-\endR}}
+\def\emph#1{{\rm\bfseries\mathversion{normal}#1}}
+
+\def\xymtt#1{\hbox to 0zw{\hss\texttt{#1}\hss}}
+\jdAdjust
+\count0=0\thispagestyle{empty}
+\jdNline{16}{}
+\jdNline{3}{\huge\emph{計算数学II　作業記録}}
+\makeatletter
+\jdNline{-1}{}
+\jdNline[r]{2}{\Large 05班 ``epsilon''，北川 弘典}
+\jdNline[r]{1}{\large \number\year/\two@digits\month/\two@digits\day
+     \space\two@digits\hour:\two@digits\minute}
+\makeatother
+\newpage
+\tableofcontents
+
+\newpage
+\section{注意事項}
+\begin{itemize}
+\item 成果物の\epTeX は\verb+http://www.ms.u-tokyo.ac.jp/~kitagawa/+で公
+      開しております．
+\item 角藤さんが2007/12/30にp\TeX${}+{}$\eTeX の実験\footnote{こち
+      らは\peTeX と呼称．正式にはどうlogoを組むか分からないので，この表現
+      で許してもらおう．pとeの位置が反対なのがおもしろいと共に幸いである
+      けれども，こちらの名称の由来はp(\eTeX)という実装方法であったからだ
+      ろう（と推測してみる）．pe\TeX の登場でこちらもやる気がかき立てら
+      れ，\epTeX がより完成度が高いものとなりえた．}を公開されたが，これ
+      は本プロジェクトとは全く関係のないものである．
+\item この文書は概ね着手した順番に並んでいるが，「形式化」以降は順番が
+      若干入り乱れている．また後になるほど実際の作業と同時進行して書いた
+      部分が多くなってくる．
+\item 本文書は計算数学IIの発表に用いるには長すぎるということで，発表当日 (2/1)
+      に使うのは別に作ったスライドだけとした．しかし，もちろん，この文書
+      は残すつもり．
+\item \emph{一部のversionのAdobe Readerではヘブライ文字がちゃんとでない
+      ようですが，原因はまだよくわかりません．}
+\item 阿部 紀行さん，角藤 亮さん，「教職男」さん，「通りすがり2」さんをは
+      じめとする方々に（このようなところで申し訳ないが）深くお礼を申し上
+      げます．
+\end{itemize}
+\newpage
+
+\section{テーマについて}
+\subsection{背景}
+Knuth教授の開発された狭義の\TeX では，日本語が通らない．それを日本語に対
+応させようという試みとして，NTT \JTeX\footnote{千葉大の桜井さんがメンテ．
+\verb+http://www.math.s.chiba-u.ac.jp/~sakurai/software.html+．} とアス
+キーの\pTeX\footnote{\verb+http://www.ascii.co.jp/pb/ptex/+が公式ページ
+である．}が有名であり，
+後者の\pTeX は縦組みもできるということもあって，日本では標準的になったと
+いってもよい．（狭義の）\TeX に対応する\LaTeX マクロについても，J\TeX,
+\pTeX のそれぞれに対応版が存在し，接頭辞を拝借してp\LaTeX などのように呼
+ぶ．
+
+\eteiri
+
+\def\heb#1{\leavevmode\smash{\fontencoding{U}\fontfamily{heb}\selectfont #1}}
+一方，それ以外の\TeX の拡張として，例えば次のようなものがある．
+\begin{itemize}
+\item \eTeX\ (eTeX). 各種機能が拡張されて
+      いる．詳細は後述．
+\item $\Omega$ (Omega). \TeX をUnicodeに対応させて多言語処理を実装させたものであ
+      る．これに対応する\LaTeX マクロは$\Lambda$ (Lambda) と呼ばれる．
+公式ページは\verb+http://omega.enstb.org/+．
+\item  \heb{\char'200}(Aleph). $\Omega$に\eTeX 相当の機能を取り込んだも
+      の．対応する\LaTeX マクロは \heb{\char'214} (Lamed) と呼ばれる．
+\item \pdfTeX. \TeX\ sourceから直にpdfを作成できるようにしたもの．今は
+      \eTeX がベースとのこと．公式ページは
+\verb+http://www.tug.org/applications/pdftex/+．
+\end{itemize}
+
+\eteiri
+
+さて，\TeX はある種のプログラミング言語であり，変数，つまりレジスタも
+\verb+\count+（4\,byte整数)，\verb+\dimen+（$2^{-16}$\,pt単位で，整数部
+14\,bit，小数部16\,bitの固定小数点数），\verb+\box+などのいくつかの種類が
+あり，各種類0\,〜\,255のindex で，つまり1 種類につき256個ずつ使えるようになっ
+ていて，\pTeX でもそれを引きずっている．しかし，MusiX\TeX などのような巨
+大なマクロパッケージでは，全く同じsourceでも（p\LaTeX では日本語まわりで
+余計にレジスタを使うので）欧文\LaTeX では処理できるが．p\LaTeX では処理で
+きないといった事態がすでに発生している．一方，前出の\eTeX による拡張では，
+レジスタは各種$2^{15}$個使えるように改良されているので，拡張機能を使う状
+況では実質的には起こりえないと思ってよい．．
+
+\eteiri
+
+欧文の\LaTeX を使おうとして端末上で\verb+latex+と打つと，そこで起動する
+のは元々の\TeX ではなく，大幅に機能拡張された\pdfTeX が互換モードで動い
+ているという状況が最近では発生している，現に，作業を行ったPCでは\TeX\
+Live 2007という\TeX 関連のファイルをまとめたもの（\pTeX は入ってない）に，
+自分で\pTeX を追加して使っているのだが，以下のように\pdfTeX が起動した．
+このことから考えると，世界的には\eTeX の機能が利用できることが
+当たり前になりつつあるといってもよいのかもしれない．つまり，特に，各種
+256個というレジスタの制限はもはやobsoluteになりつつあるといえるだろう．
+
+\begin{adjustvboxheight}
+\narrowbaselines\small
+\begin{verbatim}
+　　[h7k doc]$ latex
+　　This is pdfTeX, Version 3.141592-1.40.3 (Web2C 7.5.6)
+　　（後略）
+\end{verbatim}
+\end{adjustvboxheight}
+
+\subsection{テーマの提示}
+前置きが長くなったが，以上の背景から，本班では\emph{\pTeX に$\bm
+\epsilon$-\TeX の機能の一部，特にレジスタ数の話についての機能を組み込む}
+ということを第1の目標とした．
+
+第2の目標は半分ネタである．\TeX ソース内で使用できる算術演算はすべて整数
+（と固定小数点数）の四則演算であるため，例えば3次方程式の解の近似計算などは
+FortranとかCとかの他の言語でやらなければならなかった．これを\TeX の内部でで
+きたら，いちいち計算用プログラムの結果を貼り付けたり\verb+\input+で読んだ
+りする必要が無くて，楽になるに違いない\footnote {そう考えるのは多分僕だけ
+だ．}，と僕は考えたので，（速度はある程度は度外視することにして）\emph{\TeX への浮
+動小数点演算の実装}を次の目標にした\footnote{Beebe\nobreak\cite{beebe}のtitleは
+Extending \TeX\ and \mf\ with Floating-Point Arithmeticであるが，
+そちらは「Lua等のスクリプト言語による（IEEE 754rに基づくような）
+実装」というアプローチを示しているだけである．}．
+
+\section{\TeX 周辺のcompile方法}
+\pTeX の改造をするためには，それがどのようにcompileされているかを知らな
+ければもちろんできない．僕は昔から\TeX 関係のプログラムを自分でソースか
+らコンパイルしていた（Unix系統なら土村さんによるptetex3のおかげで，だい
+ぶ簡単になった）ので知っていたのでこれを調べる時間はほとんど0で済んだ．
+
+\TeX の一番元々のソースは{\tt tex.web}というファイルであり，はっきり冒頭
+に
+\begin{adjustvboxheight}
+\narrowbaselines\small
+\begin{verbatim}
+　　% This program is copyright (C) 1982 by D. E. Knuth; all rights are reserved.
+　　% Copying of this file is authorized only if (1) you are D. E. Knuth, or if
+　　% (2) you make absolutely no changes to your copy. (The WEB system provides
+　　% for alterations via an auxiliary file; the master file should stay intact.)
+　　% See Appendix H of the WEB manual for hints on how to install this program.
+　　% And see Appendix A of the TRIP manual for details about how to validate it.
+
+　　% TeX is a trademark of the American Mathematical Society.
+　　% METAFONT is a trademark of Addison-Wesley Publishing Company.
+\end{verbatim}
+\end{adjustvboxheight}
+\noindent とあるように，これがKnuth教授の製作したファイルそのままである．このファ
+イルは\WEB という言語/書式で書かれている．
+
+\subsection{\WEB の説明}
+ここについては松山\nobreak\cite{matsu3}を読んだ方が，
+以下の僕の下手な説明よりわかりやすいかもしれないが，まあ，お付き合いくだ
+さい．
+
+\WEB の詳細はKnuth~\cite{webman}とか
+から得られるが，大雑把に言うと，Pascalでかかれたプログラムのソースを小さ
+く分割して，各分割の断片は\TeX ソースによ
+る説明文を必要なら付属させて，それらを（ほとんど任意の順序で）並べたもの
+である．
+上の説明では非常にわかりにくいので，実例を別に挙げるこおにしておこう（付
+録参照）．
+\eteiri
+
+さて，\WEB で書かれたファイル（例えば\verb+fuga.web+）を\verb+tangle+とい
+うプログラムに通すと，そこからPascalで書かれたプログラムのソースだけが抜
+き出され，\verb+fuga.pas+とか\verb+fuga.p+ができる．一方で，\verb+weave+
+というプログラムに通すと，\verb+fuga.web+中に書かれた解説文がPascalソー
+スとともに整形され，\TeX ソース\verb+fuga.tex+を得る．これを\TeX で処理
+すると，綺麗に整形されたソース付きのドキュメントが得られる，という寸法で
+ある\footnote{ちなみに，tangleは「もつれる/させる」，weave /w\'i:v/は「織る」と
+いう意味である．{\tt tangle}は\WEB ソース中に適当な順序で置かれたプログラ
+ムの各断片をちゃんと並べ直すが，吐かれたPascalソースは読もうとする気が失せ
+るほどぐちゃぐちゃである．}．
+
+また，\WEB にはchange fileという機能が用意されており，ちょうどパッチファイ
+ルの役割を果たす．構造も似ており，\newpage
+\begin{adjustvboxheight}
+\narrowbaselines
+\begin{verbatim}
+　　@x
+　　変更前の部分
+　　@y
+　　変更後の部分
+　　@z
+\end{verbatim}
+\end{adjustvboxheight}
+\noindent の繰り返しからなっている．\verb+@x+の行が\verb+@x l.1701 hogehoge...+など
+のようになっている（注釈が書かれている）ことも多い．{\tt tangle}や{\tt
+weave}の引数にはこのchange fileを\WEB ソースとともに指定することができて，
+例えば，\par
+\noindent \ \ \ \ {\tt >\ tangle fuga.web fuga.ch}
+
+\noindent とすると，{\tt fuga.web}の内容を{\tt
+fuga.ch}でパッチしたものについて，{\tt tangle}処理が行われる．また，{\tt
+tie}というプログラムを使えば，\WEB ソースとchange fileから，change file適
+用後の\WEB ソースを作ったり，複数のchange fileをまとめることができる
+\footnote{厳密には，これは{\tt CWEB}のプログラムらしい．名前の由来は英単
+語が「結ぶ」という意味だからであろう．Star Warsの某帝国軍戦闘機とは関係は
+ないだろう．}．
+
+\subsection{Web2Cと\TeX のコンパイル}
+
+さて，{\tt tangle}で{\tt tex.web}を処理すると{\tt tex.p}が生成されるが，
+現在はWeb2Cという実装方法でこれを処理している．詳細は松山\nobreak\cite{matsu3}
+に譲るが，{\tt tex.web}に{\tt tex.ch}というWeb2C実装特有の拡張やシス
+テム依存部分（入出力とか，時計）を納めたパッチを適用して，それを{\tt
+tangle}にかけて{\tt tex.p}を生成する．その後，{\tt web2c}というプログラ
+ム（と付属する小ツール）によって，{\tt tex.p}は{\tt texini.c}, {\tt
+tex0.c},~$\ldots$というCソースにまで変換される．それらと（もともとCソー
+スで準備されているシステム依存部分である）{\tt texextra.c}とかをコンパイ
+ル，リンクして，ようやく実行可能形式が出来上がるというわけである．
+
+これを図にしてみよう：
+\jdAline[c]{\small\narrowbaselines\xymatrix{%
+\texttt{tex.web}\ar[r]&\fbox{\tt tangle}\ar[r]&\texttt{tex.p}\ar[rr]^-{\rm
+Web2C}&&\text{C source}\ar[rr]^-{\rm C\ compiler}&&\texttt{tex}\\
+&\texttt{tex.ch}\ar[u]}}
+
+同様に，\pTeX のコンパイルは次のように行われる\footnote{最後のC
+compiler のところは省略した．また，厳密には{\tt ptex-base.ch}と{\tt
+ptex.web}から{\tt ptex.ch}を作り，それを適用して{\tt tangle}に食わせてい
+るが，そこら辺は省略．}：
+
+\jdAline[c]{\small\narrowbaselines\xymatrix{\texttt{%
+tex.web}\ar[r]&\fbox{\tt tie}\ar[r]&\texttt{ptex.web}^*\ar[r]&\fbox{\tt
+tangle}\ar[r]&\texttt{ptex.p}^* \ar[rr]^-{\rm Web2C}&&\text{C source}\\
+&\texttt{tex.ch}\ar[u]&&\texttt{ptex-base.ch}^*\ar[u] }}
+
+さらに，今回の準主役とも言える\eTeX では，こうなっている：
+\jdAline[c]{\small\narrowbaselines\xymatrix{ {\tt
+tex.web}\ar[r]&\fbox{\tt tie}\ar[r]&\texttt{etex.web}\ar[r]&\fbox{\tt
+tangle}\ar[r]&\texttt{etex.p} \ar[rr]^-{\rm Web2C}&&\text{C source}\\
+{\begin{array}{c}\texttt{etex.ch}^{\dagger}\\{\tt
+etex.fix}^{\dagger}\end{array}}\ar[ur] &{\begin{array}{c}{\tt
+tex.ch0}^{\dagger}\\\texttt{tex.ch}\\\texttt{tex.ch1}^{\dagger}\\{\tt
+tex.ech}^{\dagger}\\(\texttt{etex.web})\end{array}}\ar[r] &\fbox{\tt
+tie}\ar[r]&\texttt{etex.ch}\ar[u] }}
+
+ここで，$*$, $\dagger$とかはファイルのあるディレクトリを表している．なお，
+{\tt etex.fix}は実際には中身はなかった．
+
+\newpage
+ここから，第1の目標，つまり\pTeX に\eTeX の機能の一部をマージ
+すること，を実現させるためには，大雑把に言えば，${\tt tex.web}+{\tt
+tex.ch}+\text{\tt ptex-bash.ch}^*+{\tt etex.ch}^{\dagger}$とするか，${\tt
+tex.web}+{\tt tex.ch}+{\tt etex.ch}^{\dagger}+\text{\tt ptex-bash.ch}^*$と
+（ここでの加法はもちろん非可換である！）すればよいだろう，と想像がつく．
+どちらを選んでもよかったが，ここでは\pTeX をベースとしたいという意味で，
+前者を採用することにした\footnote{これによりproject名が\emph{$\bm
+\epsilon$-\pTeX}と決まった．$\varepsilon$-(\pTeX)のつもりであ
+る．もちろんこの文書も\epTeX
+で組版している．}．
+
+\section{$\bm \epsilon$-\TeX のマージ}
+\subsection{\pTeX の準備}
+
+というわけで，主に編集するのは{\tt etex.ch}である．
+しかし，\pTeX を元に作業をするので，\pTeX がコンパイルできることを確かめ
+ておかねばならない．その手順は大まかには\TeX wiki~\cite{texwiki}の後
+半部にある「古い情報」にある通りである．しかし，te\TeX\ 3.0下では無事にあ
+るようにコンパイルができるのだが，\TeX\ live 2007だとWeb2Cのバージョンが
+新しく，途中で以下のようなエラーを出して止まってしまった：
+\begin{adjustvboxheight}
+\narrowbaselines\small
+\begin{verbatim}
+　　gcc -DHAVE_CONFIG_H  -I. -I.. -I../.. -I../..   -O2 -s -march=pentium-m -fomit-f
+　　rame-pointer  -c ptexextra.c -o ptexextra.o
+　　ptexextra.c: In function 'parse_options':
+　　ptexextra.c:956: error: too few arguments to function 'printversionandexit'
+　　ptexextra.c: In function 'getjobname':
+　　ptexextra.c:1722: error: number of arguments doesn't match prototype
+　　texcoerce.h:908: error: prototype declaration
+　　make: *** [ptexextra.o] Error 1
+\end{verbatim}
+\end{adjustvboxheight}
+これは{\tt printversionandexit}関数と{\tt getjobname}関数の宣言がWeb2Cの
+version upに伴って変わってしまったのが原因である．修正箇所は
+{\tt ptex756.diff}にdiffの形で書いている．
+また，{\tt tftopl}とかについては{\tt tangle}の段階でエラーが出るようであ
+るが，これらは本projectと関係ないので省略する：
+\begin{adjustvboxheight}
+\narrowbaselines\small
+\begin{verbatim}
+　　This is TIE, CWEB Version 2.4. (Web2C 7.5.6)
+　　Copyright (c) 1989,1992 by THD/ITI. All rights reserved.
+　　(../tftopl.web)
+　　(../tftopl.ch)
+　　....500....1000....1500
+　　(No errors were found.)
+　　../tangle ./tftopl.web tftopl.ch
+　　This is TANGLE, Version 4.5 (Web2C 7.5.6)
+　　*1*6*18*26*44*88*96*100
+　　! Hmm... 1 of the preceding lines failed to match. (change file l.378)
+　　@y
+　　   *114*126
+　　Writing the output file.....500..
+　　Done.
+　　(Pardon me, but I think I spotted something wrong.)
+　　make: *** [tftopl.p] Error 1
+\end{verbatim}
+\end{adjustvboxheight}
+
+さて，とりあえずのたたき台として\pTeX の\WEB ソース，つまり{\tt
+tex.web}, {\tt tex.ch}, {\tt ptex-base.ch}を1つにまとめた{\tt
+ptex-orig.web}を{\tt tie}によって作成した．その後，{\tt ptex-orig.web}中
+の最初の部分である「{\tt This is TeX}」の部分などを若干修正した．修正箇所は
+diffの形で{\tt ptex-orig.diff}としてある．
+
+\subsection{$\bm\epsilon$-\TeX の機能}
+\eTeX のマニュアル\nobreak\cite{etexman}を元に\eTeX の主な機能を見てみることにする．
+\eTeX にはCompatibility modeとExtended modeの2つが存在し，前者では\eTeX
+特有の拡張は無効になるのでつまらない．後者がおもしろい．
+
+拡張機能を使うに\xspcode`*=3\xspcode`-=3{}はファイル名を渡すときに{\tt *}
+をつけるかコマンドラインオプションとして{\tt -etex}スイッチをつければいい
+が，\eTeX 拡張に関わる追加マクロ\footnote{例えば，\TeX ではレジスタに
+\verb+\@tempcnta+などの「別
+名」をつけることが非常によくある．この機能については我々が実際に使うのははplainマクロや
+\LaTeX マクロによって提供されており，当然256個制限の環境下を前提として組
+まれている．}は当然ながらそれだけで
+は駄目である．「plainマクロ for \eTeX」（{\tt etex.fmt}というのが一番マシ
+かな）では自動的に追加マクロである{\tt etex.src}が呼ばれる．\LaTeX 下では
+ちょうど{\tt etex.src}に対応した{\tt etex} パッケージを読み込む必要がある．
+
+\paragraph{レジスタの増加}
+最初に述べたように，\TeX では6種類のレジスタが各256個ずつ利用できる．そ
+れぞれのレジスタには\verb+\dimen75+などのように0\,〜\,255の番号で指定できる
+他，予め別名の定義をしておけばそれによって指定することもでき
+る\makeatletter\advance\c@footnote-1\footnotemark\makeatother．
+これらのいくつかは特殊な用途に用いられる（例えば
+\verb+\count0+はページ番号などのように）ことになっているので，さらにuser
+が使えるレジスタは減少する．
+
+\eTeX では，追加のレジスタとして番号で言うと256\,〜\,32767が使用できるように
+なった．上のpdfによると最初の0\,〜\,255と違って若干の制限はあるようだが，そ
+れは些細な話である．追加された（各種類あたり）$32768-256=32512$個のレジ
+スタは，メモリの効率を重視するためsparse registerとして，つまり，必要な時に始めてツリー構造の中で確保
+されるようになっている．
+
+\paragraph{式が使用可能に}
+\TeX における数量の計算は充実しているとは言い難い．例えば，
+
+　\verb+\dimen123+${}\leftarrow($\verb+\dimen42+${}+{}$\verb+\@tempdima+
+$)/2$
+
+\noindent という計算を元々の\TeX で書こうとすると，
+\begin{verbatim}
+　　\dimen123=\dimen42 \advance\dimen123 by \@tempdima \dimen123=0.5\@tempdima
+\end{verbatim}
+のように書かないといけない．代入，加算代入，乗算代入，除算代入ぐらいしか
+演算が用意されていない状態になっている（上のコードのように，$d_2\mathrel{+\!\!=}
+0.8 d_1$というような定数倍を冠することは平気）．
+
+\eTeX では，そのレジスタの演算に，他のプログラミング言語で使われているような数式の表現が使えるようになった．上のPDFでは実例として
+\begin{verbatim}
+　　\ifdim \dimexpr (2pt-5pt)*\numexpr 3-3*13/5\relax + 34pt/2<\wd20
+\end{verbatim}
+が書かれている．これは，\def\mpt{\,\mathrm{pt}}
+\[
+ 32\mpt=(2\mpt-5\mpt)\left(3-\mathop{\mathrm{div}}(3\cdot 13,5)\right)
++\frac{34\mpt}{2}<\text{{\tt \char'134 box20}の幅}
+\]
+が真か偽かを判定していることになる\footnote{divは整数除算を表したつもり
+である．整数除算は余りが被除数の符号と等しくなるように計算される．}．
+
+\newpage
+\paragraph{{\tt\char'134 middle} primitive}
+\TeX に\verb+\left+, \verb+\right+というprimitiveがあり，それを使えば括
+弧の大きさが自動調整されるのはよく知られている．\eTeX では，
+さらに\verb+\middle+ primitiveが追加された．
+
+具体例を述べる．
+\def\set#1#2{\setbox0=\hbox{$\displaystyle #1,#2$}%
+\left\{\, \vphantom{\copy0}#1 \,\right|\!\left.\, \vphantom{\copy0}#2 \,\right\}}
+\def\eset#1#2{\left\{\, #1 \,\middle|\, #2 \,\right\}}
+\[ \set{n+\frac12}{n\in \omega} \eset{n+\frac12}{n\in \omega} \]
+
+これは以下のsourceで出力したものである：
+\begin{adjustvboxheight}
+\narrowbaselines
+\begin{verbatim}
+　　\def\set#1#2{\setbox0=\hbox{$\displaystyle #1,#2$}%
+　　\left\{\, \vphantom{\copy0}#1 \,\right|\!\left.\, \vphantom{\copy0}#2 \,\right\}}
+　　\def\eset#1#2{\left\{\, #1 \,\middle|\, #2 \,\right\}}
+　　\[ \set{n+\frac12}{n\in \omega} \eset{n+\frac12}{n\in \omega} \]
+\end{verbatim}
+\end{adjustvboxheight}
+
+両方とも集合の表記を行うコマンドである．\TeX 流の\verb+\set+では2つの
+\verb+\left+, \verb+\right+の組で実現させなければならず，そのために$|$の
+左側と右側に入る式の最大寸法を測定するという面倒な方法を使っている．その
+上，この定義では\verb+\textstyle+以下の数式（文章中の数式とか）ではそのま
+ま使えず，それにも対応させようとすると面倒になる．一方，\eTeX 流の
+\verb+\eset+では，何も考えずに
+\verb+\left+, \verb+\middle+, \verb+\right+だけで実現できる．
+
+\paragraph{\TeXXeT\ \rm({\tt TeX-{}-XeT})}
+left-to-rightとright-to-leftを混植できるという機能であるらしい．
+ヘブライ語あたりの組版に使えるらしいが，よく知らない．
+ここでのRtoLはLtoRに組んだものを逆順にしているだけのような
+気がする．
+%\footnote{例えば{\TeXXeTstate=1\beginR ``Tea, Earl Grey,
+%hot.''\endR}のように．}．
+\eteiri
+
+とりあえず一目につきそうな拡張機能といったらこれぐらいだろうか．他にも
+tracing機能や条件判断文の強化などあるが，そこら辺はパッとしないのでここ
+で紹介するのは省略することにしよう．
+
+この中で，\TeXXeT 機能だけは，「\TeX から\pTeX への変更部分とかちあって，
+作業に非常に手間がかかる」と予想した（根拠はなし．あえて言えば勘）．それ
+に，僕は右→左の言語をアラビア語やヘブライ語ぐらいしか知らず，これらは
+Arab\TeX などを使うことで\pLaTeX でも入力できるので，ひとまず\TeXXeT 機能だ
+けは実装を見送り\footnote{目次からも分かる通り，最終的には実装することに
+なるが．}，他はできる限り実装することにした．
+
+\subsection{{\tt etex.ch}の改変}
+ここから実際の作業であり，ひどく退屈な作業である．
+まず{\tt etex.ch}先頭の著作権等に関する部分を
+書き換えておく．
+
+{\tt etex.ch}中の{\tt @x ... @y ... @z}のところにはありがたいことにコメ
+ントがついていて，どういう理由でパッチが当たるのかと，当たる行番号までわ
+かるようになっている\footnote{但し，ここに書かれている行番号は{\tt
+tex.web}に対してのそれであろう．しかし{\tt ptex-orig.web}でもあまり行番
+号は変わらない．}．次は{\tt etex.ch}の抜粋である：
+\begin{adjustvboxheight}
+\narrowbaselines\small
+\begin{verbatim}
+　　%---------------------------------------
+　　@x [15] m.208 l.4087 - e-TeX saved_items
+　　@d un_vbox=24 {unglue a box ( \.{\\unvbox}, \.{\\unvcopy} )}
+　　@y
+　　@d un_vbox=24 {unglue a box ( \.{\\unvbox}, \.{\\unvcopy} )}
+　　  {( or \.{\\pagediscards}, \.{\\splitdiscards} )}
+　　@z
+　　%---------------------------------------
+　　@x [15] m.208 l.4097 - e-TeX TeXXeT
+　　@d valign=33 {vertical table alignment ( \.{\\valign} )}
+　　@y
+　　@d valign=33 {vertical table alignment ( \.{\\valign} )}
+　　  {or text direction directives ( \.{\\beginL}, etc.~)}
+　　@z
+　　%---------------------------------------
+　　@x [15] m.208 l.4113 - e-TeX middle
+　　@d left_right=49 {variable delimiter ( \.{\\left}, \.{\\right} )}
+　　@y
+　　@d left_right=49 {variable delimiter ( \.{\\left}, \.{\\right} )}
+　　  {( or \.{\\middle} )}
+　　@z
+%---------------------------------------
+\end{verbatim}
+\end{adjustvboxheight}
+
+\TeXXeT 機能の実装はとりあえず見送ったと書いたので，
+上で言うところの{\tt e-TeX TeXXeT}などとコメントが振られている部分をバッサリ
+削除するとともに，{\tt ptex-orig.web}にそのまま{\tt etex.ch}が適用できな
+いところを調べ，{\tt tex.web}と{\tt ptex-orig.web}も見ながら修正していく．
+\eTeX 拡張の本質的な部分は，（\pTeX でもそうだったが）{\tt etex.ch}の後
+半部の以下の部分に集中して現れるので，そこでも
+\TeXXeT 関連と思われる場所を削除した．
+\begin{adjustvboxheight}
+\narrowbaselines\small
+\begin{verbatim}
+　　%---------------------------------------
+　　@x [54] m.1379 l.24945 - e-TeX additions
+　　@* \[54] System-dependent changes.
+　　@y
+　　@* \[53a] The extended features of \eTeX.
+　　（中略）
+　　@* \[54] System-dependent changes.
+　　@z
+　　%---------------------------------------
+\end{verbatim}
+\end{adjustvboxheight}
+
+削除しすぎたような場合は{\tt tangle}時に警告メッセージが表示される（断片
+が欠けていた場合）か，C sourceのコンパイルでエラーが出るので，退屈ではあっ
+たが，そんなに厳しくは無かった．
+
+なお，{\tt ptex-orig.web}にそのまま{\tt etex.ch}が適用できな
+いところを調べるのは簡単である．そのようなところがあった場合，{\tt
+tie}で適用後の\WEB ソースを作ろうとすると，以下のようなメッセージが表示
+されるからである．
+\begin{adjustvboxheight}
+\narrowbaselines\small
+\begin{verbatim}
+　　[h7k eptex]$ tie -m ep.web  ptex-orig.web ../etexdir/etex.ch
+　　This is TIE, CWEB Version 2.4. (Web2C 7.5.6)
+　　Copyright (c) 1989,1992 by THD/ITI. All rights reserved.
+　　(ptex-orig.web)
+　　(../etexdir/etex.ch)
+　　....500....1000....1500....2000....2500....3000....3500....4000....4500....5000.
+　　...5500....6000....6500....7000....7500....8000....8500....9000....9500....10000
+　　....10500....11000....11500....12000....12500....13000....13500....14000....1450
+　　0....15000....15500....16000....16500....17000....17500....18000....18500....190
+　　00....19500....20000....20500....21000....21500....22000....22500....23000....23
+　　500....24000....24500....25000....25500....26000....26500....27000....27500....2
+　　8000....28500..
+　　! Change file entry did not match (file ../etexdir/etex.ch, l.200).
+
+　　(Pardon me, but I think I spotted something wrong..)
+\end{verbatim}
+\end{adjustvboxheight}
+ちょっとずつ{\tt etex.ch}を改変するごとに上のようなコマンドを走らせれば，
+次に修正するべき場所がわかるという話である．
+
+\subsection{\trip\ test, \etrip\ test}
+\trip\ testとは，Knuth教授による\TeX のdebugの補助ツールである．これは\TeX
+のソースコードの全部分を渡るように作られたテスト入力であり，大量のlogを
+出力する．一度自分の計算機で\trip\ testを行い，その結果が「正しい」出力と
+異なっていたなら，それはどこかにbugが潜んでいるに違いないということを意
+味する．Knuth教授自身も，Knuth~\cite{trip}の中で以下のように述べている．
+\begin{adjustvboxheight}
+\narrowbaselines\begin{indented}{2zw}
+If somebody claims to have a correct implementation of \TeX, I will not
+believe it until I see that {\tt TRIP.TEX} is translated properly.
+I propose, in fact, that a program must meet two criteria before it
+can justifiably be called \TeX: (1)~The person who wrote it must be
+happy with the way it works at his or her installation; and (2)~the
+program must produce the correct results from {\tt TRIP.TEX}.
+\end{indented}
+\end{adjustvboxheight}
+その意味では，p\TeX の段階でももはや\trip\ testはパスしない．\TeX で出ていた\\
+　　\verb+! Bad character code (256).+\\
+というerrorはもはや出ないし，内部モー
+ドが出力される所でもいちいち\verb+yoko direction+などが出力される．しか
+し我々は\pTeX をベースとしているので，\epTeX の動作をチェックするという
+今の文脈では．\pTeX による出力を\trip\ testの「正しい」出力と
+考えてもよいだろう．
+
+\eteiri さらに，今回は\eTeX の機能も組み込んでいるのだから，\eTeX による
+\trip\ testの出力とも比較する必要があった．Extended mode
+の出力は当然\TeX による\trip\ testの
+出力とは異なる．幸い，その内容は文献\nobreak\cite{etrip}に記述されている．また，
+\eTeX では，\eTeX 特有の拡張機能をテストするための，同様の
+\etrip\ testというものが別に用意されている．
+
+\eteiri ひとまず\TeXXeT 以外を追加した\epTeX により\trip, \etrip\ testを
+行わせてみた．出力結果
+は，\pTeX による結果とも\eTeX による結果とも若干異なっていたが，その差異
+は，\TeX${}\to{}$\pTeX による出力結果の差異と\TeX${}\to{}$\eTeX による出
+力結果の差意を合わせたものでしかない．また，\epTeX による\etrip\ testの結
+果は\eTeX のそれと大きく異なるが，それは「\epTeX が\TeXXeT を実装していな
+いことによるもの」「\pTeX に合うように{\tt etex.ch}を変更したことによる，
+内部パラメタの若干の変更」「\pTeX の機能による，\verb+yoko direction+とか
+の追加出力など」がほとんどであり，十分に予測ができたものであった．その意
+味では，（日本語処理以外には）criticalなbugはこの時点でなかったと言ってい
+いだろう\footnote{なお，第6章でさらなる\trip, \etrip\ testをパスさせるた
+めのdebugを行っている．}．
+
+この\trip, \etrip\ testは，実際に\epTeX のdebugに役に立った．11/1
+近傍で，すでに「通常のソースファイルを入力しても出力は同じ」状況にはなっ
+ていた．しかし，\trip\ testをかけると，異常なpenalty値\footnote{penalty
+（罰金）とは，改行/改ページの制御に使われる量であって，box, glueとともに
+\TeX での組版において重要な役割を果たしている．}の出力が見られた．
+そこで，\eTeX によるpenalty拡張を\epTeX に実装するところにbugが埋まっていると見
+当を付けて，そこを見直した結果，\verb+etexdir/etex.ch+（つまり，もともと
+の\TeX${}\to{}$\eTeX のchange file）にある2箇所の修正箇所が，\epTeX 用の
+\verb+etex.ch+には何故か抜け落ちていたことが分かり，この\epTeX のbugを修正す
+ることができたのである．
+
+\eteiri
+なお，この時点でも\epTeX は\eTeX の\TeXXeT 以外の全ての機能を実装してい
+たことを注意しておこう．
+\newpage
+\section{浮動小数点演算の実装}
+もう一つのテーマの柱，浮動小数点演算の実装に入ろう．
+
+まず，サポートする精度についてであるが，計算速度から言えば4\,byteの所謂
+「単精度」が良く，コードも簡単になる．しかし単精度は有効桁数が7桁前後しか
+ない．しかし，実際の数値計算では，この7桁程度の精度では不足し，倍精度以上
+が使われる場合が多いと思われる．浮動小数点演算の実装の目的が「\TeX に数値
+計算をやらせる」ことであるので，倍精度以上は必須である．
+
+\subsection{基本方針}
+何よりも，\TeX の既存部分の\WEB ソースを改変するところを最小限に留めることを最
+優先にした．使い勝手から言えば，新しいレジスタの種類を（例えば
+\verb+\real+とかいう名前で）定義して，他のレジスタと同様に扱えるようにし
+たほうがよいのだが，それは\TeX の内部処理を大きく変更することとなり，bug
+も混じる可能性も増える．
+
+\eteiri
+ここで，\TeX の数量にまつわるレジスタの種類を思い出そう：
+\begin{itemize}
+\item \verb+\count+：$-2147483647$から$+2147483647$までの整数 (number) を格納する．
+\item \verb+\dimen+：$1$\,sp${}=2^{-16}$\,ptを刻み幅として，絶対値が
+      $2^{30}$\,sp${}=16384$\,pt より小さい長さ (dimension) を格納する．
+\item \verb+\skip+：いわゆるglue．自然長 (width part)，伸び量
+      (stretch part)，縮み量 (shrink part)を持っており，後者2つは無限大も
+      指定できる（しかもその無限大にはrank があったりする）．
+\item \verb+\muskip+：数式モードでの\verb+\skip+に相当する．
+\end{itemize}
+前者2つは内部でも4\,byteであり，後者2つは4\,byte変数3つ分を記憶領域
+として使っている．\TeX のソースを見ると，レジスタがこれら（と
+\verb+\toks+, \verb+\box+）だけであることに依存したコードが書かれていたの
+で，新たに浮動小数点数用のレジスタと専用の記憶領域を確保したりするのは労
+力がかかるだけだと判断した．そのように考えてみると，\verb+\skip+が
+12\,byte以上を使っていることになる．
+
+\eteiri
+すると，1つのglueに浮動小数点数1つを納めるようにするのが楽である．せっか
+く12\,byteあるのに8\,byte分しか使わないのは勿体ないので，12\,byte分にでき
+る限り収まる限りの精度とすることにした．なお，Web2Cでサポートされている
+Pascalの機能は限定的なものであるので，Pascal規格内にある浮動小数点演算の
+サポートについても不安である．そこで，ここでは\emph{整数演算のみを用いて実装}す
+ることとした．そのため，仮数部の演算は本質的には多
+倍長整数の演算であるので速度は非常に遅いことを覚悟しなければならない．．
+
+\eteiri
+高レベルな機能は\TeX のマクロ機能を使い実装することを考えると，とりあえ
+ず実装すべき機能として，以下を決めた：
+\begin{itemize}
+\item 浮動小数点定数値を表現するglueを返す：\verb+\real+\footnote{他のコ
+      マンドがfpを接頭辞にしているのにこれだけそうじゃないのは変かもしれ
+      ないが，かといって\verb+\fp+にするのは短すぎる気がするし，演算コマ
+      ンド側を\verb+\realadd+などとすると長すぎると思ったからである．当
+      然ながら，Fortranの{\tt REAL*}\hskip0.1zw$x$が根底にある．}．
+\item 2項演算：\verb+\fpadd+, \verb+\fpsub+, \verb+\fpmul+,
+      \verb+\fpdiv+, \verb+\fppow+．結果は第1引数のレジスタに上書き．
+\item 単項演算：\verb+\fpneg+，その他初等関数達．
+\item 浮動小数点数の出力，及び型変換．
+\end{itemize}
+\newpage
+格納形式は色々と悩んだが，最終的には以下に述べるように落ち着いた．2進で
+格納すると基数変換とかいう変なものを組む必要がある\footnote{もちろん
+debug時であっても．僕は暗算は異常に弱いし．}ので，10進で行った．但し指数
+部については諸事情により$16$\,bit分としている．
+\jdAline[c](1){\unitlength=5mm
+\begin{picture}(30,2)
+\put(0,0){\line(0,1){1.5}}
+\put(0,0){\line(1,0){30}}
+\put(10,0){\line(0,1){1.5}}
+\put(20,0){\line(0,1){1.5}}
+\put(30,0){\line(0,1){1.5}}
+\put(0,1){\line(1,0){30}}
+
+\put(7,0){\line(0,1){1}}
+\put(2,0){\line(0,1){1}}
+\put(1,0){\line(0,1){1}}
+\put(11,0){\line(0,1){1}}
+\put(21,0){\line(0,1){1}}
+
+\put(8.5,0.5){\line(0,-1)1}
+\put(8.5,-0.6){\makebox(0,0)[t]{\small $A_1$ (3)}}
+\put(1.5,0.5){\line(0,-1)1}
+\put(1.5,-0.6){\makebox(0,0)[t]{\small $F$}}
+\put(4.5,0.5){\line(0,-1)1}
+\put(4.5,-0.6){\makebox(0,0)[t]{\small $E$}}
+\put(15.5,0.5){\line(0,-1)1}
+\put(15.5,-0.6){\makebox(0,0)[t]{\small $A_2$ (9)}}
+\put(25.5,0.5){\line(0,-1)1}
+\put(25.5,-0.6){\makebox(0,0)[t]{\small $A_3$ (9)}}
+
+\put(0,1){\line(1,-1){1}}
+\put(0,0){\line(1,1){1}}
+\put(10,1){\line(1,-1)1}
+\put(10,0){\line(1,1)1}
+\put(20,1){\line(1,-1)1}
+\put(20,0){\line(1,1)1}
+
+\put(5,1.25){\makebox(0,0)[b]{\small width part}}
+\put(15,1.25){\makebox(0,0)[b]{\small stretch part}}
+\put(25,1.25){\makebox(0,0)[b]{\small shrink part}}
+
+\end{picture}}
+\eteiri
+一つのglueの自然長，伸び量，縮み量は\TeX 内部ではそれぞれ32\,bit整数とし
+て扱われている．これらをこの順に並べて，1つの96\,bit領域とみなし
+て書いたのが上の図である．
+\begin{enumerate}
+\item 各32\,bit部分では上位2\,bitは未使用とする\footnote{dimensionの表現
+      では最上位bitは符号，次のbitはOverflow検出用のような意味を持ってい
+      る．そのため，これらの2\,bitも使ってしまうと何かと面倒になるように
+      思われた．}．そ
+      れぞれの残り30\,bitで10進9桁を格納する．
+\item 仮数部は図の$A_1$, $A_2$, $A_3$で示した領域とする．これらの後ろに()でく
+      くった数字はそこの10進での桁数を表す．合計で10進21
+      桁分の領域となり，（図の）左側を上位として21桁を格納する．小数点が
+      $A_1$での100の位と10の位の間に来た状態を「正規化されている」と称する．
+\item 指数部は$E$で示した部分で，2進数で16\,bit分の領域をもっている．ここ
+      には実際の指数（$-32767$--$32767$）を32767をバイアスした値が格
+      納される．但し，この$E$の値が65535のときは，（正負の）無限大として
+      扱う．
+\item $F$で表した部分は0, 1, 2のどれかが格納され，符号bitとしての役割を持つ．
+      0は正，1は負，2はNaNを表す．
+\item 以上の説明では見にくいので，このglueが表現している値を述べると，以下のよ
+      うになる．
+\[
+ \begin{cases}
+(1-2F)(10^{18}A_1+10^9A_2+A_3)\cdot 10^{E-32767-20},
+&{\rm if}\ F\neq2;\\
+{\rm NaN},&{\rm if}\ F=2.
+\end{cases}
+\]
+また，width partに実際に格納されている値は$1000(E+65536F)+A_0$である．
+
+\end{enumerate}
+
+\TeX ソース中での浮動小数点数の表記は，他のプログラミング言語でもよく用い
+られているごく普通の表記を採用するが\footnote{Fortranでは指数部に{\tt
+D}や時には{\tt Q}などを許容したりしているけれども，それらは\epTeX では認
+めない．}，\TeX 本来の読み取りルーチンを一部流
+用した部分があるため，小数点は大陸式の`,'も認め，符号は複数あってもいい
+（その場合，実際の符号は全部掛けたものになる）ことになった．
+
+\subsection{内部表現と四則演算}
+実際の演算をglueに「パックされた」状態で行うのは余り良くないように感じた．
+なぜなら，初等関数の実装を最初から念頭に置いていたが，それを21桁精度のままで計算す
+るのは精度の面で非常に不安だったからである．
+そうすると，内部での計算の実装は，21桁とは限らない任意長\footnote{とは
+いっても，さすがに数千桁とか数万桁とかはたかが21桁の計算の内部処理として
+はしないだろう．個人的には60桁もあれば十分と感じている．}の計算に対応で
+きるようにした方がよい．
+
+上を考慮に入れて，浮動小数の内部表現である4\,byte整数型の配列$q$を以下
+のように定める：
+\jdAline[c]{\unitlength=5mm
+\begin{picture}(30,2)
+\put(0,0){\line(1,0){15}}
+\put(20,0){\line(1,0){10}}
+\put(0,1){\line(1,0){15}}
+\put(20,1){\line(1,0){10}}
+\put(0,0){\line(0,1){1.5}}
+\put(2.5,0){\line(0,1){1}}
+\put(5,0){\line(0,1){1.5}}
+\put(10,0){\line(0,1){1.5}}
+\put(15,0){\line(0,1){1.5}}
+\put(20,0){\line(0,1){1.5}}
+\put(25,0){\line(0,1){1.5}}
+\put(30,0){\line(0,1){1.5}}
+\put(1.25,0.5){\makebox(0,0){\small $n$}}
+\put(3.75,0.5){\makebox(0,0){\small 符号}}
+\put(7.5,0.5){\makebox(0,0){\small 指数部}}
+\put(12.5,0.5){\makebox(0,0){\small $a_0$}}
+\put(22.5,0.5){\makebox(0,0){\small $a_{n-1}$}}
+\put(27.5,0.5){\makebox(0,0){\small $a_{n}$}}
+\put(2.5,1.1){\makebox(0,0)[b]{\small $q[0]$}}
+\put(7.5,1.1){\makebox(0,0)[b]{\small $q[1]$}}
+\put(12.5,1.1){\makebox(0,0)[b]{\small $q[2]$}}
+\put(22.5,1.1){\makebox(0,0)[b]{\small $q[n+1]$}}
+\put(27.5,1.1){\makebox(0,0)[b]{\small $q[n+2]$}}
+\put(17.5,0.5){\makebox(0,0){$\cdots\cdots\cdots\cdots$}}
+\end{picture}}
+ここで，各$a_i$, $0\le i\le n+1$は0\,〜\,999の範囲の自然数であって，符号部は
+（前節のように）0が正，1が負，2がNaNを表す．即ち，仮数部を基数1000で表現
+している\footnote{乗法を行う場合，基数の平方が処理系の内部で扱える必要は
+ないように感じるが，それを考えると，基数に32768とか10000とかを使った方が，
+メモリも計算の手間も減ることになる．しかし，glueに格納するのが21桁である
+から，1000にするのもそんなに悪くないように思う．}ことになる．$a_{n}$は桁
+上がりなどの際に用いられ，所謂「正規化された状態」では$a_n=0$, $a_{n-1}\ge
+100$である．また，指数部は（正規化された状態では）$-32767$\,〜\,$32767$の範囲
+の整数が通常の浮動小数点数を，32768が無限大を表す．NaNや0に符号の区別は
+なく，当然ながらIEEE 754/754r規格には全然適合しない．$n$を「浮動小数点数
+の長さ」と以降呼ぶことにする．
+
+このような配列は，最初の実装では，その都度動的に確保，解放することにした
+\footnote{このポリシーは5.6節で変更される．}．\TeX でのメモリ管
+理はすべて\TeX 自身が行う\footnote{起動時に巨大な4\,byte整数型の配列を確
+保して，あとは全部その枠内で行われる．配列確保と解放はそれぞれ
+$\langle{\it pointer}\rangle:={\it get\_node}(\langle{\it
+length}\rangle)$と{\it free\_node}($\langle{\it
+pointer}\rangle,\langle{\it length}\rangle$)で行われる．ここで
+$\langle{\it pointer}\rangle$は先頭要素のindexであり，$\langle{\it
+length}\rangle$は確保された配列の要素数である．}ことが伝統的になっている
+ (\cite{arizawa}) ので，ここでも当然それに従う．
+
+\eteiri 浮動小数点の四則演算を大きくわけると，仮数部同士の計算と，指数部
+の調整に2分される．前者は前に書いたように多倍長整数の四則計算となるので，
+Knuth~\cite{TAOCP}にある「古典的な」アルゴリズムをそのまま用いることがで
+きる．
+
+これらのアルゴリズムは（割り算を除けば）そんなに長くはなく，指数部や符
+号の処理，無限大やNaNの処理の方が分量的には多い．整数演算として得られた
+仮数部を正規化する処理や，加法や減法で行われる2引数の指数部を揃え
+る処理，また乗法や除法で行われる，列の長さを延長したり縮小したりする処理
+の方にいっそう気を使った．
+
+%%% 要検討：除算をNewton法で，short_mult
+
+\subsection{入出力と型変換}
+演算はできるようになっても，それを入出力することができなければどうしようも
+ない．浮動小数点はglueとして\verb+\skip+レジスタに格納されるので，
+\verb+\skip+レジスタに対して直にpackされた値を指定したり，あるいは
+\verb+\the+で出力をしたりすれば一応はいいのだが，それでは非常に使い勝手
+が悪い．
+
+\eteiri
+入力側についてのほとんどの処理は
+浮動小数点数を読み込み，内部表現の配列の形に変換して返す\textit{scan\_float}\
+procedureによって行う．
+これは整数を読み込む\textit{scan\_int}や長さを読み取る
+\textit{scan\_dimen}，glueを読み取る\textit{scan\_glue}の各procedureに対
+応するものとして考えたもので，コードも大いに参考にさせてもらった．
+2項演算のコマンドの2つめの引数を読み取る部分もこのprocedure「だけ」で行
+われる．
+
+\textit{scan\_dimen}では整数部分を読むのに\textit{scan\_int}を用いて，次
+に小数部を独自に読み取るという方法をとっていたが，同じ方法では21桁の数値
+を読み取ることはできない．そこで，\textit{scan\_float}では，先に（すぐ後
+で述べる）内部表現の配列を21桁分確保し，それに上の方から数字を詰めていく
+という方法をとった．22桁め以降が存在した場合は，Knuth~\cite{TAOCP}に従い「基本
+的には四捨五入だが，丸める桁が5である場合は最も近い偶数になるように」丸め
+る\footnote{この丸め方は内部演算で共通である．全部の下位の桁を見てるわけ
+では無いので，丸め誤差は最大で0.6\,ulpぐらいになるはずである．}．こうし
+て仮数部を読めるだけ読んだ後，もし{\tt e}または{\tt E}があれば，その後に
+指数部が続くものと認識して，指数部を\textit{scan\_int}で読み取る．こうし
+て仮数部も指数部も両方読み込んだ後は，\textit{scan\_float}はこれをglueと
+してpackし，それを返す．
+
+\eteiri
+また，「浮動小数点数を読み取る」とはいっても，文字列で書かれた{\tt
+-1.701E5}だけを「読み取る」のではあまり便利ではないので，
+既存のskipレジスタや，countレジス
+タやdimenレジスタも指定できるようにしてある．skipレジスタの場合は，ある
+浮動小数点数を表現していない可能性も考えられるので，そのチェックを行うよ
+うにしてある．一方，countレジスタやdimenレジスタはそのようなことについて
+はチェックする必要はない．
+なお，dimensionを直に，例えば\verb+1.2mm+とか指定された場合は，最初に出会う
+文字が1であるから，浮動小数点数が文字列表記されているものと見なされるの
+で，意図した結果は絶対に得られないことに注意．
+
+\eteiri
+出力部で問題になるのは「どの書式
+で出力するか」である．ご存知のようにFortranでは{\tt FORMAT}文が，C言語では
+{\tt printf}文の第一引数が出力書式の設定を担っており，何桁出力するだとか，指数
+形式にするのかそうでないのかとか，いくつかの設定項目が用意されている．今
+回ではそういう本格的な出力機能を実装することはせずに，primitiveとしては以
+下に絞ることにした：
+\begin{enumerate}
+\item\verb+\fpfrac+：仮数部を$\pm a.bcd\cdots$の形で出力する．最後に0が
+     続かない範囲内でできるだけ多くの桁を出力する．正数の場合は符号は出
+     力されない．
+\item\verb+\fpexpr+：指数部をそのまま出力する．
+\end{enumerate}
+浮動小数点数全体を一度に出力するprimitiveを準備しなかったのは，「そうい
+うのはマクロ機能があれば用が足りる」ことである．また，\TeX の数式組版能
+力を生かさないのは勿体ないことではないか，とも考えたからである．
+\skip1=\real-1234567890123456.4
+例えば$-1234567890123456.4$を{\tt\fpfrac\skip1{}E\fpexpr\skip1}と出力す
+るよりかは，
+$\fpfrac\skip1\times10^{\fpexpr\skip1}$など
+と表示させる方が見栄えが良い．
+桁数指定については（dimensionの表示とかにもそのような
+機能は無いので）見送ることにした．
+
+\eteiri
+countレジスタやdimenレジスタから浮動小数点数の変換が実装されたのだから，
+逆の，即ち浮動小数点数から整数やdimensionへの変換も実装されるべきである．
+しかし，dimensionの\TeX での内部表現を考えると，2つの処理はあまり違わないよ
+うにできる．dimensionへの変換は浮動小数点数をsp単位に（つまり，65536をか
+けて）したものの整数部をとれば終わってしまう．
+丸め方については，0に近い方に丸めるとしたが，dimensionへの変換は一連の計
+算の最後で行うことと決めておけば．あまり不都合は起こらないように感じる．
+
+\subsection{虫取り}
+以上の機能を実装した所で（実際は実装と半分平行した感じで）debugを行った．
+もはや\trip\ test等には頼ることはできず，全部自分でなんとかしなければならな
+い．元からtypoが多い方なのでbugは多量に及び，かなりの時間と気力をdebugに
+とられてしまった．debugは主に加算や平方根を求めるNewton法，$e$のTaylor展
+開による計算などの繰り返しで行った．演算アルゴリズムの部分にも，タイプミ
+スや僕の詰めの甘さ（加減算での符号の処理など）が見られたが，厄介だったのは
+\TeX 自身のメモリ管理による動的確保/解放の処理であった．
+
+先の脚注に書いたように，\TeX でのメモリ確保は最初に巨大な配列が確保され
+た後はすべて\TeX 内部の\textit{get\_node}関数などによって行われるのであっ
+た．動的確保で避けて通れない問題として，初期化忘れと解放忘れ，それに2重
+の解放がある．前者については対処方法は簡単なのだが，後者2つが曲者だった．
+浮動小数点数を内部で表現する配列は自分で作ったことがよくわかっているから，
+それについては問題ない．
+
+\eteiri
+一方，実はglueの格納についても動的確保/解放が使
+われている．glueはwidth, stretch, shrinkの3つの部分があると書いたが，内
+部ではさらに\textit{glue\_ref\_count}という量が各glueについて設けられてい
+る．これは名前の通り「何個の変数がこのglueを指しているか」というのを示す
+値であって，glueを解放するように\textit{delete\_glue\_ref} procedureで指令
+しても，\textit{glue\_ref\_count}が0でない限り\footnote{本来はnull値基準
+なのだが，そこまで細かい所はどうでもいい．}実際には解放されないようになっ
+ている．そして，skipレジスタに実際に格納されているのは実際のglueの値へのポイ
+ンタとなっている．
+
+動作確認をしたところ，\verb+\fpadd+などであるskipレジスタの値が演算結果に
+よって書き換えられるような場合に，書き換え元のglueは（他にそれを参照して
+いる変数が無い限り）解放されるべきであるにも関わらず，なぜか解放されない
+まま，いわば次々と過去の遺物だけが増えていってしまうという事態が起こった
+\footnote{\verb+\tracingstats+に例えば3ぐらいの値を指定しておけば，
+\TeX でのメモリ消費量がページ出力時に表示される用になる．}．
+1回あたりでは些細な量としかならないが，しかしbugはbugである．これを除去
+するために，解放指令を1回多く入れたら，今度は無限ループやらsegmentation
+faultが出て強制終了するという事態が発生した．
+
+結局，\textit{scan\_float} procedureの内部で既存のglueを取り出す所で
+reference countが1増加しているのではないかという結論に達し，
+\textit{glue\_ref\_count}だけを1減少させる処理をそこに加えた所，うまく動くよう
+になった．
+
+\subsection{初等関数}
+次に，初等関数の実装である．基本的には，関係式を用いて引数を0近傍のある値
+にまで持っていって，そこから先をTaylor展開などを用いて計算させ，関係式を逆に
+用いて元に戻すというものである．平山\nobreak\cite{mppack}での実装と奥村%
+\nobreak\cite{okuc}を大いに参考にした．
+
+ここで，関係式の適用と逆向きの適用により誤差が入り込む余地があるので，
+そこをなんとかするために内部の四則演算を任意精度でできるように実装したの
+である．本節の関数の計算では．$n$桁の引数が与えられた時に，内部では
+$n+15$桁で計算を行っている．この分量は「まあこれぐらい桁を増やしておけば
+いいか」という勝手な推測で選んだものであって，適切かどうかは知らない．
+
+\paragraph{平方根 (\textit{fp\_sqrt})}
+$a$の平方根$\sqrt a$の計算は，方程式$1-a/x^2=0$から導かれるNewton法
+$x_{n+1}:=(3-ax_n^2)x_n/2$を用いることにした．このNewton法では$1/\!\sqrt
+a$が2次収束で計算され，収束後$x_\infty$に$a$をかければ，$\sqrt a$が得られ
+る．$a$
+は$[0.1,10)$の範囲内に入るように変換して計算することとして，初期値$x_0$
+は，$a$の上位桁をいくつかとったものの平方根を奥村
+\nobreak\cite{okuc}に載っているアルゴリズムを使用して計算したものとした．
+
+なお，この関数のdebug中に，ずっと前に書いた「列の長さの縮小」の丸め処理
+にbugが見つかった．原因は{\bf while}\ $i<n+1$ {\bf do} ... のルー
+プで，$i$も$n$も更新せずに回していたことであった．このように，初等関数の
+debug中に，既に組んだ四則演算等のbugが発見されることが結構あったが，以降
+はいちいちそれを書かないことにする．
+
+\paragraph{指数関数 (\textit{fp\_exponent})}
+指数関数はTaylor展開$\exp x=\sum_{i=0}^\infty x^i/i!$の有限
+項の部分和で計算する．収束を速めるためと，交代級数の計算に桁落ちの恐れが
+あることから，Taylor級数の計算は$x\in[0,1]$の範囲内だけで行い，一般は
+$\exp 2x=(\exp x)^2$, $\exp(-x)=1/\exp x$でそれに帰着させている．
+
+\paragraph{三角関数周辺 (\textit{fp\_tri\_hyp}, 
+\textit{fp\_ceil\_floor})} 
+ご存知のように，三角関数と双曲線関数のTaylor展開は符号が異なるだけである．
+さらに，$\tan x=\sin x/\cos x$ であり，sinの展開は奇数次のみが，cosの展開
+には偶数次のみが現れるので，$\sin x$と$\cos x$を（あるいは，$\sinh x$と
+$\cosh x$を）同時に計算するのも悪くは無い．$\cos x$, $\cosh x$のTaylor展
+開の計算では，桁落ちを防ぐために2次の項から先の和を計算して，すべての計算
+の後に1を足すという方法をとった．
+
+いつものように収束を速めるため，三角関数では引数を$[0,\pi/4]$に，
+双曲線関数では引数を$[0,1]$に帰着させる．三角関数では，引数$x$
+に対して$a:=x-2\pi \lfloor x/2\pi\rfloor$として，$a/4$に対してTaylor展開
+の計算を行い，
+\[
+ \sin 2x=2\sin x(\cos x-1)+2\sin x,\qquad
+\cos 2x-1=-2\sin^2 x
+\]
+を2回用いて答えを計算する．\newpage
+
+双曲線関数では，
+\[
+ \sinh 2x=2\sinh x(\cosh x-1)+2\sinh x,\qquad
+\cosh 2x-1=2\sinh^2 x
+\]
+を同様に用いる．
+
+また，前段落の$a$の式から分かるように，$\lfloor\cdot\rfloor$の計算が必要
+となる．これと同じようなコードで$\lceil\cdot\rceil$も計算できるので，つ
+いでに両者を行う\textit{fp\_ceil\_floor}\ procedureもここで書いた．
+
+\paragraph{対数関数周辺 (\textit{fp\_log\_inner}, 
+\textit{fp\_log}, \textit{fp\_arc\_hyp})}
+対数関数は，奥村\nobreak\cite{okuc}によれば
+\[
+ \frac12\log\frac{1+u}{1-u}=u+\frac{u^3}{3}+\frac{u^5}{5}
++\frac{u^7}{7}+\cdots
+\]
+を計算する方が速いとあるが，明らかに分かるようにこの式はarctanhのTaylor
+展開式そのものである．$x=(1+u)/(1-u)$を解くと$u=(x-1)/(x+1)$となり，これ
+は$x>0$では単調増加で$x=1$のときに$u=0$となる．当然収束を速めるためには
+$|u|$が小さい方がよいので，$x$を1の近傍の範囲に帰着させて計算をおこな
+うようにする．
+帰着方法は単純で，まず適切な$10^n$を掛けて$x\in [1,10)$と
+させ，以下のようにさらに変換する：
+\def\from{\leftarrow}
+\begin{alignat*}{4}
+x \in[1,1.5)&\Longrightarrow \text{\inhibitglue（そのまま）\inhibitglue},\qquad&
+x \in[1.5,3)&\Longrightarrow x\from x/2,\\
+x \in[3,6)&\Longrightarrow x\from x/4,&
+x \in[6,10)&\Longrightarrow x\from x/8.
+\end{alignat*}
+こうすると，$|u|\le 0.2$となり，収束速度はかなり速いものと予想される．逆
+変換に必要な$\log 10$, $\log 2$, $\log 4$, $\log 8$については，$\log 10$
+と$\log 64$を定数として内部に持っておくこととした．
+
+対数関数$\log x$を実装してしまえば，逆双曲線関数は以下の式
+で計算可能である：
+\begin{align*}
+\mathop{\rm arcsinh} x&=\log(x+\sqrt{x^2+1}),\\
+\mathop{\rm arccosh} x&=\log(x+\sqrt{x^2-1}),\qquad x\ge 1\\
+\mathop{\rm arctanh} x&=\frac12\log\frac{1+x}{1-x},\qquad |x|<1
+\end{align*}
+この中でarctanhの実装はlogのそれの内部に入り込む形になっているので，引数
+が小さい場合には$\log x$の内部計算部（即ち，本節の最初に示したTaylor展開
+の計算）にそのまま引き渡してしまうようにした．
+
+しかし，この式では$x\simeq 0$であるとき，$x+\sqrt{x^2+1}\simeq 1$となる
+ので桁落ちが発生する．そこで，$x$の有効桁数が$3n$であるとき，
+$|x|<10^{-n-5}$であれば，次のTaylor展開式を用いてarcsinhを計算することにし
+た：
+\[
+\mathop{\rm arcsinh} x=x-\frac{x^3}6+\frac{3x^5}{40}-\cdots.
+\]
+\paragraph{逆三角関数 (\textit{fp\_arc\_tri})}
+逆三角関数は多価だが，常識的に考えれば$\arcsin x$, $\arctan x\in
+[-\pi/2,\pi/2]$, $\arccos x\in[0,\pi]$とするのが適当だろう．$\arcsin
+x=\arctan (x/\!\sqrt{1-x^2})$であるから，$\arctan x$だけ計算すればよいが，
+これはいつものように級数展開
+\[
+ \arctan x=\sum_{n} \frac{(-1)^nx^{2n+1}}{2n+1},\qquad |x|\le 1
+\]
+を用いる．$\arctan x=\pi/2 - \arctan x^{-1}$, $\arctan x=\pi/4 - \arctan
+((1-x)/(1+x))$を用いれば，$|x|\le \tan \pi/8=\sqrt 2-1=0.414\cdots$まで
+できて，収束は保証される．
+\paragraph{べき乗 (\textit{fp\_pow\_int})}
+一般には$a^b$の計算は$\exp(b\log a)$とすればよいが，それでは$(-2)^5$など
+の$a\in[-\infty,0)$, $b\in\mathbb Z\setminus\mathbb N$のときが計算できな
+い．このため，指数部分が整数のときの累乗を計算する関数
+\textit{fp\_pow\_int}を作った．方針は奥村\nobreak\cite{okuc}に従い，例えば$b=1701$の
+ときは，$1701=1024+512+128+32+4+1$であるから，$x_0:=a$, $x_{n+1}:=x_n^2$
+としたとき，$a^b=x_0x_2x_5x_7x_9x_{10}$として求めれば良い．
+
+気になるのは$0^0$の扱いだが，本来はNaNとするのが正当な扱いであろう．しか
+し，ここでは手抜きし，\textit{fp\_pow}でも\textit{fp\_pow\_int}でも1とし
+た．後から考えたり見つけたりしたこじつけを3つばかり：
+\begin{itemize}
+\item $a^b=\exp(b\log a)$を無理やり$a=b=0$の
+ときにも適用して，``$0^0=\exp(0\log 0)=\exp(0\cdot -\infty)=\exp 0=1$''．
+\item $m^n=\#\{f\colon n\longrightarrow m\}$である\footnote{集合論的定義に従い，
+$m=\{0,1,\ldots,m-1\}$として考えている．}から，
+$0^0=\#\{f\colon0\longrightarrow 0\}=\#\{f\colon
+\emptyset\longrightarrow\emptyset\}=1$となる．
+\item 二項定理$(1+m)^n=\sum_{i=0}^n {n\choose i}m^i$を$m=n=0$のとき成立
+      させるために必要．
+\end{itemize}
+
+\subsection{高速化}
+一応以上に挙げた関数の実装は行ったが，これらの関数は演算の途中経過が求ま
+る度に動的確保/解放を行っており，arcsinを求めるだけで800回以上の動的確保
+を行っていた．これは速度的に非常に不利であるので，できる限り動的確保を行
+わずにすむように書き直す必要があった．
+
+方針としては次の通りである：各演算では，当然引数と結果を格納するための領
+域と，一時領域が必要になるが，引数の有効桁数が（つまり，引数を表現するの
+に必要なメモリ領域の量が）わかっていれば，一時領域の大きさはそこから計算
+することができる．元々の呼び出し元は\textit{do\_float\_operation}という1
+つのprocedureである\footnote{ここで\TeX のコマンドで渡された演算指令が最
+終的に実行され，結果を表現するglueが得られる．}．よって，必要な一時領域の上限が
+わかるので，演算を実際に呼び出す前に適当な所で確保しておけば良い．
+
+演算の種類によって一時領域の量は次の様になった：
+\jdAline[c](1){\small\tabrowsep=0.5zw%\setbox0=\hbox{fp}\advance\tabrowsep-\dp0
+\btabular{c/lrr/r}\vline
+\emph{演算}&\multicolumn{1}{c}{\emph{procedure名}}&%
+\emph{　引数　}&\emph{　返り値　}&%
+\multicolumn{1}{c}{\emph{一時領域}}\\\hline
+$+$, $-$&\textit{fp\_add\_or\_sub}&$n$, $n$&$n$&$n+3$\\
+$\cdot$&\textit{fp\_mul}&$m$, $n$&$m$&$m+n+3$\\
+$/$&\textit{fp\_div}&$n$, $n$&$n$&$5n+15$\\
+$/$ (short)&\textit{fp\_short\_div}&$n$&$n$&$2n+10$\\
+$a^2$&\textit{fp\_square}&$n$&$n$&$2n+3$\\
+$\lfloor\cdot\rfloor$, $\lceil\cdot\rceil$%
+    &\textit{fp\_ceil\_floor}&$n$&$n$&$n+3$\\\hline
+\smash{$\sqrt{\hskip0.5zw}$}&\textit{fp\_sqrt}&$n$&$n$&$4n+32$\\
+$\exp$&\textit{fp\_exponent}&$n$&$n$&$4n+32$\\
+$\sin$, $\cosh$ etc.&\textit{fp\_tri\_hyp}&$n$&$n+5$&$5n+40$\\
+$\log$（内部）&\textit{fp\_log\_inner}&$n$&$n$&$4n+12$\\
+$\log$&\textit{fp\_log}&$n$&$n$&$6n+48$\\
+$\arcsin$ etc.&\textit{fp\_arc\_tri}&$n$&$n+5$&$8n+120$\\
+arcsinh etc.&\textit{fp\_arc\_hyp}&$n$&$n+5$&$8n+120$\\
+$a^b$ if $b\in\mathbb Z$&\textit{fp\_pow\_int}&$n$&$n$&$3n+24$\\\vline
+\etabular}
+一時領域の欄の単位は
+4\,byteであり，引数と返り値はそれぞれを表す浮動小数点数の「長さ」を表してい
+る\footnote{動作切り替えのブール値や整数の引数はすべて省略している．}．
+但し，下半分の演算については，上半分の四則演算等の一時領域は除いて計算し
+ている．
+
+ここで，初等関数の演算のために，$\pi$, $\log 10$, $\log 64$を定数としてもっ
+ておくことは前節に書いた．この定数の初期化と一時領域の確保は同時に行って
+も良いだろう，しかし，一時領域と定数たちだけでメモリの$80+184+3\cdot
+23=333$要素が使われることになり，常時確保しておくのは気が引ける
+\footnote{現在のように贅沢にメモリが使える環境ではごく僅かの量である．な
+お，内部演算は最大$3(8+5)=39$桁で行われるので，四則演算に必要な一時領域
+は80要素あれば充分となるのだが，80113.22より前の版では，長さ18で四則演算
+されてしまうバグがあった．}．そこで，
+この「初期化」を行う\verb+\fpinit+コマンドと，逆に一時領域や定数たちを解
+放する\verb+\fpdest+コマンドを作り，\emph{浮動小数点演算を使用する場面の
+前後にこれらのコマンドを実行させる}ようにした．なお，実装の簡略化のため，
+二重確保や二重解放のチェックは全く行っておらず，一時領域が確保されてない
+状態で演算を行おうとしたときのエラー処理も全く行っていない．確保されてな
+い状態で演算を行えば，最悪の場合はセグメンテーション違反で落ちることにな
+るので気をつけること．
+
+\section{形式化}
+浮動小数点演算を実装したところで，説明文をつけたりinstall script
+をつけたりする段階へと入ることにした．ここら辺を行う直前になって，角藤
+さんの\peTeX が登場した\verb+^^;+．
+
+\eteiri
+一番苦労したのは，「\epTeX のためにどのファイルを修正したのか分からない」
+ということであった．{\tt ptexextra.c}の変更は，コマンドラインオプション
+{\tt -etex}をつけるためにやったことを覚えていたが，結構それ以外にも変更
+したファイルがあったものだった．なお，僕はMakeの使い方が分からないので，
+コンパイルとインストールは基本的には（自分の環境用の）bash scriptとして
+準備して，何をやっているかは別途テキストファイルに書いておいた．
+
+\pTeX から\epTeX への修正部分を分類してみると，その性格の違いからいくつも
+のファイルに分けた方が気分がいいと思ったので，そのようにした．実質的に何
+もしてない{\tt ptex-orig.diff}を削除したり，{\tt ptex-hack-1.diff}（次章
+参照）を入れたり取ったりとかで整理した結果，本プロジェクトの最終結果とし
+ては以下のようになった：
+\footnote{以下は{\tt README.txt}からの引用である．}．
+\eteiri
+\begin{adjustvboxheight}
+\narrowbaselines\small
+\begin{verbatim}
+  ■ファイル構成
+  ----------------------------------------------------------------------
+    README.txt         このファイル．
+    Changelog          更新履歴
+    HOWTOINST.txt      インストール方法について
+    doc/               浮動小数点演算についての簡易説明書
+    ks2/               「計算数学II」での詳細な作業記録
+    build              buildするための（自分用の）bash script
+    install            installするための（自分用の）bash script
+    trip               TRIP, e-TRIP testを実行させるbash script
+    eptex.src          etex.srcをe-pTeX用に改変したもの．ほとんど同じ
+    eptexdefs.lib      etexdefs.libをe-pTeX用に改変したもの．ほとんど同じ
+    ep1.diff           \
+    pconvert.diff      |- e-TeX機能のマージに使用するpatch群
+    etex-sysdep.ch     |
+    etex.diff          /
+    fp.ch              浮動小数点演算の実装部
+    ptex756.diff       pTeXをWeb2C-7.5.6に対応させるpatch
+    uptex.diff         \_ upTeXとマージしようとするときに使用するpatch群
+    up1.diff           /
+\end{verbatim}
+\end{adjustvboxheight}
+
+\newpage
+\section{細かい機能追加}
+\subsection{\TeXXeT の実装}
+角藤さんによる\peTeX に触発されて\footnote{対抗して，
+と言った方が実状にあっているが．}，\epTeX でも\TeXXeT 機能の実装を試みる
+ことにした．浮動小数点演算の部分は\eTeX 拡張とは完全に切り離せるので，
+{\tt fp.diff}を組み込まない状態でも作業を行える．
+
+作業方法は「\eTeX のマージ」で行ったものとほとんど同じである．オリジナル
+の{\tt etex.ch}と前に作った対\pTeX 用の{\tt etex.ch}を見比べ，\TeXXeT 機
+能で後者に抜けているものがあれば加えたりした．これにより，新たな{\tt
+etex.diff}は\TeX から\pTeX への変更に伴う部分だけとなり，分量が減った．
+
+\eteiri \verb+\beginR+と\verb+\endR+ではさまれた区間は右から左に文字が組
+まれる区間であるが，そのまま{\tt etex.ch}の方法を使うと日本語が通らずに，
+強制終了したりdviが読めなくなったりする．これの原因を次のように考えた：
+
+\begin{indented}{2zw}
+right-to-leftを実現させる部分に，「全ての」構成要素を逆順にするという
+\textit{reverse}\ functionがある．例えばLtoRの状況で「{\tt
+...abcdefABghCDEFij...}」：小文字は欧文文字，大文字は2つで和文文字を表す
+となっていたものが，このprocedureにより{\tt ...jiFEDChgBAfedcba...}と反転され
+てしまい，それによってエラーが発生する．従って，和文文字のところは反転せず
+に{\tt ...jiEFCDhgABfedcba...}という結果を得るようにすれば，エラーは起き
+ないのではないか？
+\end{indented}
+
+\eteiri
+\pTeX のソースで\verb+if font_dir[f]<>dir_default then+とかいう
+フレーズが何回かあったので，これを2\,byte文字と1\,byte文字の判定と考えること
+で上の処理を実装したところ，一応はうまくいくようになった．
+しかし，組版規則はどうか，というと当然
+のことながら「怪しい」．ただ単に全部左右が入れ替えられるだけであるからだ．
+
+
+\subsection{副産物}
+\TeXXeT 関連のdebugを行っていたときに，和欧文混在の文章をright-to-leftに
+したら上下位置がおかしくなることに気づいた．「全てを逆順に」がここでも悪
+さをしており，\pTeX により和欧文間に挿入されるbaseline補正の指
+標\textit{disp\_node}までも逆順にされてしまうからだった．
+
+\pTeX では，和文と欧文の境目に\textit{disp\_node}が挿入され，このnode以降
+の文字のbaseline補正がそこで示されるようになっている．したがって，和文→
+欧文と切り替わるときのnodeでは\verb+\ybaselineshift+とかが，逆に切り替わ
+るときのnodeでは0が対応している．よって，一時変数を使って，
+\textit{reverse} functionで反転させるときに，\textit{disp\_node}の値も入
+れ替えてしまえばいいのではないか，と推測される．それで実際大抵の場合には
+うまくいったように思えた\footnote{1/30追記：実際には，こんな簡単な処理
+ではダメだった．段落全体がRtoLの状態のとき，どうやら，各行はdisplacement
+nodeで始まっており，その後に\TeXXeT 関連のnodeとかがくるようで，こういう
+場合が曲者だったりする．global変数\textit{revdisp}を作り，その変数に「現
+在のdisplacementの値」を代入するようにしておくことで，何とか対処療法的に
+片付けて，\emph{「大抵の場合にはうまく動くのではないか」という段階にはなったけ
+れども，\pTeX の内部動作を良く理解しているわけではないので，非常に怪し
+い}．使うときには注意してください．}．
+
+\eteiri
+こうしてなんとか解決した直後に，
+たまたま\TeX フォーラム%
+\footnote{\verb+http://oku.edu.mie-u.ac.jp/tex/+}を覗いたら，奥村さんに
+よる「\pTeX への
+提案もどき」と称した次の投稿\cite{okupt}があった（以下引用）：
+\newpage
+\begin{adjustvboxheight}
+\small\narrowbaselines\begin{indented}{2zw}
+\begin{verbatim}
+その1: \ybaselineshiftの仕様変更
+
+和文と欧文のベースラインを調節するための\ybaselineshiftを使っても数式部
+分のベースラインが変わらない。数式も欧文なみと見て移動したい。
+
+例：
+
+\ybaselineshift=0.12zw
+第5章第$n=5$節
+
+その2: 段落の頭での引用符の挙動の改善
+
+デフォルトのpTeXでは引用符で始まる段落の頭が\parindent+0.5zw下がりになる。
+jsarticle，jsbookでは\everyparを使ったハックで補正しているが，pTeX本体に
+段落頭のJFMグルーをなくすスイッチを付けられないか。
+
+（後略）
+\end{verbatim}
+\end{indented}
+\end{adjustvboxheight}
+
+この「その1」というのは，僕も散々悩まされてきた問題であった．古くは高校の
+部活の部誌（縦書き）の組版で，最近では数学科オリパンフ\nobreak\cite{ori}
+の組版でも遭遇し，非常に腹が立った．「その2」は現状のjsclassesでのハック
+で十分だと思い，またこちらは難しそうだった．
+
+「その1」のパッチを作るのは，\textit{disp\_node}が挿入される位置を調べ，そ
+こでいかほどの値がセットされるかを調べればいいので，さほど
+困難な作業ではなかった．互換性のために従来の\pTeX の動作も残し，スイッチ
+で切り替えるようにしたが，スイッチの定義は\verb+\TeXXeTstate+（\TeXXeT
+がonならば1，offならば0）のそれが非常に参考になった．
+\eteiri
+最初は\epTeX 内部に本パッチを取り込んでいたが，（後に述べるように）角藤
+さんが\epTeX をW32\TeX に導入するときに外されたと聞いたので，こちらでも
+外しておくことにした．
+\subsection{さらなる虫取り}
+本稿では，\etrip\ testをしたときの\eTeX との差異をもっと少なくすることを
+行う．まず，通常の\trip\ testを行ったときに，そのままでは
+\verb+http://oku.edu.mie-u.ac.jp/%7Eokumura/texfaq/qa/50546.html+
+と同様の症状，すなわち\verb+, direction+がいくつか余計に残ってしまうこと
+から対処を始めた．これの原因は\pTeX でboxの中身をdumpしたときに
+\verb+, yoko direction+の表示部である．
+boxが{\tt yoko}でも{\tt tate}でも{\tt
+DtoU}方向\footnote{{\tt DtoU}方向ってなんだろうね．}でもないときは
+\verb+yoko+などが表示されず，ただ\verb+, direction+と表示されてしまうの
+だった．
+{\tt ,}が出てくる場所は1箇
+所だったので，ここだけdirection表示のコードを別にすることで解決．
+
+\eteiri
+次に，\verb+\lastnodetype+と\verb+\currentiflevel+の調整に入った．
+\eTeX でコマンドがどう処理されているかを調べると，各nodeにはソース中で型
+を表す自然数が割り振られており，その値に1を足すとかの若干の補正をして出
+力するだけだった．そうすると話は速く，\TeX${}\to{}$\pTeX の拡張で内部パ
+ラメータがどれだけ変更されているかを調べ，それに合うように両コマンドを
+hackするだけであった．
+
+これらのコマンドの正しい動作は，\eTeX のマニュアル\nobreak%
+\cite{etexman}に与えられている．\pTeX で追
+加されたnodeや条件判断文には，既存の番号より大きい値を与えるようにした．
+具体的には，下の表のようになった．上が\verb+\currentiflevel+，下が
+\verb+\lastnodetype+の動作で，番号が太字なのは\pTeX 特有のものである
+\footnote{当然ながら，\verb+\iffp+は本プロジェクトの浮動小数点演算の実装
+に特有である．}．
+なお，これに合わせるように{\tt etexdefs.lib}を更新した{\tt
+eptexdefs.lib}も作ってある：
+
+{\def\cs#1{{\tt\char`\\#1}}\makeatletter
+\newenvironment{multilist}[2]%
+ {$$\setbox\z@=\hbox\bgroup  % catch some funny things -> \mathord
+  \let\a=\empty
+  \let\b=\empty
+  \count@=\z@
+  \toks@={#2}%
+  \def\item##1\cr
+   {\ifnum \count@=\z@
+      \count@=#1%
+      \expandafter\def\expandafter\b\expandafter{\b\y{}}%
+    \fi
+    \advance\count@ by\m@ne
+    \expandafter\def\expandafter\a\expandafter{\a\x{##1}}}%
+  \ignorespaces}%
+ {\loop
+  \ifnum \count@>\z@
+    \expandafter\def\expandafter\a\expandafter{\a\expandafter\z\b\relax}%
+    \advance\count@ by\m@ne
+  \repeat
+  \def\x##1{\expandafter\y\b\relax{##1}}%
+  \def\y\y##1##2\relax##3%
+   {\ifx @##1@%
+      \def\b{##2\y{##3}}%
+    \else
+      \def\b{##2\y{##1&##3}}%
+    \fi}%
+  \def\z\y##1##2\relax{\def\b{##2\y{##1}}}%
+  \a
+  \def\x
+   {\expandafter\egroup\expandafter\halign\expandafter\bgroup
+    \expandafter&\the\toks@\cr}%
+  \def\y##1{\expandafter\def\expandafter\x\expandafter{\x##1\cr}}%
+  \b
+  \x\egroup $$}
+\begin{adjustvboxheight}\small
+\begin{multilist}{4}{\hfil\qquad#:&\quad#\qquad\hfil}
+\item 1&\cs{if}\cr
+\item 2&\cs{ifcat}\cr
+\item 3&\cs{ifnum}\cr
+\item 4&\cs{ifdim}\cr
+\item 5&\cs{ifodd}\cr
+\item 6&\cs{ifvmode}\cr
+\item 7&\cs{ifhmode}\cr
+\item 8&\cs{ifmmode}\cr
+\item 9&\cs{ifinner}\cr
+\item 10&\cs{ifvoid}\cr
+\item 11&\cs{ifhbox}\cr
+\item 12&\cs{ifvbox}\cr
+\item 13&\cs{ifx}\cr
+\item 14&\cs{ifeof}\cr
+\item 15&\cs{iftrue}\cr
+\item 16&\cs{iffalse}\cr
+\item 17&\cs{ifcase}\cr
+\item 18&\cs{ifdefined}\cr
+\item 19&\cs{ifcsname}\cr
+\item 20&\cs{iffontchar}\cr
+\item \bf 21&\cs{iftdir}\cr
+\item \bf 22&\cs{ifydir}\cr
+\item \bf 23&\cs{ifmdir}\cr
+\item \bf 24&\cs{iftbox}\cr
+\item \bf 25&\cs{ifybox}\cr
+\item \bf 26&\cs{iffp}\cr
+\end{multilist}
+\end{adjustvboxheight}
+\begin{adjustvboxheight}\small
+\begin{multilist}{3}{\hfil\qquad#:&\quad#\qquad\hfil}
+\item -1&none (empty list)\cr
+\item 0&char node\cr
+\item 1&hlist node\cr
+\item 2&vlist node\cr
+\item 3&rule node\cr
+\item 4&ins node\cr
+\item 5&mark node\cr
+\item 6&adjust node\cr
+\item 7&ligature node\cr
+\item 8&disc node\cr
+\item 9&whatsit node\cr
+\item 10&math node\cr
+\item 11&glue node\cr
+\item 12&kern node\cr
+\item 13&penalty node\cr
+\item 14&unset node\cr
+\item 15&math mode nodes\cr
+\item \bf 16&direction node\cr
+\item \bf 17&displacement node\cr
+\end{multilist}
+\end{adjustvboxheight}}
+
+\eteiri
+これでだいぶ\trip, \etrip\ testの動作はうまくいくようになった．状況を述
+べると，以下のようになる．
+\begin{itemize}
+\item \emph{Compatibility modeでの\trip\ testの，\pTeX との差異}\\最後の
+      方の{\tt 1440 strings of total length 25223}等が異なるだけ．
+      ソース中の文字列が多くなっていたりすることなどによるものだろう．
+\item \emph{\trip\ testの，\eTeX との差異（両方ともCompatibility mode）}\\
+↑を除けば，\pTeX での\trip\ testでも出ている差異なので，問題はな
+      いと考えられる．
+\item \emph{\trip\ testの，\eTeX との差異（両方ともExtended mode）}\\
+「両方ともCompatibility mode」のときの差異と同じような雰囲気．
+\item \emph{\etrip\ testの，\eTeX との差異}
+\begin{itemize}
+\item \verb+\lastnodetype+のチェックで3箇所失敗する．\pTeX の仕様に関わ
+      るのではないか？
+\item Memory usageが多かったり，directionが表示されたりとか，明らかに
+      \pTeX 拡張によると考えられるもの.
+\end{itemize}
+\end{itemize}
+
+
+\section{他環境でのコンパイル}
+今まで\TeX\ Live 2007上で開発を行ってきたが，\TeX\ Liveは非常に巨大であり，
+これを気楽にダウンロード，コンパイルということはやはりし辛いものである．
+一方，これ以外に主に使われている（と信じる）\TeX\ distributionとしては，
+以下がある．
+\begin{itemize}
+\item {\bf te\TeX\ 3.0}：Thomas Esserさんが作っていたUnix系OS用のもの．適
+      度な大きさで便利だったのだが，残念ながら3.0をもって開発中止に．
+ソースは{\tt CTAN/systems/unix/teTeX/3.0/distrib/}からダウンロードできる．
+      おそらく大半のlinux distributionがこれをベースにした\TeX 環境を導
+      入している．
+\item {\bf ptetex3}：土村さんによるte\TeX 3.0$\,+{}$日本語環境を簡単に
+      整えるためのpatch集．公式ページは\\
+      \verb+http://www.nn.iij4u.or.jp/~tutimura/tex/ptetex.html+．
+\item {\bf up\TeX}：ttkさんによる，p\TeX の内部コードをUnicodeにする実験．
+      ptetex3内のUnicodeサポート活動 ({\tt ptexenc}) と少なからず関係．
+      下のW32\TeX でも使えるが，本来はptetex3へのパッチ．
+      公式ページは
+      \verb+http://homepage3.nifty.com/ttk/comp/tex/uptex.html+．
+\item {\bf W32\TeX}：角藤さんの作られているWindows用\TeX\
+  distributionの通称．おそらくWindows上で\TeX を利用している人ならほとん
+  どが入れてるはず\footnote{cygwinでコンパイルしたものを使って，W32\TeX
+      を使ってない人という人が若干いる模様．}．\\
+公式ページは
+\verb+http://www.fsci.fuk.kindai.ac.jp/kakuto/win32-ptex/web2c75.html+．
+
+ここから一番近いミラーは数理の大島研．インストールにはTA
+  の阿部さんの「\TeX インストーラ」が非常に便利である．
+\end{itemize}
+\eteiri
+
+とりあえず上2つはなんとかサポートするようにするべきだろう．W32\TeX につ
+いては，TAの阿部さんからの要望である．
+
+\subsection{W32\TeX}
+W32\TeX のソースは前節の大島研のFTPなどからダウンロードすることができる．
+「どうやらVisual C++がコンパイルに必要らしい」ということはわかっていたの
+で，MicrosoftのサイトからMicrosoft Visual C++ 2005 Express Editionと
+Platform SDKをインストールし，また最新のCygwinもインストールをして，環境
+を整えた\footnote{Platform SDKが必要であることを知るまでに数時間を無駄に
+した．}．
+
+しかし，ここから先が大変だった．p\TeX のソースは{\tt
+756/texk/web2c/ptexdir/}にある．どうやら土村さんによるptexenc拡張を取り
+入れている様子であった．しかし，なぜかその直上のディレクトリのmakeがうま
+くいかず，{\tt tangle}とか{\tt web2c}とかは元々のバイナリのものを使わな
+ければならなかった．これらでいろいろ悪戦苦闘したあげく，結局{\tt
+ptexdir}のソースをベースにすることは諦めることにした．
+
+その後，いろいろと慣れないWindows環境のことを調べ，なんとかコンパイルで
+きるところまでこぎつけた．しかし，阿部さんから作ったbinaryが動作不良とい
+う報告を受け，結構悩むことになった．おそらくDLLまわりの事情だったと思う
+のだが，「W32\TeX に取り込む」という角藤さんからの報告が来たので，こちら
+でのWindowsバイナリの開発はやらなくても良いような状況になってしまった．
+
+\subsection{te\TeX\ 3, ptetex3 (ptexenc), up\TeX}
+これらはみなWeb2C-7.5.4環境がオリジナルである．従って，
+{\tt ptex756.diff}を使わないことが必要になるが，前者2つについては，それ
+ぐらいだけであまり注意は必要なかった．ptetex3独自拡張の{\tt ptexenc}について
+も，コンパイル時にライブラリを追加するぐらいであった．up\TeX につ
+いても，\WEB ソースについては同じであったが，できるプログラム名を{\tt
+euptex}などとしてみたため，C headerなどの修正が少し面倒になった．
+
+後者の{\tt ptexenc}, up\TeX で心配であることは，日本語が\TeXXeT で通るか，とい
+うことであった．僕が先に行った\TeXXeT への和文対応では，漢字などの
+2\,byte文字が，内部では2つのnodeで表現されていることを前提としたもので
+あった．そのため「Unicode拡張によって1文字3\,nodeとかになっていないだろ
+うか」と心配した．\WEB\ change fileをざっとざっと見てみた所，どうやらその
+ような事態は起こっていないように思えた．どうやら動いてはいるようである．
+
+\eteiri
+このときついでに，{\tt fp.diff}をchange fileの形式に書き直したりもした．
+そこで\textit{fp\_sub\_absolute\_value} procedure内で
+$\infty-\infty\neq{\rm NaN}$というbugを発見して，修正することができた．
+
+
+
+\newpage
+\section{今後の課題と，それにまつわる雑感}
+今まで書いたような作業をしてきて，最初に気づいたことは，\emph{自分の英語
+力の無さ}である．英語の数学書とかは（英文については）たいした苦もなく読
+めるのだが，一方でいざ自分で書こうとすると表現が全く思い浮かばない．\WEB
+ソースを書き換えるにあたっては，とりあえずの英語で間に合わせたけれども，
+意味の余り取れないような文章になっているであろうことは確実である．院試ま
+でになんとかしたいものだ\verb+^^;+
+
+\eteiri 内容面について．浮動小数点の実装をしたはいいが，Pascalの，それも
+ごく基本的な仕様に沿っただけの実装であり，速度的にも不利であると思われる．
+Beebe~\cite{beebe}にあるように，C製の何か信頼性のおける高速多倍長数値計算ライブ
+ラリを利用するというのが手っ取り早くまた安全な方策であろう．しかし，僕は
+自分で浮動小数点演算を実装したことがなかったので，一回は自分でコードを書
+いてみたかった．
+
+また，\eTeX で長さ量とかには\verb+\dimexpr+などがあ
+り式の表現が使えるのに，浮動小数点演算ではまだその機能がないとか，やっぱ
+り出力書式指定の機能がないというのも気
+になる話である．後者はマクロを頑張っていじればなんとかできそうな気もする．
+
+\eteiri
+最後に，避けて通れない問題であるが，bugの問題がある．特に浮動小数点演算
+の方は自分で書き起こしたものであるから，どんなbugが潜んでいるかは分から
+ない．だいぶbugは取れたような気もするが，それは現時点での思い込みであっ
+て，やはり心配である．
+
+\eteiri 
+ひょっとすると，\pTeX の寿命はもはやあまり長くないのではないかと
+心配している．最初に紹介した\TeX の拡張たちや，\pdfTeX を拡張してスクリプ
+ト言語Luaを組み込んだLua\TeX，また\XeTeX なんかの存在を聞いてると，純粋な
+\TeX に日本語を対応させただけのp\TeX の存在意義は過去の遺産の継承ぐらいし
+かなくなり，主流は世界的にもこれらの拡張のどれか or その発展形
+{---}{---}Lua\XeTeX とでも呼べばいいのだろうか？\inhibitglue {---}{---}に
+なっていきそうな予感がする．ちょうど，日本電気のPC-9800シリーズと所謂
+「DOS/Vパソコン」の関係のように．
+
+\eteiri しかし，せっかくこの計算数学IIで「\pTeX に対して，\eTeX の機
+能のマージと浮動小数点演算の実装を行う」ということが大っぴらにできたのだ
+から，このまま終わるのは非常に虚しいと思っている．こんなことを言うと「何
+を言っているんだ」と言われそうだが，up\TeX などと共に，\pTeX の地位
+向上に寄与できたらいいな，と思っている．
+
+\eteiri
+以上，いろいろ書いてきたが，冬休み中やそれ以降に，この\epTeX まわりがと
+んでもないおおごとになってしまったことには驚きである．取り上げてもらえる
+のはうれしいことではあるが，\epTeX がどんどん自分の中に抱えきれないもの
+になっているような気もしている．
+
+\newpage
+\section{付録}
+\subsection{$\bm\varepsilon$-\pTeX のコンパイル方法のイメージ}
+{\tt eptex-xxxxx.xx.tar.bz2}内の{\tt HOWTOINST.txt}とかを見れば分かる話では
+あるが，図にしておくとなにかと便利である．
+
+\begin{adjustvboxheight}
+\small\narrowbaselines
+\begin{center}
+\xymatrix{\
+\texttt{../tex.web}\ar[r]&\fbox{\tt
+tie}\ar[r]&\texttt{ptex.web}\ar[r]&\fbox{\tt tie}\ar[r]&(*)\\
+&\xymtt{../tex.ch}\ar[u]&\texttt{ptex.ch}\ar[ur]&\texttt{etex.ch}\ar[u]&%
+{\begin{array}{c}\texttt{etex-sysdep.ch}\\\texttt{fp.ch}\end{array}}\ar[ul]\\
+&\xymtt{ptex-base.ch}\ar[ur]^-{\xymtt{tie -c ...}}&
+\texttt{etex.diff}\ar[r]^-{\rm patch}&\\
+&&\texttt{../etexdir/etex.ch}\ar[r]^-{\rm cp}
+&\texttt{etex.ch}\ar[uu]}
+\ \\[0.5\baselineskip]\ 
+\xymatrix{
+(*)=\texttt{eptex.web}\ar[r]&\fbox{\tt tangle}\ar[r]&
+\texttt{eptex.p}\ar[rr]^-{\rm Web2C}&&\text{{\tt tex1.c}\ etc.}%
+\ar[rr]^-{\text{C compiler}}&&\texttt{eptex}\\
+&&&\texttt{pconvert.diff}\ar[u]_-{\text{patch to {\tt pconvert}}}&
+\texttt{ep1.diff}\ar[r]^-{\rm patch}&\\
+&&&&&\hbox to 0zw{\hss\texttt{ptexextra.c} etc.\hss}\ar[uu]
+}\ 
+\end{center}
+\end{adjustvboxheight}
+
+\subsection{\WEB の実例：\texttt{ks1.web}}
+このファイルがあるディレクトリ，もしくは公開場所にある{\tt ks1.web}は，僕
+が計算数学Iのレポートに書いたCarmichael数を探索するプログラム（{\tt
+ks1.f90}, Fortran 90）を\WEB に翻訳したものである．
+
+ここでは，（本来の\WEB では日本語が通らないので）松山さんの日本語版
+WEB~\cite{jpweb}を使わせてもらうことにした．この日本語版\WEB による
+{\tt jtangle}, {\tt jweave}コマンドがそれぞれ{\tt tangle}, {\tt weave}の
+代わりとなる．
+
+僕はPascalのコンパイラを所持していなかったので，Web2Cを利用してコンパ
+イルを行った．
+\begin{adjustvboxheight}
+\narrowbaselines\small
+\begin{verbatim}
+  [h7k doc]$ web2cdir=/home/h7k/ks2/texk/web2c/web2c
+  [h7k doc]$ cat $web2cdir/common.defines $web2cdir/texmf.defines ks1.p|$web2cdir/
+  web2c -t -hks1-a.h -cks1 |$web2cdir/fixwrites > ks1.c
+  [h7k doc]$ gcc -o ks1 ks1.c
+\end{verbatim}
+\end{adjustvboxheight}
+{\tt jtangle}, {\tt jweave}コマンドでできた{\tt ks1.p}, {\tt ks1.tex}や，
+上のようにC言語に変換して得られた{\tt ks1.c}, {\tt ks1.h}も同じディレク
+トリに置いておいた．
+なお，{\tt ks1-a.h}というのはWeb2Cが吐くCソースを
+きちんとコンパイルできるようにするための最小限の設定である．
+
+
+\newpage
+\begin{thebibliography}{99}
+\bibitem{matsu3} 松山 道夫，「\TeX 読み物その3　\TeX の成立ちに関する
+	諸々」．\\
+\verb+http://www.matsuand.com/downloads/texread/texread3.pdf+
+\bibitem{webman} Donald\ E.~Knuth. \textit{The \WEB\ System of
+	Structured Documentation}. Stanford Computer Science Report
+	CS980, 1983.\\
+例えば\verb+http://www.ctan.org/tex-archive/systems/knuth/WEB/WEBman.tex+
+	とかにある．
+\bibitem{texwiki} 奥村氏の\TeX\ wikiの「Make」の項．\\
+\verb+http://oku.edu.mie-u.ac.jp/~okumura/texwiki/?Make+
+\bibitem{etexman} The \NTS\ Team. \textit{The \eTeX\ manual}. \\
+\verb+http://www.tug.org/texlive/Contents/live/texmf-dist/doc/etex/base/etex_man.pdf+
+\bibitem{trip} Donald E. Knuth. \textit{A torture test for
+	\TeX}. Stanford Computer Science Report CS1027, 1984.\\
+\verb+http://ftp.yz.yamagata-u.ac.jp/pub/CTAN/systems/knuth/tex/tripman.tex+
+\bibitem{etrip} The \NTS\ Team. \textit{A torture test for \eTeX}.\\ 旧版\
+(Ver.~2) が以下にある．現在はVer.~2.2で，\TeX\ Live 2007とかには入ってい
+	る．\\%
+\verb+http://tug.ctan.org/cgi-bin/getFile.py?fn=/systems/e-tex/v2/etrip/etripman.tex+
+\bibitem{TAOCP} Donald E.\ Knuth.
+{\it The Art of Computer Programming}, Volume 2: Seminumerical
+Algorithms. Addison-Wesley, third edition 1998.
+\bibitem{arizawa} 有澤 誠 編，『クヌース先生のプログラム論』，共立出版，
+1991
+\bibitem{jpweb} 松山 道夫，日本語版\WEB（試供版）．\\
+\verb+http://www.matsuand.com/downloads/jWEB/jWEB-0.0.7.tar.gz+
+\bibitem{pascal} K.\ イェンゼン，N.\ ヴィルト 著，A.\ B.~ミケル，L.\ F.~%
+	マイナー 改訂，原田 賢一 訳，\\
+『情報処理シリーズ2　PASCAL　原書第4
+	版』，培風館，1981
+\bibitem{mppack} 平山 弘，高精度計算プログラムMPPACK 1.0．
+\verb+http://phase.hpcc.jp/phase/mppack/+
+\bibitem{okuc} 奥村 晴彦，『C言語による最新アルゴリズム辞典』，技術評論
+	社，1991
+\bibitem{beebe} Nelson H. F. Beebe. Extending \TeX\ and \mf\
+	with Floating-Point Arithmetic. \textit{TUGboat}, 28 (3),
+	November 2007. 
+\verb+http://www.math.utah.edu/~beebe/talks/2007/tug2007/tug2007.pdf+
+\bibitem{ori} 数学科3年オリエンテーション係，『2007年度 数学科オリパン
+	フ』，2007.9\\
+（数理266（学部生用控え室）に結構残部がある模様．）
+\bibitem{okupt} 奥村 晴彦，「pTeXへの提案もどき」，2008.1.4．\\
+\verb+http://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=29+
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,924 @@
+\documentstyle{jarticle}
+
+\西暦
+
+\title{\TeX の出版への応用\\
+	\large--- 縦組み機能の組み込み ---}
+\author{濱野 尚人\thanks{（株）\kern-2pt アスキー %
+		出版局 電子編集研究統轄部 出版技術部}
+	\and 田村 明史${}^*$
+	\and 倉沢 良一\thanks{（株）\kern-2pt アスキー %
+		システムソフトウェア事業部 技術統轄部 オフィスシステム技術部}}
+\date{\ }
+
+\setlength{\unitlength}{0.1in}
+
+\def\angle#1{$\langle{}$#1${}\rangle$}
+\def\pTeX{p\kern-.2em\TeX}
+
+\begin{document}
+
+\maketitle \thispagestyle{empty}
+
+\begin{abstract}
+日本語\TeX を出版分野で本格的に応用するため, 縦組み機能を追加した.
+拡張された\TeX は以下のような特長を持つ.
+\begin{itemize}
+\item 同一文書, 同一ページに縦/横組みの混在ができ,
+	縦組み中でも和/欧文/数式の混在が可能である.
+\item 英語版のオリジナル\TeX や（横組み）日本語\TeX と互換性があり,
+	従来の\TeX の文書やマクロをそのまま処理することができる.
+\item 縦組みを使用すると, 拡張フォーマットの{\tt DVI}ファイルを出力する.
+	ただし, 横組みのみ使用している場合は,
+	従来のフォーマットの{\tt DVI}ファイルを出力する.
+\end{itemize}
+本論文ではその設計と実現方法について説明する.
+\end{abstract}
+
+% \tableofcontents
+
+
+\section{はじめに}
+
+\TeX はスタンフォード大学のクヌース教授によって開発された組版システムであり,
+組版の美しさと強力なマクロ機能を特徴としている.
+日本語化され\cite{jtex}, 高品位の写植出力を得ることができるようになり,
+わが国でも\TeX によって組版された書籍が出版されるようになってきた.
+
+ところが, 従来の日本語\TeX は英語向けのシステムをベースとしているため,
+縦組み, ルビなどの日本語特有の機能がない.
+\TeX を一般書籍の出版に使用するためするには, これらの機能を持った
+「本格的出版に耐え得る日本語\TeX\kern0pt 」が必要であろうと判断し,
+日本語\TeX の改造に取り組むことにした.
+この機能拡張された\TeX を\pTeX （\kern0pt publishing \TeX\kern0pt ）と
+呼ぶことにする.
+まず, 機能拡張第一弾として（株）\kern-3pt アスキーで開発された
+日本語\TeX に縦組み機能を追加した.
+
+本論文ではその設計と実現方法について報告する.
+次章から\ref{output}章までで\pTeX の縦組み機能についての基本的な概念を説明し,
+\ref{imple}章で具体的な実現方法を説明する.
+
+
+\section{ディレクション} \label{direction}
+
+文書を組版すると, いくつかの`ページ'の集合となる.
+`ページ'は`行'を``行送り方向''に並べたものであり,
+`行'は`文字'を``字送り方向''に並べたものである.
+
+従来の\TeX では, ページはverticalボックス, 行はhorizontalボックスであり,
+``行送り方向'', ``字送り方向''は横組み用に固定されていた.
+\pTeX では, \TeX の状態として``組み方向''（ディレクション）を考え,
+ディレクションによって`行送り方向', `字送り方向'を変えることにした.
+縦組みは, 横組みの``行送り方向'', ``字送り方向''を,
+右に$90^\circ$回転させたものと同じになる.
+\begin{quote} \begin{description}
+\item[横組み] 字送り方向: 水平右向き, 行送り方向: 垂直下向き
+\item[縦組み] 字送り方向: 垂直下向き, 行送り方向: 水平左向き
+\end{description} \end{quote}
+
+また, 縦組み中で使われた場合と横組み中で使われた場合で
+動作が変わるようなマクロが書けるように,
+\verb|\iftdir|, \verb|\ifydir|というマクロも用意した.
+
+% \TeX の用語やプリミティブには上下左右を連想させる単語が多く使われているが,
+% これらの上下左右は座標系に依存するものである.
+% \TeX のプリミティブには\begin{quote}
+%	\verb|\belowdisplayshortskip|, \verb|\belowdisplayskip|,
+%	\verb|\lower|,\\
+%	\verb|\abovedisplayshortskip|, \verb|\abovedisplayskip|,
+%	\verb|\raise|,\\
+%	\verb|\rightskip|, \verb|\moveright|,\\
+%	\verb|\leftskip|, \verb|\moveleft|
+% \end{quote}のようなものもある.
+% これらの, below, lowerは行送り方向, above, raiseは行送りの逆方向, 
+% rightは字送り方向, leftは字送りの逆方向を意味しているものとして,
+% 縦組みでもそのまま使用する.
+
+
+\section{ボックス}
+
+オリジナルの\TeX では, 文字を並べて``行''のボックスを作るモードをhモードと言い,
+できたボックスをhボックスと呼ぶ.
+これは\TeX がアメリカで開発されたシステムであり,
+英語では文字が水平（\kern0pt horizontal\kern0pt ）に並ぶからである.
+ディレクションが横の場合はそのままで問題ない.
+ディレクションが縦の場合, 行の中で文字は垂直に並ぶのだが,
+やはり, 文字を並べて行のボックスを作るモードをhモードと言い,
+できたボックスをhボックスと呼ぶことにした.
+横組みと縦組みの両方で使えるマクロを作りやすいように,
+`横組みの行のボックス'と`縦組みの行のボックス'は同じ名前の方が良く,
+`横組みの行のボックス'は従来のhボックスと同じものだから,
+互換性を考慮してそのようにした.
+
+同様に, ボックスを行送り方向に並べるモードをvモード,
+それらを集めて作られたボックスをvボックスと呼ぶことにした.
+横ディレクションのvモードではボックスは縦（\kern0pt vertical\kern0pt ）に並ぶが,
+縦ディレクションのvモードではボックスが水平に右から左へ並ぶことになる.
+
+\TeX を起動した直後は横ディレクションのvモードであり,
+ディレクションを変えなければ従来の\TeX と互換性がある.
+つまり, ここで文字を入力すると横ディレクションのhモードに移行し,
+文字を左から右に並べていく.
+ラインブレークによって作られたhボックスは,
+横ディレクションのvモードで上から下に並べていく.
+
+\TeX のディレクションを変更するプリミティブとして,
+\verb|\yoko|, \verb|\tate|を用意した.
+ディレクションの変更は,
+作成中のリストやボックスに何も入力されていない状態でのみ許すことにした.
+\TeX を起動して何も入力されていない状態で\verb|\tate|プリミティブを実行すると,
+縦ディレクションのvモードになる.
+ここで文字を入力すると縦ディレクションのhモードに移行し
+文字を上から下に並べていく.
+ラインブレークによって作られたhボックスは,
+縦ディレクションのvモードで右から左に並べていく.
+
+ボックスの大きさ（ベースラインの位置）を表す用語として,
+\TeX ではWidth, Depth, Heightという言葉を使っている.
+\pTeX では,
+これらの言葉を, ボックスの字送り方向の大きさ（\kern0pt Width\kern0pt ）,
+行送り方向側の大きさ（\kern0pt Depth\kern0pt ）,
+行送り方向の反対側の大きさ（\kern0pt Height\kern0pt ）であると定義した.
+よって, 縦ディレクション中のボックスでは, ボックスの高さを$W$といい,
+左側の幅を$D$といい, 右側の幅を$H$という.
+\begin{quote} \begin{picture}(50,24)(0,4)
+	\put(4,26){\makebox(24,0)[b]{横ディレクション中のボックス}}
+	\put(4,24){\begin{picture}(0,0)(0,0)
+		\thicklines
+		\put(0,0){\vector(1,0){6}}
+		\put(0,0.5){\makebox(6,0)[b]{\small 字送り方向}}
+		\put(0,0){\vector(0,-11){6}}
+		\put(0,-6){\makebox(0,0)[t]{\small 行送り方向}}
+	\end{picture}}
+	\put(6,6){\begin{picture}(0,0)(0,0)
+		\thicklines
+		\put(6,0){\framebox(12,10){}} \put(6,4){\line(1,0){12}}
+
+		\thinlines
+		\put(0,4){\line(1,0){5}} \put(19,4){\line(1,0){5}}
+		\put(3,0){\line(1,0){2}} \put(3,10){\line(1,0){2}}
+		\put(6,11){\line(0,1){2}} \put(18,11){\line(0,1){2}}
+
+		\put(4,0){\vector(0,1){4}} \put(4,0){\vector(0,-1){0}}
+		\put(3.5,0){\makebox(0,4)[r]{$D$}}
+		\put(4,10){\vector(0,-1){6}} \put(4,10){\vector(0,1){0}}
+		\put(3.5,4){\makebox(0,6)[r]{$H$}}
+		\put(6,12){\vector(1,0){12}} \put(6,12){\vector(-1,0){0}}
+		\put(6,12.5){\makebox(12,0)[b]{$W$}}
+	\end{picture}}
+	\put(35,26){\makebox(18,0)[b]{縦ディレクション中のボックス}}
+	\put(53,24){\begin{picture}(0,0)(0,0)
+		\thicklines
+		\put(0,0){\vector(-1,0){6}}
+		\put(-6,0.5){\makebox(6,0)[b]{\small 行送り方向}}
+		\put(0,0){\vector(0,-11){6}}
+		\put(0,-6){\makebox(0,0)[t]{\small 字送り方向}}
+	\end{picture}}
+	\put(35,0){\begin{picture}(0,0)(0,0)
+		\thicklines
+		\put(0,6){\framebox(10,12){}} \put(4,6){\line(0,1){12}}
+
+		\thinlines
+		\put(4,19){\line(0,1){5}} \put(4,0){\line(0,1){5}}
+		\put(0,19){\line(0,1){2}} \put(10,19){\line(0,1){2}}
+		\put(11,6){\line(1,0){2}} \put(11,18){\line(1,0){2}}
+
+		\put(12,6){\vector(0,1){12}} \put(12,6){\vector(0,-1){0}}
+		\put(12.5,6){\makebox(0,12)[l]{$W$}}
+
+		\put(4,20){\vector(-1,0){4}} \put(4,20){\vector(1,0){0}}
+		\put(0,20.5){\makebox(4,0)[b]{$D$}}
+		\put(4,20){\vector(1,0){6}} \put(4,20){\vector(-1,0){0}}
+		\put(4,20.5){\makebox(6,0)[b]{$H$}}
+	\end{picture}}
+\end{picture} \end{quote}
+
+\subsection{異ディレクションのボックス}
+
+一つの文書, 一枚のページであっても部分によって組み方向を変えられるように,
+組み方向の混在を許すことにした.
+たとえば, 表の中で項目によって縦組み/横組みを使い分けることが可能になれば
+表現力が増すことになる.
+また, 縦組み中で数桁の数を表現するとき,
+アラビア数字を横組みにして縦組み中に挿入することがある.
+これを出版業界では連数字と言うが, これも組み方向の混在機能で実現できる.
+
+組み方向の混在を許すということは, 一つの文書に,
+内部の文字が横に並ぶ横組みのhボックスと,
+縦に並ぶ縦組みのhボックスの, 2種類のhボックスが存在することになる.
+縦/横どちらのディレクションで作られたボックスであるか, ボックスごとに記録して,
+これらの組み方向の異なるボックスを区別することにした.
+
+\verb|\hbox|, \verb|\vbox|などで作られるボックスは, 通常,
+\verb|\hbox|, \verb|\vbox|が実行されたときの\TeX のディレクションと
+同じディレクションを持つ.
+しかし以下のように\verb|\yoko|プリミティブを使うと,
+縦ディレクションの中に,
+`123'という内容の横ディレクションを持つhボックスを置くこともできる.
+\begin{quote}
+	（縦ディレクション）\\
+	\verb|\hbox{\yoko 123}|
+\end{quote}
+
+\verb|\hbox|, \verb|\vbox|でディレクションの異なるボックスを作ると,
+横ディレクションを持つボックスは, 縦組み中では
+$W_t=H_y+D_y$, $H_t=W_y/2$, $D_t=W_y/2$
+（$H_y$は, ボックスの横ディレクション中における$H$）となる.
+縦ディレクションを持つボックスは, 横組み中では
+$W_y=H_t+D_t$, $H_y=W_t$, $D_y=0$となる.
+
+\begin{quote} \begin{picture}(50,24)(0,0)
+	\put(0,22){\makebox(16,0)[b]{縦組み中の横組みのボックス}}
+	\put(0,0){\begin{picture}(0,0)(0,0)
+		\thicklines
+		\put(0,6){\framebox(12,10){}} \put(0,10){\line(1,0){12}}
+
+		\thinlines
+		\put(2,10){\vector(0,-1){4}} \put(2,10){\vector(0,1){0}}
+		\put(2.5,6){\makebox(0,4)[l]{$D_y$}}
+		\put(2,10){\vector(0,1){6}} \put(2,10){\vector(0,-1){0}}
+		\put(2.5,10){\makebox(0,4)[l]{$H_y$}}
+		\put(0,14){\vector(1,0){12}} \put(0,14){\vector(-1,0){0}}
+		\put(0,13.5){\makebox(12,0)[t]{$W_y$}}
+
+		\put(6,0){\line(0,1){5}} \put(6,17){\line(0,1){5}}
+		\put(0,17){\line(0,1){2}} \put(12,17){\line(0,1){2}}
+		\put(13,6){\line(1,0){2}} \put(13,16){\line(1,0){2}}
+
+		\put(14,6){\vector(0,1){10}} \put(14,6){\vector(0,-1){0}}
+		\put(14.5,6){\makebox(0,10)[l]{$W_t$}}
+		\put(6,18){\vector(-1,0){6}} \put(6,18){\vector(1,0){0}}
+		\put(0,18.5){\makebox(6,0)[b]{$D_t$}}
+		\put(6,18){\vector(1,0){6}} \put(6,18){\vector(-1,0){0}}
+		\put(6,18.5){\makebox(6,0)[b]{$H_t$}}
+	\end{picture}}
+	\put(30,22){\makebox(22,0)[b]{横組み中の縦組みのボックス}}
+	\put(30,4){\begin{picture}(0,0)
+		\thicklines
+		\put(6,0){\framebox(10,12){}} \put(10,0){\line(0,1){12}}
+
+		\thinlines
+		\put(14,0){\vector(0,1){12}} \put(14,0){\vector(0,-1){0}}
+		\put(13.5,0){\makebox(0,12)[r]{$W_t$}}
+		\put(10,10){\vector(-1,0){4}} \put(10,10){\vector(1,0){0}}
+		\put(6,9.5){\makebox(4,0)[t]{$D_t$}}
+		\put(10,10){\vector(1,0){6}} \put(10,10){\vector(-1,0){0}}
+		\put(10,9.5){\makebox(4,0)[t]{$H_t$}}
+
+		\put(0,0){\line(1,0){5}} \put(17,0){\line(1,0){5}}
+		\put(3,12){\line(1,0){2}}
+		\put(6,13){\line(0,1){2}} \put(16,13){\line(0,1){2}}
+
+		\put(4,0){\line(0,-1){2}} \put(4,0){\vector(0,1){0}}
+		\put(3.5,-2){\makebox(0,2)[r]{$D_y$}}
+		\put(4,0){\vector(0,1){12}} \put(4,0){\vector(0,-1){0}}
+		\put(3.5,0){\makebox(0,12)[r]{$H_y$}}
+		\put(6,14){\vector(1,0){10}} \put(6,14){\vector(-1,0){0}}
+		\put(6,14.5){\makebox(10,0)[b]{$W_y$}}
+	\end{picture}}
+\end{picture} \end{quote}
+
+二つの場合で$W$, $D$, $H$の算出方法が異なるのは,
+縦組み, 横組みでの文字の扱いの違い（\ref{jfont}参照）を反映している.
+
+\TeX には256個のボックスレジスタが用意されていて
+\begin{quote}
+	\verb|\setbox123\hbox{\yoko |\angle{文}\verb|}|
+\end{quote}
+と書けば, ボックスレジスタの123番に\angle{文}を内容とする
+横ディレクションのhボックスが登録される.
+登録されたボックスは
+\begin{quote} \begin{verbatim}
+	\advance\ht123 by \dp123
+	\dp123=0
+\end{verbatim} \end{quote}
+のように, \verb|\wd|, \verb|\dp|, \verb|\ht|を使って
+ボックスの大きさやベースラインの位置を自由に変えることができる.
+\pTeX では, レジスタの内容は
+\begin{quote} \begin{verbatim}
+	\hbox{\tate\copy123}
+	\hbox{\yoko\box123}
+\end{verbatim} \end{quote}
+のようにどのディレクションで使用されるかわからず,
+ボックスが使用されるディレクションによって, $W$, $D$, $H$は異なる値を持つ.
+そこで\verb|\wd|なども,
+そのときのディレクション用の$W$などをアクセスすることにした.
+\begin{quote}
+	\verb|\hbox{\yoko \global\wd123=|\angle{縦高さ}\verb|}|\\
+	\verb|\hbox{\tate \global\wd123=|\angle{横幅}\verb|}|\\
+	\verb|\hbox{\tate\copy123}|\\
+	\verb|\hbox{\yoko\box123}|
+\end{quote}
+のように書けば, 3行目の\verb|\copy123|の$W$は\angle{縦高さ}であり,
+4行目の\verb|\box123|の$W$は\angle{横幅}である.
+
+この場合注意しなければならないのは,
+\verb|\hbox|, \verb|\vbox|で作られたボックスは
+$W_t=H_y+D_y$, $W_y=H_t+D_t$であるが,
+\verb|\wd|, \verb|\dp|, \verb|\ht|を使って$W$, $D$, $H$を変更すると
+この関係は必ずしも成立しないということである.
+ディレクションによってボックスの大きさが変化することになる.
+
+\subsection{異ディレクションのアジャスト, インサート}
+
+vモードや内部vモードの中のhボックスの中に\verb|\vadjust|を使うと,
+vリストのそのボックスの次に, \verb|\vadjust|の内容が挿入される.
+以下のようにディレクションの異なるhボックスの中でも
+支障なく\verb|vadjust|が使えるようにした.
+\begin{quote}
+	（縦ディレクション, vモード）\\
+	\verb|\hbox{\yoko |\ldots\verb|\vadjust{|\ldots\verb|}|\ldots\verb|}|
+\end{quote}
+\verb|\vadjust|の中括弧の内側は, 自動的に,
+それがアジャストされるリストのディレクションである縦ディレクションになる.
+
+\verb|\insert|の場合, クラスによってディレクションを変えたい場合もある.
+たとえば文書全体は縦組みで, 脚注は横組みするとしよう.
+図をクラス12のインサートで, 脚注をクラス34のインサートで処理することにする.
+\begin{quote}
+	（縦ディレクション, vモード）\\
+	\ldots\verb|\insert12{\tate |\ldots\verb|}|\ldots\\
+	\ldots\verb|\insert34{\yoko |\ldots\verb|}|\ldots\\
+	\ldots\verb|\insert12{\tate |\ldots\verb|}|\ldots\\
+	\ldots\verb|\insert34{\yoko |\ldots\verb|}|\ldots
+\end{quote}
+このように書けば,
+ボックスレジスタ12には縦ディレクションで図が集められ,
+ボックスレジスタ34には横ディレクションで脚注が集められるようにした.
+なお, 同じクラスに違うディレクションを混ぜて使うことはできない.
+
+
+\section{縦組みに使用する文字} \label{font}
+
+\subsection{縦組み用日本語フォント}
+
+\TeX は各フォントに一つずつ用意されている
+{\tt TFM}（\kern0pt{\it\TeX\/} {\it F\/}ont {\it M\/}etric\kern0pt ）ファイルを
+参照して組版を行う.
+{\tt TFM}ファイルにはそのフォントに含まれる各文字の大きさなど
+組版に必要な情報が定義してある.
+
+\pTeX でも同様であるが, 日本語のフォントの場合, 同じ書体でも
+縦組みで使うか横組みで使うかによって, 組版に必要な情報は変わってくる.
+たとえば, ``り''という文字は比較的縦に長い文字であるが,
+このような文字は横組みではとなりの文字との間隔をつめて組むことはできても,
+縦組みではある程度間隔を空けないと読みにくくなってしまう.
+そこで, 横組み時と縦組み時では,
+別の\verb|TFM|ファイルを参照して組版することにした.
+\TeX から見ると, 縦組みと横組みでは別のフォントを使っているように
+見えることになる.
+ただし, 組み方向によるフォントの切り替えは,
+ユーザーが気にする必要がないように自動的に行うようにした.
+和文用のカレントフォントを2つ用意し,
+ディレクションによって自動的に切り替えるようにしてある.
+また{\tt TFM}ファイルに縦組み用か横組み用かの情報を埋め込み,
+フォントを指定したとき, 自動的に適切なカレントフォントを切り替えるようにした.
+
+\label{jfont}
+横組みでは, ベースラインは文字の下の方を通っている.
+縦組みの和文フォントは, ベースラインが文字の中央を通ることにした.
+行の途中で文字の大きさを変えたとき, そのほうが自然だと判断したからである.
+
+\subsection{縦組み中の欧文}
+
+縦組みの部分に欧文や数式が出てくると,
+従来の\TeX の欧文用フォントを$90^\circ$回転して上から下に向かって組んでいく.
+これは普通に横に組んだ欧文を, 90度回転させたような結果になる.
+ところが, \ref{jfont}で説明したように,
+縦組みの和文のベースラインは文字の中心を通るようにしたので,
+そこに欧文のベースラインを一致させると行がずれて見えてしまう.
+そこで, \verb|\tbaselineshift|というdimen変数を用意し,
+その寸法だけ縦組み中の欧文のベースラインをシフトさせることにした.
+
+横組みでも, 和文と欧文のベースラインの位置を細かく調節しないと,
+フォントのデザインによってはバランスが悪くなる場合があり,
+\verb|\ybaselineshift|を用意して調節可能にした.
+
+\begin{quote} \begin{picture}(0,46)
+	\put(4,41){\line(0,1){5}}
+	\put(4,40){\begin{picture}(0,0)
+		\thicklines
+		\put(-7,-14){\framebox(14,14){縦組みの漢字}}
+		\put(0,0){\line(0,-1){14}}
+
+		\thinlines
+		\put(8,0){\line(1,0){2}} \put(8,-14){\line(1,0){2}}
+		\put(-7,1){\line(0,1){2}} \put(7,1){\line(0,1){2}}
+
+		\put(9,0){\vector(0,-1){14}} \put(9,0){\vector(0,1){0}}
+		\put(9.5,-14){\makebox(0,14)[l]{$W$}}
+		\put(0,2){\vector(1,0){7}} \put(0,2){\vector(-1,0){0.0}}
+		\put(0,2.5){\makebox(7,0)[b]{$H$}}
+		\put(0,2){\vector(-1,0){7}} \put(0,2){\vector(1,0){0.0}}
+		\put(-7,2.5){\makebox(7,0)[b]{$D$}}
+	\end{picture}}
+	\put(4,19){\line(0,1){6}} \put(0,19){\line(0,1){5}}
+	\put(0,23){\vector(1,0){4}} \put(0,23){\vector(-1,0){0}}
+	\put(4.5,23){\makebox(0,0)[l]{\tt \char92 tbaselineshift}}
+	\put(0,18){\begin{picture}(0,0)
+		\thicklines
+		\put(-4,-12){\framebox(12,12){英字（$90^\circ$ 回転）}}
+		\put(0,0){\line(0,-1){12}}
+
+		\thinlines
+		\put(-4,1){\line(0,1){2}} \put(8,1){\line(0,1){2}}
+		\put(9,0){\line(1,0){2}} \put(9,-12){\line(1,0){2}}
+
+		\put(-4,2){\vector(1,0){4}} \put(-4,2){\vector(-1,0){0}}
+		\put(-4,2.5){\makebox(4,0)[b]{$D$}}
+		\put(0,2){\vector(1,0){8}} \put(0,2){\vector(-1,0){0}}
+		\put(4,2.5){\makebox(4,0)[b]{$H$}}
+		\put(10,0){\vector(0,-1){12}} \put(10,0){\vector(0,1){0}}
+		\put(10.5,0){\makebox(0,-12)[l]{$W$}}
+	\end{picture}}
+	\put(4,0){\line(0,1){5}}
+
+	\put(16,8){\line(1,0){5}}
+	\put(22,8){\begin{picture}(0,0)
+		\thicklines
+		\put(0,-2){\framebox(14,14){横組みの漢字}}
+		\put(0,0){\line(1,0){14}}
+
+		\thinlines
+		\put(-3,-2){\line(1,0){2}} \put(-3,12){\line(1,0){2}}
+		\put(0,13){\line(0,1){2}} \put(14,13){\line(0,1){2}}
+		\put(-2,0){\vector(0,-1){2}} \put(-2,0){\vector(0,1){0}}
+		\put(-2.5,-2){\makebox(0,2)[r]{$D$}}
+		\put(-2,0){\vector(0,1){12}} \put(-2,0){\vector(0,-1){0}}
+		\put(-2.5,0.0){\makebox(0.0,12.0)[r]{$H$}}
+		\put(0,14){\vector(1,0){14}} \put(0,14){\vector(-1,0){0}}
+		\put(0,14.5){\makebox(14,0.0)[b]{$W$}}
+	\end{picture}}
+	\put(37,8){\line(1,0){6}} \put(38,9){\line(1,0){5}}
+	\put(39,9){\vector(0,-1){0}} \put(39,8){\vector(0,1){0}}
+	\put(39,4){\line(0,1){7}}
+	\put(39,3.5){\makebox(0,0)[t]{\tt \char92 ybaselineshift}}
+	\put(44,9){\begin{picture}(0,0)
+		\thicklines
+		\put(0,-4){\framebox(12,12){英字（正立）}}
+		\put(0,0){\line(1,0){12}}
+
+		\thinlines
+		\put(-3,-4){\line(1,0){2}} \put(-3,8){\line(1,0){2}}
+		\put(0,9){\line(0,1){2}} \put(12,9){\line(0,1){2}}
+
+		\put(-2,0){\vector(0,-1){4}} \put(-2,0){\vector(0,1){0}}
+		\put(-2.5,-4){\makebox(0,4)[r]{$D$}}
+		\put(-2,0){\vector(0,1){8}} \put(-2,0){\vector(0,-1){0}}
+		\put(-2.5,0){\makebox(0,8)[r]{$H$}}
+		\put(0,10){\vector(1,0){12}} \put(0,10){\vector(-1,0){0}}
+		\put(0,10.5){\makebox(12,0)[b]{$W$}}
+	\end{picture}}
+	\put(57,8){\line(1,0){5}}
+\end{picture} \end{quote}
+
+
+\section{縦組み中の数式}
+
+縦組み中の数式も, 欧文と同様にシフトさせなければならない.
+\TeX の数式には, 分数の線の高さなどを決定するための
+axis（軸）という概念があるので, これでシフト量を決定することにした.
+
+問題は次のような場合である.
+\begin{quote}
+	（縦ディレクション, hモード）\\
+	\ldots\verb|$ \hbox{$ |\angle{数式}\verb| $} $|\ldots
+\end{quote}
+この場合, 数式モードがネスティングされることになるので,
+内側の\angle{数式}は2回シフトされることになってしまう.
+これを避けるため, \verb|$| の内側は,
+普通の縦ディレクションではない縦数式ディレクションに移行することにした.
+縦数式ディレクションでは
+文字やボックスの並ぶ方向は縦ディレクションと同じであるが,
+その他の動作は横組みと同様である.
+数式ディレクション中で数式モードに移行してもシフトは行わず,
+また, 日本語のフォントは横組みカレントフォントを使用する.
+つまり, 数式は横組みで組んだものを時計回りに90度回転して,
+縦組み中に挿入する形になる.
+
+便宜的に, 横組みでも数式モードに入ると横数式ディレクションに入ることにした.
+現在のディレクションが通常のディレクションであるか,
+数式ディレクションであるかは, \verb|\ifmdir|でテストできる.
+
+
+\section{組版結果の出力} \label{output}
+
+\TeX は\verb|\shipout|プリミテイブで, ボックスの左上隅が紙の左上隅から,
+右に $\verb|\hoffset|+1インチ$,
+下に $\verb|\voffset|+1インチ$ の位置になるように,
+{\tt DVI}（\kern0pt{\it D\/}e{\it v\/}ice {\it I\/}ndependent\kern0pt ）
+ファイルに出力する.
+\pTeX も同様である.
+\verb|\hoffset|, \verb|\voffset|は, ほかのプリミティブ名と違って,
+ディレクションに関係なく, h, vが本当にholizontal, vertcalを意味している.
+
+従来の\verb|DVI|命令は, \.横\.組\.み\.の\.と\.きファイルが小さくなるように
+工夫されている.
+たとえば, ``文字の印字''と``文字幅だけ右へ移動''が,
+1つの命令でできるようになっている.
+\pTeX では, 縦組みの場合でも横組みと同様にファイルが小さくなるように,
+\verb|DVI|フォーマットを拡張した.
+
+ただし, たとえば従来の文書をこの\TeX で処理した場合など,
+その文書内で縦組みを使用していない場合,
+従来のものと同じフォーマットの{\tt DVI}を出力する.
+また, プリアンブル, ポストアンブルをテストすれば,
+文書内した縦組みを使用した箇所が存在するかどうかを知ることができるようにした.
+
+
+\section{インプリメント} \label{imple}
+
+現在構築中のリストのネスティング状態を示す
+レコード（\kern0pt {\it list\_state\_record\/}）に,
+ディレクションを表すフィールドを追加し,
+トップのディレクションをマクロ{\it direction\/}でアクセスできるようにした.
+{\it direction\/}の値は{\it dir\_yoko\/}か, {\it dir\_tate\/}か,
+$-{\it dir\_yoko\/}$か, $-{\it dir\_tate\/}$である.
+$-{\it dir\_yoko\/}$, $-{\it dir\_tate\/}$は数式ディレクションを意味する.
+
+各種ノードにディレクションを保持するフィールドを加えなければならない.
+ボックスを表す{\it hlist\_node\/}, {\it vlist\_node\/}では
+第1ワードの{\it sub\_type}フィールドが未使用だったので,
+これを{\it box\_dir\/}として使うことにした.
+\verb|\insert|によって生成される
+{\it ins\_node\/}には空いているフィールドがなかったので,
+サイズを1ワード大きくして全部で6ワードにし,
+最後の1ワードを{\it ins\_dir\/}として使うことにした.
+
+\subsection{\it dir\_node}
+
+縦ディレクションのリストに横ディレクションのボックスを追加するような場合,
+間に{\it dir\_node\/}を挿入して, ボックスの大きさなどを整合させる.
+{\it dir\_node\/}は, {\it hlist\_node\/}, {\it vlist\_node\/}と
+全く同じ構造を持っている.
+リストにはこの{\it dir\_node\/}が挿入され,
+{\it dir\_node\/}の{\it box\_dir\/}にはリストのディレクションが,
+{\it width\/},{\it depth\/},{\it height\/}には,
+リストのディレクションで見た, ボックスの$W$, $D$, $H$の値が入っている.
+{\it dir\_node\/}の{\it list\_ptr\/}は実体のボックスを指すポインタである.
+実体のボックス（{\it hlist\_node\/}, {\it vlist\_node\/}）の
+{\it box\_dir\/}にはボックスのディレクションが,
+{\it width\/},{\it depth\/},{\it height\/}には,
+ボックスのディレクションで見た, $W$, $D$, $H$の値が入っている.
+
+たとえば
+\begin{quote}
+	（縦ディレクション）\\
+	{\gt \verb|昭和\hbox{\yoko 38}年|}
+\end{quote}
+は図のようなリストを作る.
+\begin{quote} \begin{picture}(40,25)(-4,-22)
+	\thinlines
+	\put(0,0){\begin{picture}(0,0)
+		\put(-4,-3){\framebox(8,4){}}
+		\put(0,0){\vector(1,0){6}}
+		\put(0,0){\circle*{0.3}}
+		\put(-4,-1){\line(1,0){8}}
+		\put(-4,-3){\makebox(8,2)[c]{`昭'}}
+	\end{picture}}
+	\put(10,0){\begin{picture}(0,0)
+		\put(-4,-3){\framebox(8,4){}}
+		\put(0,0){\vector(1,0){6}}
+		\put(0,0){\circle*{0.3}}
+		\put(-4,-1){\line(1,0){8}}
+		\put(-4,-3){\makebox(8,2)[c]{`和'}}
+	\end{picture}}
+	\put(20,0){\begin{picture}(0,0)
+		\put(-4,-7){\framebox(8,8){}}
+		\put(-4,-1){\makebox(4,2)[c]{\bf 縦}}
+		\put( 0,-1){\line(0,1){2}}
+		\put( 2, 0){\vector(1,0){4}}
+		\put(2,0){\circle*{0.3}}
+		\put(-4,-1){\line(1,0){8}}
+		\put(-4,-5){\makebox(8,4)[c]{\it dir\_node\/}}
+		\put(-4,-5){\line(1,0){8}}
+		\put( 0,-6){\circle*{0.3}}
+		\put( 0,-6){\vector(0,-1){3}}
+	\end{picture}}
+	\put(30,0){\begin{picture}(0,0)
+		\put(-4,-3){\framebox(8,4){}}
+		\put(-4,-1){\line(4,1){8}}
+		\put(-4,-1){\line(1,0){8}}
+		\put(-4,-3){\makebox(8,2)[c]{`年'}}
+	\end{picture}}
+
+	\put(20,-10){\begin{picture}(0,0)
+		\put(-4,-7){\framebox(8,8){}}
+		\put(-4,-1){\makebox(4,2)[c]{\bf 横}}
+		\put( 0,-1){\line(0,1){2}}
+		\put( 0,-1){\line(2,1){4}}
+		\put(-4,-1){\line(1,0){8}}
+		\put(-4,-5){\makebox(8,4)[c]{\it hlist\_node\/}}
+		\put(-4,-5){\line(1,0){8}}
+		\put( 0,-6){\circle*{0.3}}
+		\put( 0,-6){\vector(0,-1){3}}
+	\end{picture}}
+
+	\put(20,-20){\begin{picture}(0,0)
+		\put(-4,-3){\framebox(8,4){}}
+		\put(0,0){\vector(1,0){6}}
+		\put(0,0){\circle*{0.3}}
+		\put(-4,-1){\line(1,0){8}}
+		\put(-4,-3){\makebox(8,2)[c]{`3'}}
+	\end{picture}}
+	\put(30,-20){\begin{picture}(0,0)
+		\put(-4,-3){\framebox(8,4){}}
+		\put(-4,-1){\line(4,1){8}}
+		\put(-4,-1){\line(1,0){8}}
+		\put(-4,-3){\makebox(8,2)[c]{`8'}}
+	\end{picture}}
+\end{picture}\end{quote}
+\begin{quote}\gt\begin{verbatim}
+	\tmin 昭
+	\tmin 和
+	\dirboxT(5.00002+5.00002)x6.44444
+	.\hboxY(6.44444+0.0)x10.00003
+	..\tenrm 3
+	..\tenrm 8
+	\penalty 500(for \jcharwidowpenalty)
+	\glue(\kanjiskip) 0.0 plus 0.4 minus 0.4
+	\tmin 年
+\end{verbatim} \end{quote}
+
+`\verb|\hbox{|'と入力されると,
+それまでのリストやモードやディレクションがセーブされ,
+新たなリストやモードやディレクションが用意される.
+\verb|\tate|や\verb|\yoko|は,
+その時点でのリストが空であればディレクションを変更する.
+`\verb|\hbox{|'に対応する`\verb|}|'が入力されると,
+まず, \verb|\hbox{}|の内部のディレクションと同じディレクションのボックスが
+作られる.
+そのディレクションと\verb|\hbox{}|の外側のディレクションが一致していなければ,
+{\it dir\_node}を使って, ディレクションが整合させられる.
+
+\subsection{\it disp\_node}
+
+和文中の欧文や数式のベースラインをシフトさせるために,
+新種のノード{\it disp\_node\/}（\kern0pt displacement node\kern0pt ）を
+導入することにした.
+このノードは, リンク情報ワードのほかに
+{\it disp\_dimen\/}フィールド（1ワード）を持っている.
+{\it disp\_node\/}はhリスト中にのみ存在し,
+このノード以降のすべてのノードのベースラインを,
+{\it disp\_dimen}だけ行送り方向にシフトさせる.
+
+たとえば, 縦ディレクションで\verb|\tbaselineshift|の値が2ポイントのとき,
+\begin{quote}\gt
+	\ldots\verb|このdispノード|\ldots
+\end{quote}
+のように入力すると`\verb|disp|'の前に2ポイントの{\it disp\_node\/},
+後に0ポイントの{\it disp\_node\/}が挿入される.
+\begin{quote}\gt\begin{verbatim}
+	\tmin こ
+	\tmin の
+	\displace 2.0
+	\glue(\xkanjiskip) 2.5 plus 1.0 minus 1.0
+	\tenrm d
+	\tenrm i
+	\tenrm s
+	\tenrm p
+	\displace 0.0
+	\glue(\xkanjiskip) 2.5 plus 1.0 minus 1.0
+	\tmin ノ
+	\penalty 200(for kinsoku)
+	\glue(\kanjiskip) 0.0 plus 0.4 minus 0.4
+	\tmin ー
+	\penalty 500(for \jcharwidowpenalty)
+	\glue(\kanjiskip) 0.0 plus 0.4 minus 0.4
+	\tmin ド
+\end{verbatim} \end{quote}
+文字（\kern0pt {\it char\_node\/}）,
+ボックス（\kern0pt {\it hlist\_node\/}, {\it vlist\_node\/}, {\it dir\_node\/}）,
+罫線（\kern0pt {\it rule\_node\/}）以外のノードには,
+$H$や$D$がないので{\it disp\_node\/}の影響を受けない.
+だから
+\begin{quote}\gt
+	\ldots\verb|このdvi fileフォーマット|\ldots
+\end{quote}
+のように入力されたとき, \verb|device|と\verb|independent|の間の空白の前後に
+{\it disp\_node\/}を入れるのは無駄である.
+\begin{quote}\gt\begin{verbatim}
+	\tmin こ
+	\tmin の
+	\displace 2.0
+	\glue(\xkanjiskip) 2.5 plus 1.0 minus 1.0
+	\tenrm d
+	\tenrm v
+	\tenrm i
+	\displace 0.0
+	\glue 3.33333 plus 1.66666 minus 1.11111
+	\displace 2.0
+	\tenrm ^^L (ligature fi)
+	\tenrm l
+	\tenrm e
+	\displace 0.0
+	\glue(\xkanjiskip) 2.5 plus 1.0 minus 1.0
+	\tmin フ
+	\penalty 150(for kinsoku)
+	\glue 1.07391 minus 1.07391
+	\tmin ォ
+\end{verbatim} \end{quote}
+そこで, リストに{\it disp\_node\/}を加えるとき,
+無駄な{\it disp\_node\/}を消すようにした.
+\begin{quote}\gt\begin{verbatim}
+	.\tmin こ
+	.\tmin の
+	.\displace 2.0
+	.\glue(\xkanjiskip) 2.5 plus 1.0 minus 1.0
+	.\tenrm d
+	.\tenrm v
+	.\tenrm i
+	.\glue 3.33333 plus 1.66666 minus 1.11111
+	.\tenrm ^^L (ligature fi)
+	.\tenrm l
+	.\tenrm e
+	.\displace 0.0
+	.\glue(\xkanjiskip) 2.5 plus 1.0 minus 1.0
+	.\tmin フ
+	.\penalty 150(for kinsoku)
+	.\glue 1.07391 minus 1.07391
+	.\tmin ォ
+\end{verbatim} \end{quote}
+
+\subsection{縦組み用{\tt TFM}ファイル}
+
+縦組みフォント用拡張{\tt TFM}ファイルのフォーマットは, 基本的には,
+従来の{\tt JFM}フォーマット\cite{jfm}と変わらない.
+ただ各フィールドの意味が多少変化している.
+最初のハーフワード（\kern0pt {\it id}\kern0pt ）で
+{\tt JFM}フォーマットであることを示す.
+$\hbox{\it id} = 11$ の場合は横組み用{\tt JFM},
+$\hbox{\it id} = 9$ の場合は縦組み用{\tt JFM}である.
+
+{\it width}, {\it italic}, {\it kern}, {\it glue}など
+従来の横組み{\tt JFM}フォーマットで横方向の意味を持っていたフィールドは,
+縦組み{\tt JFM}では縦（字送り）方向の意味を持つ.
+たとえば{\it width}はその文字の縦方向の大きさである.
+
+{\it height}, {\it depth}など
+従来の横組み{\tt JFM}で縦方向の意味を持っていたフィールドは,
+縦組み{\tt JFM}では横（行送り）方向の意味を持つ.
+{\it height}はその文字のベースラインの右側の大きさ,
+{\it depth}はその文字のベースラインの左側の大きさである.
+
+\subsection{拡張{\tt DVI}フォーマット}
+
+従来の\verb|DVI|には水平方向へ移動する命令として\verb|right|,
+垂直方向へ移動する命令として\verb|down|という名前が使用されている.
+hボックスを``水平ボックス''ではなく``字送り方向のボックス''と定義したように
+\verb|right|命令を字送り方向へ移動する命令,
+\verb|down|命令を行送り方向へ移動する命令と定義した.
+字送り, 行送りの方向は, 組み方向によって変わるので,
+\verb|DVI|リーダにもディレクションを設けて,
+新しい命令\verb|dir|によってディレクションを切り換えることにした.
+\verb|push|, \verb|pop|で, $(h,v,w,x,y,z)$の他に,
+ディレクション$d$もpush, popする.
+
+\verb|DVI|の命令は最初の1バイトで識別できるようになっている.
+すでに0--249が使用されている\footnote{
+	\TeX を, 英語などの左から右へ書く言語と,
+	アラビア語やヘブライ語のように右から左へ書く言語を
+	混植できるように改造した事例\cite{arabic}では,
+	そのインプリメントの方法として\verb|DVI|命令を拡張しており,
+	250, 251を使用している.
+}ので新しい命令は255を使うことにした.
+\verb|dir|（\kern0pt 255\kern0pt ）命令は1バイトの引数$d$を1つ取る.
+\begin{itemize}
+\item $d=0$ $\cdots$ 横組み
+\item $d=1$ $\cdots$ 縦組み
+\end{itemize}
+
+横ディレクションの場合は従来の\verb|DVI|とコンパチブルであるが,
+縦ディレクションの場合は従来の\verb|DVI|で横方向に移動する命令
+\begin{quote} \begin{verbatim}
+	set_char_* set? set_rule right? w? x?
+\end{verbatim} \end{quote}
+は縦方向（字送り方向）に移動する命令となり,
+従来の\verb|DVI|で縦方向に移動する命令
+\begin{quote} \begin{verbatim}
+	down? y? z?
+\end{verbatim} \end{quote}
+は横方向（行送り方向）に移動する命令となる.
+
+文字は, ベースラインの方向が字送りの方向と一致するように,
+必要なら回転して, 印字されなければならない.
+罫線の命令もディレクションによって方向が変わる.
+従来の\verb|set_rule|, \verb|put_rule|では,
+最初の引数が高さ, 次の引数が幅を表していた.
+拡張\verb|DVI|では, 最初の引数が罫線の行送り方向の反対側の大きさ,
+次の引数が字送り方向の大きさを表している.
+\verb|set_rule|では2番目の引数で指定してある長さだけ
+字送り方向に参照点を移動させる.
+
+各ページの先頭では, {\tt DVI}リーダは横ディレクションであり,
+拡張\verb|DVI|対応のプリンタドライバで, 従来の\verb|DVI|もプリントアウトでき,
+拡張命令（\kern0pt \verb|dir|\kern0pt ）を使っていない\verb|DVI|ファイルは,
+従来のプリンタドライバでプリントアウトできる.
+
+\verb|DVI|ファイルには, ファイルの先頭（\kern0pt preamble\kern0pt ）と
+末尾（\kern0pt postamble\kern0pt ）に\verb|DVI|のバージョンを表す
+{\it id\_byte}が書き込まれている.
+従来の\verb|DVI|ではどちらの{\it id\_byte}も2である.
+拡張命令を使っている\verb|DVI|ファイルでは, postambleの{\it id\_byte}を3にして,
+拡張プリンタドライバでプリントアウトしなければならないことを表す.
+
+
+\section{日本語\TeX との互換性}
+
+\pTeX は, 機能面では従来の日本語\TeX との完全な互換性を保っている.
+
+性能面での違いを比較するために
+SONY NEWS 1460上の日本語\TeX と\pTeX で本論文を組版し,
+cshのtimeコマンドでCPU時間を比較してみた.
+なおこのテストでは, あらかじめauxファイルを作成しておき,
+{\tt virtex}に\LaTeX のフォーマットファイルを読み込ませる形で起動して計測した.
+\begin{itemize}
+\item 日本語\TeX の場合:\\
+	\verb|24.7u 0.3s 0:25 99% 44+123k 0+16io 0pf+0w|
+
+\item \pTeX の場合:\\
+	\verb|25.0u 0.3s 0:25 99% 46+121k 0+16io 0pf+0w|
+\end{itemize}
+
+やはり多少負荷は重くなっているようだが,
+約1 \%なのでほとんど変っていないと言っていいと思う.
+これは, \pTeX を日本語\TeX の置き換えとして使用しても
+支障はないということを意味している.
+
+
+\section{おわりに}
+
+今回行った\TeX の改造は, 相当大規摸なものである.
+アスキー版日本語\TeX の段階で既に{\tt trip test}をパスしなくなっており,
+これにさらに改造を加えたので,
+`もはやこれは\TeX ではない'という意見もあるかも知れない.
+私は, \TeX の根本は以下の3項目であろうと考えている.
+\begin{itemize}
+\item ボックスとグルー
+\item ラインブレーク, ページブレーク
+\item マクロ
+\end{itemize}
+この機構は単純であるにもかかわらず非常に強力で,
+組版の諸問題をほぼ解決することができる.
+この基本を踏み外さなければ, \TeX と呼んでいいのではないだろうか.
+
+もともと, \TeX システムはクヌース教授が伝統的な組版について調査し,
+同等以上のクオリティを得ることを目標に作られたシステムである.
+\pTeX も, 従来の日本語の組版について十分調査し,
+先人の行ってきた美しい組版のための工夫を,
+できる限り取り込んでいきたいと考えている.
+それをある程度効率よく行うためには,
+やはり, \TeX の内部に変更を加える必要がある.
+
+今後の\pTeX の環境の整備, 機能拡張として以下のものを考えている.
+\begin{description}
+\item[マクロの充実]\ \\
+	縦組みに必要なマクロを洗い出し, 充実させる必要がある.
+
+\item[約物のチューニング]\ \\
+	現在の{\tt TFM}では, 約物（記号類）の扱いについて
+	チューニングの足りない部分がある.
+
+	{\tt TFM}のチューニングで対応しきれない場合は,
+	\TeX 本体のスペーシングアルゴリズムに変更を
+	加えなければならないかもしれない.
+
+\item[漢字・カナ別フォント]\ \\
+	写植にはカナ書体と言って, 漢字が含まれていない書体がある.
+	これと漢字の書体（明朝, ゴシックなど）とを組み合わせて文章を組む.
+	カナの書体を変えただけでもかなり雰囲気が変わるものである.
+
+	これを\TeX で実現するには, カナのカレントフォントを設けて,
+	コードによって漢字フォントとカナフォントを使い分けることになるだろう.
+
+\item[ルビ]\ \\
+	やはり日本語の書籍を組版するためには, ルビを避けるわけにはいかない.
+
+	ルビの振ってあることばの途中でラインブレークが起こる場合があるので,
+	ラインブレーク処理に手を加えなければならない.
+	縦組み拡張に匹敵する大改造になると思われる.
+\end{description}
+
+\subsection*{謝辞}
+
+本研究の機会を与えてくださった
+（株）\kern-3pt アスキー 電子編集研究統轄部 井芹昌信 統轄部長,
+同 技術統轄部 三浦雅孝 統轄部長,
+ならびに, \TeX システムについて貴重なご意見をいただいた 同 技術部 大野俊治 次長
+に感謝します.
+
+\begin{thebibliography}{9}
+\bibitem{texbook} Knuth, D. E. : {\em The \TeX book}, Addison-Wesley (1986)\\
+	［斎藤信男 監修, 鷺谷好輝 翻訳 : \TeX ブック, アスキー(1989)］
+\bibitem{texweb} Knuth, D. E. : {\em \TeX : the program}, Addison-Wesley (1986)
+\bibitem{jtex} 倉沢良一 : \TeX システムの日本語化,
+		日本語\TeX 配布テープ, {\tt ./doc/jtex.tex} (1987)
+\bibitem{jfm} 倉沢良一 : JFM file format,
+		日本語\TeX 配布テープ, {\tt ./doc/jfm.tex} (1987)
+\bibitem{arabic} Knuth, D. E. and MacKay, P. :
+	Mixing right-to-left texts with left-to-right texts,
+		{\em TUGboat Volume~8 No.~1}, pp.~14--25 (1987)
+\end{thebibliography}
+
+\end{document}

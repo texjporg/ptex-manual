@@ -1,0 +1,403 @@
+\def\cs#1{$\backslash$\kern0pt#1}
+\def\angle#1{$\langle$\kern0pt#1\kern0pt$\rangle$}
+\documentstyle{jarticle}
+\begin{document}
+\title{日本語\TeX}
+\author{倉沢 良一\\ASCII Corporation}
+\date{昭和62年8月 \\ 昭和62年12月 \\ 平成元年10月}
+\maketitle
+\begin{abstract}
+これは、日本語\TeX の使い方の注意点と、
+\TeX の日本語化にともない変更あるいは追加された機能について
+解説したドキュメントです。
+基本的な\TeX の使い方については、\TeX bookや
+\LaTeX: A document Preparation System. をご覧ください。
+\end{abstract}
+
+\section{日本語\TeX の概要}
+日本語\TeX は、オリジナルの\TeX と完全なアッパーコンパチブルを保っています。
+ですから、これまで欧文で作られたファイルはそのまま日本語\TeX に
+かけられるはずです。
+現在のバージョンで扱える漢字コードは、シフトJISおよびEUCです。
+ただし、これらはソースファイルにパッチをあてて、makeし直さなければなりません。
+
+日本語（2バイトコードキャラクタ）のハンドリングに関しては、
+でき得る限り英字（1バイトコードキャラクタ）と同じように取り扱える
+ようにしてあります。
+したがって、特殊な使い方をしない限り英字と同じようにして、
+原稿ファイルを作成していくことができます。
+
+しかも、カレントフォントとして英字と漢字とを別々に持っているため、
+英字と漢字の切り換えは特に気にする必要はなく、
+そのまま混在して使うことができます。
+
+和文と欧文の処理の違いとしてラインブレークのタイミングと
+それに関係する禁則処理、さらに和文欧文が混在した場合のスペーシング
+の処理などがあります。
+日本語\TeX では、これらの処理を自動的に行っていますが、
+柔軟性を高めるために、こうした処理に関係するパラメータを自由に再設定
+できるようになっています。
+
+フォントに関しては、1フォントでJISコードの第1水準、第2水準全てを
+扱えるように拡張してありますから、英字フォントと同じように漢字フォントを扱え、
+JFM(TFM)ファイルをつくることにより、自由に使用可能なフォントを増やして
+いくことができます。
+
+DVIファイルは、SET2 および PUT2 を使って2バイトコードを出力しているため、
+これまでのものとの互換性は保たれています。
+またDVIファイルには、JISコードを用いて出力しています。
+
+\section{原稿を書く上での注意点}
+基本的には、欧文と和文は全く同じようにして扱えます。
+ただし、日本語特有の処理機能を持たせているため、
+原稿を書くうえでは次のことに注意してください。
+\begin{itemize}
+\item コントロールシーケンスにも2バイトコードキャラクタ
+	が使えるようになっています。
+	したがって、コントロールシーケンスに続けて2バイトコードの
+	文字を書き並べる場合は、必ず半角スペースやタブ等で間を区切ってください。
+\item 欧文の場合、改行は単語間のスペースとして取り扱われますが、
+	日本語の場合、原稿内では自由な箇所で改行が行えたほうが便利です。\\
+	そこで日本語\TeX では、1行の終わりが1バイトコードの場合はスペーサー
+	の挿入を行い、2バイトコードの場合は何も行わないようになっています。
+\item 2バイトコードキャラクタと1バイトコードキャラクタが
+	連続する場合、自動的に\cs{xkanjiskip}に設定されてているグルーを
+	挿入します。ただしこの処理は、どの1バイトコードキャラクタとの
+	間で行うか\cs{xspcode}によって指定でき、デフォルトではa--z,
+	A--Z, 0--9との間で行われるように設定されています。
+	この処理を特定の箇所で禁止したい場合は、
+	そこに\cs{kern0pt}、\cs{hskip0pt}などを挿入してください。
+\item 禁則処理は、禁則の対象となるキャラクタの前方あるいは
+	後方にペナルティーを自動的に挿入することで実現しています。
+	このペナルティーの設定は\cs{prebreakpenalty}、\cs{postbreakpenalty}
+	によって行います。デフォルト値は、kinsoku.texに記述されています。
+\item 現在、jtex、jlatexで扱えるフォントは明朝体とゴシック体です。
+	これらのフォントの指定は、
+	jtex, jlatexともに、\cs{mc}、\cs{gt}で行えます。
+	これら以外のフォントは、英字フォントと同じように、
+	対象のフォントにあわせてJFM(TFM)を作れば使用できます。
+\item フォントの切り換えは、英字と漢字は独立して行われます。
+	jlatexでは、\cs{large},\cs{small}などサイズ変更の
+	コントロールシーケンスによって、
+	連動してフォントをチェンジするようにしていますが、
+	jtexではそのような操作は一切行っていませんので注意してください。
+	ただし、指定したフォントが印字されるためには、それらの字体、サイズの
+	フォントがそろっていなければ行えません。
+	jlatexでは、次のフォントが存在するものと仮定しています。
+	\begin{quote}
+	min5, min6, min7, min8, min9, min10,
+	min10 magstephalf, min10 magstep1,
+	min10 magstep2, min10 magstep3,
+	min10 magstep4, min10 magstep5, \\
+	goth5, goth6, goth7, goth8, goth9, goth10,
+	goth10 magstephalf, goth10 magstep1,
+	goth10 magstep2, goth10 magstep3,
+	goth10 magstep4, goth10 magstep5
+	\end{quote}
+	これらが、きちんと印字されるかどうかはプリンタドライバの責任です。
+	また、これらのフォントにはカーニング・パラメータが設定されています。
+	カーニングを行いたくない場合は、上記のフォントの代りに以下のものを
+	使用してください。こちらのフォントは、カーニングのパラメータが設定
+	されていないことを除いて上記のものと全く同じものです。
+	\begin{quote}
+	nmin5, nmin6, nmin7, nmin8, nmin9, nmin10,
+	nmin10 magstephalf, nmin10 magstep1,
+	nmin10 magstep2, nmin10 magstep3,
+	nmin10 magstep4, nmin10 magstep5, \\
+	ngoth5, ngoth6, ngoth7, ngoth8, ngoth9, ngoth10,
+	ngoth10 magstephalf, ngoth10 magstep1,
+	ngoth10 magstep2, ngoth10 magstep3,
+	ngoth10 magstep4, ngoth10 magstep5
+	\end{quote}
+\item 現在のバージョンでは、全角スペースはほかの漢字キャラクタと同じように
+	扱われます。
+	半角スペースのような特別の処理は行っていませんので注意してください。
+\item コントロールシーケンス名にも全角文字を使用することができますが
+	次の点に注意してください。
+	\begin{enumerate}
+	\item 全角の1区、2区、7区に含まれる文字は、カテゴリーコードの
+		12つまり `Other\_character' と同様の扱いになります。
+		したがって、これらの文字は ``エスケープ文字$+$1文字'' の
+		コントロールシーケンスとしてのみ扱えます。
+	\item そのほかの文字に付いては、カテゴリーコードの11(letter)と
+		同様に扱われます。
+		また、これらの文字は半角文字と混在して使用することが
+		できます。
+	\end{enumerate}
+\item 半角カナは使えません。原稿内に半角カナのコードが入らないようにし
+	てください。
+\end{itemize}
+
+\section{追加されたプリミティブ}
+
+日本語\TeX にはつぎのプリミティブが追加されています。
+\begin{itemize}
+\item \cs{{\bf kanjiskip}}
+	\begin{quote}
+	\cs{kanjiskip}$=$\angle{dimen}
+	\end{quote}
+	連続する2バイトコード間に自動的に挿入するグルーの値を
+	格納するレジスタです。
+	ただし、この処理は\cs{autospacing}、\cs{noautospacing}によって
+	行うか行わないかの指定ができます。\\
+	このレジスタの値は、パラグラフの終わりまたは\cs{hbox}の最後の
+	時点で取り込まれ、処理されます。
+	したがって、同一パラグラフ内、あるいは\cs{hbox}内で何度か値を
+	変化させたとしても、最後に設定された値によって全て処理されます。
+
+	\noindent
+	使用例\\
+	{\tt\cs{kanjiskip}$=$10pt plus 1pt minus 1pt}\\
+	{\kanjiskip=10pt plus 1pt minus 1pt
+	とするとこうなります。\par}
+\item \cs{{\bf xkanjiskip}}
+	\begin{quote}
+	\cs{xkanjiskip}$=$\angle{dimen}
+	\end{quote}
+	連続する2バイトコードと\cs{xspcode}で指定された1バイトコードの間に
+	自動的に挿入するグルーの値を格納するレジスタです。
+	ただし、この処理は\cs{autoxspacing}、\cs{noautoxspacing}によって
+	行うか行わないかの指定ができます。\\
+	\cs{kanjiskip}と同様のタイミングで取り込まれ処理されます。
+
+	\noindent
+	使用例\\
+	{\tt\cs{xkanjiskip}$=$10pt plus 1pt minus 1pt}\\
+	{\xkanjiskip=10pt plus 1pt minus 1pt
+	とするとalphabetやnumberとの間に挿入されるグルーが
+	10pt plus 1pt minus 1ptになります。\par}
+\item \cs{{\bf sjis}}
+	\begin{quote}
+	\cs{sjis}\angle{16--bit number}
+	\end{quote}
+	シフトJISコードから内部コードへの変換を行います。
+
+	\noindent
+	使用例\\
+	{\tt\cs{char}\cs{sjis}"889F}\\
+	とすれば、`\char\sjis"889F' となります。
+\item \cs{{\bf jis}}
+	\begin{quote}
+	\cs{jis}\angle{16--bit number}
+	\end{quote}
+	JISコードから内部コードへの変換を行います。
+
+	\noindent
+	使用例\\
+	{\tt\cs{char}\cs{jis}"3022}\\
+	とすれば、`\char\jis"3022' となります。
+\item \cs{{\bf kuten}}
+	\begin{quote}
+	\cs{kuten}\angle{16--bit number}
+	\end{quote}
+	区点コードから内部コードへの変換を行います。
+	16進4桁の上2桁が区を下2桁が点であると解釈します。
+
+	\noindent
+	使用例\\
+	{\tt\cs{char}\cs{kuten}"1003}\\
+	とすれば、`\char\kuten"1003' となります。
+\item \cs{{\bf xspcode}}
+	\begin{quote}
+	\cs{xspcode}\angle{8--bit number}$=$\angle{$0|1|2|3$}
+	\end{quote}
+	2バイトコードと1バイトコードの間に自動的にスペースが挿入されますが、
+	このプリミティブによってどの1バイトコードとの間でこの処理を行うか
+	どうかを指定できます。この指定は0--3のいずれかを選択することにより
+	次のような動作を選択できます。
+	\begin{itemize}
+	\item 0を設定することによりこの1バイトコード文字と2バイトコード文字
+		の間での処理を禁止します。
+	\item 1を設定することでこの文字と直前の2バイトコード文字との間にのみ
+		スペースを挿入することを許可します。
+	\item 2を設定することにより直後の2バイトコード文字との間にのみ
+		スペースを挿入することを許可します。
+	\item 3を設定することで前後の2バイトコード文字との間でのスペースの
+		挿入を許可します。
+	\end{itemize}
+
+	\noindent
+	使用例\\
+	{\tt\cs{xspcode}`1=0\\
+	\cs{xspcode}`2=3\\
+	\cs{xspcode}`;=2}\\
+	とすることにより、`1' に対する処理を禁止し、
+	`2' に対して前後の処理を許可します。
+	また、`;' に対しては直後へのスペースの挿入を許可します。
+\item \cs{{\bf inhibitxspcode}}
+	指定した2バイトコードとそれに前後する1バイトコードの間に
+	自動的に挿入されるスペースを抑制します。
+	この指定は0--3のいずれかを選択することにより
+	次のような動作を選択できます。
+	\begin{itemize}
+	\item 0を設定することによりこの2バイトコード文字と1バイトコード文字
+		の間での処理を禁止します。
+	\item 1を設定することでこの文字と直前の1バイトコード文字との間に
+		スペースを挿入することを禁止します。
+	\item 2を設定することにより直後の1バイトコード文字との間に
+		スペースを挿入することを禁止します。
+	\item 3を設定することで前後の1バイトコード文字との間でのスペースの
+		挿入を許可します。
+	\end{itemize}
+	このプリミティブは、日本語\TeX のバージョン1.4で追加しました。
+
+	\noindent
+	使用例\\
+	{\tt\cs{inhibitxspcode}`？=0\\
+	\cs{inhibitxspcode}`（=2\\
+	\cs{inhibitxspcode}`）=1}
+\item \cs{{\bf jcharwidowpenalty}}
+	\begin{quote}
+	\cs{jcharwidowpenalty}$=$\angle{number}
+	\end{quote}
+	パラグラフの最後の全角文字が、孤立して改行されるのを防ぐための
+	ペナルティです。またパラグラフの最後が1文字以上の1区、2区、7区
+	に含まれる文字の場合は、その直前にある全角文字に対してこの
+	ペナルティが使われます。
+\item \cs{{\bf autospacing}}
+	\begin{quote}
+	\cs{autospacing}
+	\end{quote}
+	このプリミティブによって2バイトコード間へのグルーの自動挿入を許可
+	します。
+\item \cs{{\bf noautospacing}}
+	\begin{quote}
+	\cs{noautospacing}
+	\end{quote}
+	このプリミティブによって2バイトコード間へのグルーの自動挿入を禁止
+	します。
+\item \cs{{\bf autoxspacing}}
+	\begin{quote}
+	\cs{autoxspacing}
+	\end{quote}
+	このプリミティブによって2バイトコードと1バイトコード間へのグルーの
+	自動挿入を許可します。
+\item \cs{{\bf noautoxspacing}}
+	\begin{quote}
+	\cs{noautoxspacing}
+	\end{quote}
+	このプリミティブによって2バイトコードと1バイトコード間へのグルーの
+	自動挿入を禁止します。
+\item \cs{{\bf prebreakpenalty}}
+	\begin{quote}
+	\cs{prebreakpenalty}\angle{16--bit number}$=$\angle{number}
+	\end{quote}
+	指定する文字の前方に挿入するペナルティ値を設定します。
+	この指定は、行頭禁則の指定にあたります。
+
+	\noindent
+	使用例\\
+	{\tt\cs{prebreakpenalty}`あ$=$1000}\\
+	とすることにより、`あ' の前方に1000のペナルティ値が付けられます。
+\item \cs{{\bf postbreakpenalty}}
+	\begin{quote}
+	\cs{postbreakpenalty}\angle{16--bit number}$=$\angle{number}
+	\end{quote}
+	指定する文字の後方に挿入するペナルティ値を設定します。
+	この指定は、行末禁則の指定にあたります。\\
+	ただし、\cs{prebreakpenalty}と\cs{postbreakpenalty}を同一の
+	文字に対して同時に設定することはできません。
+	同一の文字に対して両方の指定を行った場合、後からの設定が有効になります。
+\item \cs{{\bf jfont}} \\
+	基本的な動作は、``\cs{font}'' と同じです。
+	ただし、`\cs{showthe}' などのプリミティブと組み合せた場合に
+	カレントの漢字フォントを返します。
+	フォントの定義は、\cs{font}, \cs{jfont}のどちらを使っても
+	英字フォント、漢字フォントの定義が行えます。
+\item \cs{{\bf jfam}} \\
+	`\cs{jfont}' と同様に ``\cs{fam}'' とほとんど同じ動作をします。
+	`\cs{showthe}' などとの組み合せることで、カレントの漢字フォント
+	ファミリーを返します。
+	ただしこのプリミティブでは、英字フォントのファミリーを
+	漢字ファミリーとして定義できてしまいますので注意してください。
+\item {{\bf zw, zh}} \\
+	プリミティブとは異なりますが、{\bf em, ex}と同じように
+	zw、zhは、それぞれカレントの2バイトコードフォントの幅（全角幅）
+	および高さの単位記号です。
+
+	\noindent
+	使用例\\
+	{\tt\cs{baselineskip}$=$1.5zh\\
+	\cs{hsize}=20zw}\\
+	でカレントフォントの高さの1.5倍の値が\cs{baselineskip}に代入され、
+	\cs{hsize}が全角20文字分に設定されます。
+\end{itemize}
+
+\subsection{自動挿入されるスペースについて}
+\cs{kanjiskip}や\cs{xkanjiskip}の自動挿入は、単純に連続する文字列ばかりでなく
+shift\_amountが0である\cs{hbox}内の文字との前後関係においても行われます。
+これは、\cs{hbox}が入子状になっている場合でも同じです。
+つまり、その\cs{hbox}内に現れる最初の文字と最後の文字とが、
+boxの前後の文字に連続する文字列として解釈され、
+そこに指定されたスペースが挿入されることになります。
+\cs{vbox}はその対象とはなりません。具体的には以下の例を参考にしてください。
+
+\begin{tabular}{l@{ $\longrightarrow$ }c}
+\verb|あ\hbox{A}い| & あ\hbox{A}い \\
+\verb|あ\hbox{\hbox{A}}い| & あ\hbox{\hbox{A}}い \\
+\verb|あ\hbox{\hbox{\hbox{A}}}い| & あ\hbox{\hbox{\hbox{A}}}い \\
+\verb|あ\hbox{\hbox{\hbox{\hbox{A}}}}い| & あ\hbox{\hbox{\hbox{\hbox{A}}}}い \\
+\verb|あ\hbox{A\hbox{\vbox{\hbox{A}}}B}い| &
+					あ\hbox{A\hbox{\vbox{\hbox{A}}}B}い \\
+\verb|あ\hbox{\hbox{\vbox{\hbox{A}}}B}い| &
+					あ\hbox{\hbox{\vbox{\hbox{A}}}B}い \\
+\verb|あ\hbox{A\hbox{\vbox{\hbox{A}}}}い| &
+					あ\hbox{A\hbox{\vbox{\hbox{A}}}}い \\
+\verb|あfiい| & あfiい \\
+\verb|あ\hbox{\hbox{\vbox{\hbox{A}}}}い| &
+					あ\hbox{\hbox{\vbox{\hbox{A}}}}い \\
+\verb|あ\hbox{\vbox{\hbox{\hbox{A}}}}い| &
+					あ\hbox{\vbox{\hbox{\hbox{A}}}}い \\
+\verb|あ\vbox{\hbox{\hbox{\hbox{A}}}}い| &
+					あ\vbox{\hbox{\hbox{\hbox{A}}}}い \\
+\verb|A\hbox{あ}A| & A\hbox{あ}A \\
+\verb|A\hbox{\hbox{あ}}A| & A\hbox{\hbox{あ}}A \\
+\verb|A\hbox{\hbox{\hbox{あ}}}A| & A\hbox{\hbox{\hbox{あ}}}A \\
+\verb|A\hbox{\hbox{\hbox{\hbox{あ}}}}A| & A\hbox{\hbox{\hbox{\hbox{あ}}}}A \\
+\verb|A\hbox{あ\hbox{\vbox{\hbox{あ}}}あ}A| &
+					A\hbox{あ\hbox{\vbox{\hbox{あ}}}あ}A \\
+\verb|A\hbox{\hbox{\vbox{\hbox{あ}}}あ}A| &
+					A\hbox{\hbox{\vbox{\hbox{あ}}}あ}A \\
+\verb|A\hbox{あ\hbox{\vbox{\hbox{あ}}}}A| &
+					A\hbox{あ\hbox{\vbox{\hbox{あ}}}}A \\
+\verb|A\hbox{\hbox{\vbox{\hbox{あ}}}}A| &
+					A\hbox{\hbox{\vbox{\hbox{あ}}}}A \\
+\verb|A\hbox{\vbox{\hbox{\hbox{あ}}}}A| &
+					A\hbox{\vbox{\hbox{\hbox{あ}}}}A \\
+\verb|A\vbox{\hbox{\hbox{\hbox{あ}}}}A| &
+					A\vbox{\hbox{\hbox{\hbox{あ}}}}A \\
+\end{tabular}
+
+\section{日本語化されていないプリミティブ}
+次のプリミティブについては、日本語化（2バイトコードに対応）されていません。
+
+\begin{itemize}
+\item \cs{catcode}, \cs{sfcode}, \cs{mathcode}, \cs{delcode},
+	\cs{mathchardef}は、
+	2バイトコードに対してそれぞれの定義を行うことはできません。
+\item \cs{lccode}, \cs{uccode}は、2バイトコードをそのままとおし、
+	ローワケース、アッパーケースの変更は行いません。
+\end{itemize}
+
+
+\section{問題点}
+現在のバージョンの日本語\TeX には、次のような問題点があります。
+使用の際には注意してください。
+
+\begin{itemize}
+\item 禁則処理および1バイトコードと2バイトコード間に挿入するグルーは、
+	その処理の対象となる文字を単に文字コードでのみ判断しています。
+	これは、2バイトコードの文字に対しては全く問題ないのですが、
+	1バイトコードの文字で問題が生じます。
+	それは、\TeX の文字がコードと一対一に対応していないためで、
+	フォントにより、特定のコードに割り付けられている文字が
+	変ってしまいます。
+	たとえば、`\{' はフォントcmsyの66$_{16}$に対応付けられています。
+	66$_{16}$は、アスキーコードで `f' を示すわけですから禁則の対象文字
+	とはなっていないはずです。
+
+	したがって、今のままでは `\{' のような文字に対して自動的に禁則処理や
+	グルーの自動挿入を行うことは不可能です。
+\end{itemize}
+%% cmsy の \{ は 0x6E でなく 0x66 (2001/08/24)
+\end{document}

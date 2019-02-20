@@ -1,0 +1,160 @@
+\begin{center}
+  \Large\bfseries
+  Test source for \texttt{FAM256} patch
+\end{center}
+
+
+本ソースは山本和義氏による「数式famの制限とluatex」（qa:52744）中のコー
+ドをベースにしたものである．
+
+\bigskip
+
+\paragraph{More than 16 math font families.}
+\font\fontA=cmr10
+$
+\mbfa{A}
+\mbfb{B}
+\mbfc{C}
+\mbfd{D}
+\mbfe{E}
+\mbff{F}
+\mbfg{G}
+\mbfh{H}
+\mbfi{I}
+\mbfj{J}
+\mbfk{K}
+\mbfl{L\ fam=\the\fam\ }$
+
+$
+\mbfaa{Aa}
+\mbfab{Ab}
+\mbfac{Ac}
+\mbfad{Ad}
+\mbfae{Ae}
+\mbfaf{Af}
+\mbfag{Ag}
+\mbfah{Ah}
+\mbfai{Ai}
+\mbfaj{Aj}
+\mbfak{Ak}
+\mbfal{Al}
+\mbfam{Am}
+\mbfan{An}
+\mbfao{Ao}
+\mbfap{Ap\ fam\the\fam\ }
+$
+
+$
+\mbfba{Aa}
+\mbfbb{Ab}
+\mbfbc{Ac}
+\mbfbd{Ad}
+\mbfbe{Ae}
+\mbfbf{Af}
+\mbfbg{Ag}
+\mbfbh{Ah}
+\mbfbi{Ai}
+\mbfbj{Aj}
+\mbfbk{Ak}
+\mbfbl{Al}
+\mbfbm{Am}
+\mbfbn{An}
+\mbfbo{Ao}
+\mbfbp{Ap\ fam\the\fam\ }
+$
+
+$
+\mbfca{Aa}
+\mbfcb{Ab}
+\mbfcc{Ac}
+\mbfcd{Ad}
+\mbfce{Ae}
+\mbfcf{Af}
+\mbfcg{Ag}
+\mbfch{Ah}
+\mbfci{Ai}
+\mbfcj{Aj}
+\mbfck{Ak}
+\mbfcl{Al}
+\mbfcm{Am}
+\mbfcn{An}
+\mbfco{Ao}
+\mbfcp{Ap\ fam\the\fam\ }
+$
+
+$
+\mbfda{Aa\ fam\the\fam\ }
+\mbfdb{Ab\ fam\the\fam\ }
+\mbfdc{Ac\ fam\the\fam\ }
+\mbfdd{Ad\ fam\the\fam\ }
+%
+\ \textfont255=\fontA \fam255 roman
+$
+
+\medskip
+
+\paragraph{\.{omathchar}\ etc.}
+\omathcode`<="3460065
+\mathcode`>="4065
+\xdef\lx{\odelimiter"4450068"030001}
+\odelcode`[="410074"03000B
+${\tt \verb|\mathchar"7F25|:\ }\mathchar"7F25,\ 
+{\tt \verb|\omathchar"7420125|:\ }
+\omathchar"7420125$
+
+{\tt meaning of \verb|\langle|:\ \meaning\langle}, 
+
+{\tt meaning of \verb|\lx|:\ \meaning\lx}
+
+
+${\tt \verb|\lx|:\ }\lx,\
+{\tt \verb|\bigl\lx|:\ } \bigl\lx,\
+{\tt \verb|\Bigl\lx|:\ } \Bigl\lx$
+
+
+{\tt \verb+\the\mathcode`\f+:\ \hex{\the\mathcode`\f}}, 
+{\tt \verb+\the\omathcode`\f+:\ \hex{\the\omathcode`\f}}（どちらも16進に
+変換した）
+
+$\left[\right.\bigl[\Bigl[\Bigr)\bigr)) <>$
+
+$\radical"270370{}$,\ $\oradical"460070"030074{} $\ 
+$\radical"270370{a}$,\ $\oradical"460070"030074{a} $\ 
+$\radical"270370{\int_V f\,d\mu}$,\ $\oradical"460070"030074{\int_V f\,d\mu} $
+
+\medskip
+
+\.{odelcode} primitiveによる\emph{delimiter codeの取得}はうまく動かない：\\
+{\tt \verb+\the\delcode`\|+:} ${\the\delcode`\|}$, 
+{\tt \verb+\the\odelcode`\|+:} ${\the\odelcode`\|}$（どちらも10進）
+
+\medskip
+
+\paragraph{Infinite level ``fi''}
+\def\na{\hskip 0pt plus 1fi({\tt fi})\hskip 0pt plus 1fi}
+\def\nb{\hskip 0pt plus 1fil({\tt fil})\hskip 0pt plus 1fil}
+\def\nc{\hskip 0pt plus 1fill({\tt fill})\hskip 0pt plus 1fill}
+\def\nd{\hskip 0pt plus 1filll({\tt filll})\hskip 0pt plus 1filll}
+\fbox{\hbox to 14cm{■\na ■\nb ■\nc ■\nd ■}}
+
+\fbox{\hbox to 14cm{■\na ■\nb ■\nc ■}}
+
+\fbox{\hbox to 14cm{■\na ■\nb ■}}
+
+\fbox{\hbox to 14cm{■\na ■\na\na ■}}
+
+
+
+\paragraph{65536 registers}
+\leavevmode
+{\tracingall
+\setbox40000=\hbox to 10mm{fuga!}\copy40000
+{\setbox40000=\hbox to 10mm{a}\copy40000
+  {\setbox40000=\hbox to 10mm{漢字仮名}\copy40000}
+\global\setbox40000=\hbox to 10mm{asdf}}\copy40000
+{\setbox40000=\hbox to 10mm{\TeX}\copy40000
+  {\setbox40000=\hbox to 10mm{ほげほげ}\copy40000}\copy40000}}
+
+\count34656=465\count45486=124
+\advance\count34656 by\count45486
+\the\count34656\nonstopmode

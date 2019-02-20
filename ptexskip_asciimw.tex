@@ -1,0 +1,387 @@
+\documentclass{jarticle}
+\ProvidesFile{ptexskip.tex}[1997/08/08 v0.4 about pTeX skips]
+\usepackage{plext}
+
+\title{p\TeX~2.1.5における数式の前後}
+\author{中野 賢\footnote{Ken Nakano (\texttt{<ken-na at ascii.co.jp>})：
+  株式会社 アスキー 出版技術部}}
+\date{1997年8月8日}
+
+\newcommand{\hex}[1]{\hskip\xkanjiskip\texttt{"#1}}
+\newcommand{\cs}[1]{\hskip\xkanjiskip\texttt{\char"5C #1}}
+%\xspcode"5C=1
+\xspcode"22=2 % 2
+\xspcode"27=2 % 2
+\xspcode"5C=1 % 1
+\xspcode"60=1 % 1
+\prebreakpenalty"22=10001  % ''
+\prebreakpenalty"27=10002  % '
+\postbreakpenalty"5C=10003 % ``, \
+\postbreakpenalty"60=10004  % `
+
+% サンプル用
+\newdimen\dimenA
+
+%\tracingcommands=2
+%\tracingmacros=2
+%\tracingparagraphs=2
+%\tracingoutput=2
+\showboxbreadth=\maxdimen
+\showboxdepth=\maxdimen
+\nonstopmode
+
+\begin{document}
+\maketitle
+
+\section*{はじめに}
+p\TeX{}では、和文と欧文の間に\emph{四分アキ}と呼ばれるスペースを
+自動的に挿入するようになっている。挿入される箇所は、和文と欧文の間という
+だけでなく、他にも次の条件が揃っていなくてはならない。
+
+\begin{itemize}
+\item \cs{autoxspcode}の状態
+\item \cs{xspcode}および\cs{inhibitxspcode}による抑制を受けない
+\item shift\_amount(移動量)がゼロである\cs{hbox}の直前、直後
+\item 合字、ペナルティ、ベースライン調整量、暗黙の\cs{kern}の直前、直後
+\end{itemize}
+
+本文では多くの場合、単純に文字が並んでいるだけなので、このような条件を
+知らなくても、期待している結果を得ることができる。
+しかし、数式を組み立てた場合、自分ではとくに指定をしていなくても、
+\TeX{}が内部処理で、文字の位置を調整したり、\cs{vbox}に入れたりするために、
+四分アキが入らず、その原因もわからないということがある。
+
+そこで、p\TeX~2.1.5では、テキスト数式の前後への四分アキの挿入方法を変更した。
+この文書では、その拡張に際しての仕様の変更について簡単に説明をしている。
+
+\section{p\TeX~2.1.4までの数式の前後}
+p\TeX~2.1.4で\footnote{より正確に言えば、p\TeX~2.1.5 $\beta$~6まで}、
+テキスト数式の前や後に四分アキが入らない主な原因は以下の３つである。
+
+\begin{itemize}
+\item \cs{xspcode}による影響の場合
+\item シフトされた\cs{hbox}となる場合
+\item \cs{vbox}となる場合
+\end{itemize}
+
+\subsection{\cs{xspcode}による影響の場合}
+\cs{xspcode}および\cs{inhibitxspcode}による抑制は、たとえば、
+$\alpha$や$\beta$の前後にスペースが入らないという結果をもたらす。
+なぜならば、$\alpha$はcmmi10の\hex{0B}の位置、$\beta$は\hex{0C}の位置に
+あるからである。これら文字の\cs{xspcode}の値はゼロ、すなわち前後への
+四分アキを抑制するという動作をする。
+その結果、前後に四分アキが入らないのである。
+
+\subsection{シフトされた\cs{hbox}となる場合}
+shift\_amountがゼロでない\cs{hbox}の例としては、
+$\sum$や$\int$や$x^2$や$x_2$や$\sqrt{\hbox{Var(X)}}$などを挙げられる。
+
+$\sum$はcmex10の\hex{50}の位置にあり、これはcmr10の``P''と同じ位置
+なので\cs{xspcode}による抑制は受けない。しかし、位置の調整のために、
+\cs{hbox}に入れられ、左にシフトされる。この結果、\hex{50}の文字が
+一つだけにも関わらず、処理対象外の\cs{hbox}となってしまい、
+前後への四分アキが入らなくなる。$\int$も同様である。
+
+$x^2$や$x_2$などの場合は、上付き/下付き文字がシフトされた\cs{hbox}として
+組み立てられているので、``$x$''の前には四分アキが入るが、
+``2''の後ろには入らないことになる。
+
+根号記号の場合は、全体がシフトされた\cs{hbox}として組み立てられるので、
+前後に四分アキが入らない。
+
+\subsection{\cs{vbox}となる場合}
+その他に四分アキが入る箇所は、
+合字、ペナルティ、ベースライン調整量、暗黙の\cs{kern}の直前か直後
+だけである。これ以外の箇所には入らない。
+数式の前後に限れば、このうちの、\cs{vbox}の前後には入らないという
+制限が大きく影響をしている。たとえば、$\frac{1}{k}$といった分数や、
+$x_k^2$のように上付きと下付き文字の両方を指定したときが、これに当たる。
+
+分数の場合は、最終的に\cs{vbox}として組み立てられる。
+そのため、分数の前後に四分アキが入らなくなる。
+上付きと下付きの両方がある場合は、それらが\cs{vbox}に入れられるため、
+入らなくなるのである。上付きと下付きの一方の場合と状況は異なるが、
+結果は一緒である。
+
+\section{p\TeX~2.1.5 $\beta7$での数式の前後}
+今までの実装コードでは、数式の開始や終了のノードを見つけても、
+開始/終了ノードを単純にスキップするだけで、その後、数式の内部の文字を見て、
+スペースを挿入するかどうかを判断をしていた。そのために数式を囲んでいる
+\cs{hbox}がシフトしていたり、\cs{vbox}であったりすると前後にスペースが
+入らないという結果になっていた。
+
+そこで、$\beta7$では、数式の開始ノードを見つけたとき、次の要素が何で
+あるかを調べることにした。
+
+数式の次の要素が``文字''そのものである場合、テキストの最後の文字との関係で
+適切なスペースを入れる。ここで、従来の動作と異なるのは、数式内部の文字の
+\cs{xspcode}あるいは\cs{inhibitxspcode}の設定を無視するようにした点である。
+つまり、数式内の文字とその直前との文字が和文か欧文かだけを調べて、
+四分アキか漢字間スペースを挿入するようにした。
+この変更で$\alpha$や$\beta$などの文字の前にスペースが入るようになる。
+
+数式の開始ノードの次の要素が文字以外の場合は、それが何であっても
+四分アキを入れる。この修正によって、数式がシフトされた\cs{hbox}や
+\cs{vbox}の場合であっても四分アキが入る。
+このようなボックスになるときは、上付き/下付き文字、分数、数学記号を
+使った場合などである。
+
+終了ノードの時点では、この後に挿入するスペースが決まっていればそれを用いる。
+すなわち、数式の最後とその後るの文字がともに和文であれば漢字間スペースを
+挿入し、いずれかが欧文であれば四分アキを挿入する。
+このときも、数式内部の最後の文字の\cs{xspcode}も無視するようにし、
+$\alpha$や$\beta$などの後ろにも入るようにしている。
+
+シフトされた\cs{hbox}や\cs{vbox}などで終了したときは、
+前側に四分アキを入れたので、合わせる意味で後側にも四分アキを挿入する。
+これで$x^2$や$\frac{dx}{dy}$や$\sqrt{3}$などの後ろにもスペースが入る。
+
+なお、数式の直前の文字と数式内部の先頭文字がともに欧文の場合、
+あるいは数式内部の最後と数式直後がともに欧文の場合は、
+\TeX{}と同じであり特別なスペースを入れないのは従来と同じである。
+
+\section{p\TeX~2.1.5 $\beta8$での数式の前後}
+p\TeX~2.1.5 $\beta8$では、単純にテキスト数式の前後に四分アキを入れる方法
+で実装している。ただし、「（」や「）」などによる抑制を効かせるべき箇所には
+四分アキは入らない。つまり
+``\verb|（$y=a+b$）|''は
+``（$y=a+b$）''となり
+``（\kern\xkanjiskip$y=a+b$\kern\xkanjiskip）''とは
+ならないことに注意する。
+`\verb|（$y=a+b$）|'は
+`（$y=a+b$）'となり
+`（\kern\xkanjiskip$y=a+b$\kern\xkanjiskip）'とは
+ならないことに注意する。
+\showlists
+
+$\beta7$版と$\beta8$版との仕様の違いは、
+次のように数式内の文字が漢字で始まる（あるいは終わる）ときに現れる。
+\begin{verbatim}
+    \kanjiskip=4pt \xkanjiskip=8pt
+    □□$表面積=4\pi r^2$□□
+\end{verbatim}
+この例をそれぞれで処理した場合、
+\begin{quote}
+\kanjiskip=4pt \xkanjiskip=8pt
+□□\kern\kanjiskip$表面積=4\pi r^2$\kern\xkanjiskip □□
+  \quad($\beta7$\kern.25zw 版)\\
+□□\kern\xkanjiskip$表面積=4\pi r^2$\kern\xkanjiskip □□
+  \quad($\beta8$\kern.25zw 版)\\
+□□$表面積=4\pi r^2$□□
+  \quad\hbox{\kanjiskip=0pt\xkanjiskip=.25zw (この版)}
+\end{quote}
+となる。つまり、$\beta7$版では数式内部の文字と直前の文字を比較しているため、
+前側に漢字間スペースが入り、後側に四分アキが入る。
+一方、$\beta8$版では数式内部の文字に関係なく、両側に四分アキが入る。
+
+なお、両者の違いは、次のように\cs{hbox}を用いたときにも現れる。
+\begin{verbatim}
+    \kanjiskip=4pt \xkanjiskip=8pt
+    □□$\hbox{表面積}$□□
+\end{verbatim}
+これを処理すると、$\beta7$版は目指すべき仕様とは異なり、
+後ろに何も入らない（バグ）。$\beta8$版では仕様どおりに両側に四分アキが入る。
+\begin{quote}
+\kanjiskip=4pt \xkanjiskip=8pt
+□□\kern\xkanjiskip$\hbox{表面積}$\kern0pt □□
+  \quad ($\beta7$\kern.25zw 版)\\
+□□\kern\kanjiskip$\hbox{表面積}$\kern\kanjiskip □□
+  \quad\hbox{\kanjiskip=0pt($\beta7$\kern.25zw 版を修正した場合)}\\
+□□\kern\xkanjiskip$\hbox{表面積}$\kern\xkanjiskip □□
+  \quad ($\beta8$\kern.25zw 版)\\
+□□$\hbox{表面積}$□□
+  \quad\hbox{\kanjiskip=0pt\xkanjiskip=.25zw (この版)}
+\end{quote}
+
+実際には、p\TeX, p\LaTeX のデフォルトの設定では\cs{kanjiskip}と\cs{xkanjiskip}%
+の値はもっと小さいので、違いはそれほど目立たないかもしれない。
+しかし、縦組にした場合は、つぎのような結果となる。
+\begin{quote}
+\begin{minipage}<t>{16zw}
+△△\kern\kanjiskip$表面積=4\pi r^2$\kern\xkanjiskip\raisebox{-.25zw}{△△}
+  \quad($\beta7$\kern.25zw 版)\\
+\\
+△△\kern\kanjiskip$表面積=4\pi r^2$\kern\xkanjiskip △△\\
+  \hfill($\beta7$\kern.25zw 版を修正した場合)\\
+\\
+△△\kern\xkanjiskip$表面積=4\pi r^2$\kern\xkanjiskip △△
+  \quad($\beta8$\kern.25zw 版)\\
+\\
+△△$表面積=4\pi r^2$△△
+  \quad\hbox{\kanjiskip=0pt\xkanjiskip=.25zw (この版)}
+\end{minipage}
+\end{quote}
+$\beta7$の結果を見ると文字間のスペースは仕様どおりになっている。
+しかし、ベースラインの調整量が数式の後ろで戻っていないというバグがある。
+たとえバグを修正したとしても、決して読みやすいとは思えない。
+
+以上の結果を比較すると、$\beta8$の挿入方法のほうが自然で、読みやすいように
+思える。また、挿入されるスペースも前後の文字、数式内の文字に関係なく、
+四分アキと決まっているので結果がわかりやすい。
+そこで、$\beta8$では、この節の冒頭で述べた、
+\begin{center}
+単純に、テキスト数式の前後に四分アキを入れる
+\end{center}
+という仕様で実装している。
+
+\subsection{別の問題}
+$\beta7$の実装では、完全に数式にだけ影響するようにしていなかったため、
+通常の文章内でのボックスに対する動作も変わってしまっていた。たとえば、
+\begin{quote}
+\begin{verbatim}
+□□\AA △△△△\hbox to0pt{ABC\hss}○○○○\hbox{}A\hbox{}□□□□
+\end{verbatim}
+\end{quote}
+が
+\begin{quote}
+\setbox0=\hbox{h}\dimenA=\ht0 \advance\dimenA-1ex
+□□
+\leavevmode\rlap{\raise.67\dimenA\hbox{\char'27}}\kern\xkanjiskip A%
+\kern\xkanjiskip △△△△
+\setbox0\hbox{ABC}\dimenA=\wd0\advance\dimenA-\xkanjiskip
+\kern\xkanjiskip ABC\kern-\dimenA ○○○○
+\kern\xkanjiskip A\kern\xkanjiskip □□□□
+\end{quote}
+となる。先ほどのリストを処理して期待する結果は、次のようだと思われる。
+\begin{quote}
+\setbox0=\hbox{h}\dimenA=\ht0 \advance\dimenA-1ex
+□□
+\kern\xkanjiskip
+\leavevmode\rlap{\raise.67\dimenA\hbox{\char'27}}\kern0pt A%
+\kern\xkanjiskip △△△△
+\setbox0\hbox{ABC}\dimenA=\wd0%
+\kern\xkanjiskip ABC\kern-\dimenA ○○○○
+\kern0pt A\kern0pt □□□□
+\end{quote}
+この版では、
+\begin{quote}
+□□\AA △△△△\hbox to0pt{ABC\hss}○○○○\hbox{}A\hbox{}□□□□
+\end{quote}
+となる。
+\AA の前に四分アキが入っていなければ、それはシフトされたボックスの前後に
+アキが入らないからである。$\beta7$の実装で``{\char'27}''と``A''の位置が
+ずれているのは、シフトされたボックスの前には入れないのは変わらないけれども、
+後ろで必ず入れないようにするのをやめたためである。
+また、$\beta7$では、ボックスの中身の最後が文字以外でも、空でも四分アキの
+挿入に影響をさせないようにしていたため、幅がゼロのボックスを作成しても、
+参照点の位置が戻らないし、処理の抑制もされなくなっていた
+\footnote{これらの問題は$\beta11$で修正。}。
+
+\appendix
+\section{自動挿入されるスペースの種類}
+p\TeX{}では、日本語文書をきれいに組版するために、
+和文と和文の間、和文と欧文の間に自動的にスペースを入れるように拡張している。
+欧文と欧文の間は、\TeX{}のメカニズムそのままである。
+
+和文と和文の間に入れるスペースの量は、\cs{kanjiskip}という長さレジスタに
+設定をする。和文と欧文との間は\cs{xkanjiskip}という長さレジスタである。
+p\TeX{}のデフォルトでは、
+\begin{verbatim}
+    \kanjiskip=0pt plus .4pt minus .4pt
+    \xkanjiskip=.25zw plus 1pt minus 1pt
+\end{verbatim}
+となっている。この設定は、
+\cs{kanjiskip}は標準でゼロポイント、場合によって$\pm0.4$ポイント分だけ伸縮、
+\cs{xkanjiskip}は標準でその時点の和文フォントの幅の$1/4$、
+場合によって$\pm1$ポイント分だけ伸縮しても良いということを意味している。
+
+\cs{kanjiskip}も\cs{xkanjiskip}も、段落の終わりか、\cs{hbox}の最後の時点
+の値が有効となる。したがって、ひとつの段落内や\cs{hbox}内で複数回指定を
+しても、その最後の指定によって処理される。
+
+ただし「、」や「（」のように、特定の文字が連続する場合、そのまま全角幅
+で並べ、間に\cs{kanjiskip}を挿入すると文字の間が離れすぎてしまう。
+このときには、\cs{kanjiskip}ではなく、JFM(Japanese Font Metric)で設定
+されているスペースの量が使われる。
+
+\cs{xkanjiskip}に関しても、和文と「;」、「(」と和文、欧文と「。」、
+「…」と前後の欧文のような箇所には、スペースを挿入しないほうがきれいに
+見える。そこで、特定の欧文の文字に対して、\cs{xkanjiskip}の挿入を制御
+するために\cs{xspcode}が用意されている。
+特定の和文に対しては\cs{inhibitxspcode}を用いて制御する。
+
+
+\section{スペースに関するプリミティブ}
+p\TeX{}で拡張した、スペースに関するプリミティブは以下のとおり。
+
+\subsection{\cs{kanjiskip}, \cs{autospacing}, \cs{noautospacing}}
+\cs{kanjiskip}は、
+漢字と漢字の間に自動的に挿入するスペースの量を格納する長さレジスタである。
+
+\cs{autospacing}と\cs{noautospacing}は、
+漢字と漢字の間にスペースを挿入するかどうかを指定するのに用いる。
+\cs{autospacing}を指定すると自動的に挿入される。
+\cs{noautospacing}を指定すると漢字間へのスペース挿入は抑制される。
+
+\subsection{\cs{xkanjiskip}, \cs{autoxspacing}, \cs{noautoxspacing}}
+\cs{xkanjiskip}は、
+漢字と英字の間に自動的に挿入するスペースの量を格納する長さレジスタである。
+
+\cs{autoxspacing}と\cs{noautoxspacing}は、
+漢字と英字の間にスペースを挿入するかどうかを指定するのに用いる。
+\cs{autoxspacing}を指定すると自動的に挿入される。
+\cs{noautoxspacing}を指定すると漢字間へのスペース挿入は抑制される。
+
+\subsection{\cs{xspcode}}
+\cs{xspcode}は、指定した英字と漢字との間のスペース挿入を
+どのように\textgt{許可}するかの設定をするプリミティブである。
+動作は、つぎのいずれかの数値で指定をする。
+
+\begin{center}
+\begin{tabular}{ll}
+0 & 前後の漢字との間へのスペースの挿入を禁止する。\\
+1 & 直前の漢字との間にだけスペースの挿入を許可する。\\
+2 & 直後の漢字との間にだけスペースの挿入を許可する。\\
+3 & 前後の漢字との間にスペースの挿入を許可する。\\
+\end{tabular}
+\end{center}
+
+初期値は、\texttt{[0-9A-Za-z]}は３、それ以外はゼロになっている。
+ただし、以下の文字については、kinsoku.texで別の値に初期化されている。
+括弧内はASCII文字コード（16進数）である。
+
+\begin{center}
+\begin{tabular}{l@{\hspace{2.5zw}}l@{\hspace{2.5zw}}l@{\hspace{2.5zw}}l}
+\texttt{(}=1 (\hex{28}) & \texttt{)}=2 (\hex{29}) &
+\texttt{[}=1 (\hex{5B}) & \texttt{]}=2 (\hex{5D})\\
+\texttt{`}=1 (\hex{60}) & \texttt{'}=2 (\hex{27}) &
+\texttt{;}=2 (\hex{3B}) & \texttt{,}=2 (\hex{2C})\\
+\texttt{.}=2 (\hex{2E}) \\
+\end{tabular}
+\end{center}
+
+ただし、\cs{xspcode}の設定は、文字コードに対してであり、フォントによって
+異なる値を指定することはできない。したがって\hex{60}の位置にある文字は、
+cmr10では``\textrm{`}'', cmmi10では``$\ell$'', cmex10では``$\coprod$''で
+あるが、これらの文字はすべて\cs{xspcode}=1として処理される。
+
+\subsection{\cs{inhibitxspcode}}
+\cs{inhibitxspcode}は、指定した漢字と英字の間のスペース挿入を
+どのように\textgt{抑制}するかの設定をするプリミティブである。
+動作は、つぎのいずれかの数値で指定をする。
+
+\begin{center}
+\begin{tabular}{ll}
+0 & 漢字と英字との間のスペースの挿入を禁止する。\\
+1 & 直前の英字との間のスペースの挿入を禁止する。\\
+2 & 直後の英字との間のスペースの挿入を禁止する。\\
+3 & 前後の英字との間のスペースの挿入を許可する。\\
+\end{tabular}
+\end{center}
+
+初期値は、すべての漢字について３である。
+ただし、以下の文字については、kinsoku.texで別の値に初期化されている。
+
+\begin{center}
+\begin{tabular}{l@{\hspace{2.5zw}}l@{\hspace{2.5zw}}l@{\hspace{2.5zw}}
+                l@{\hspace{2.5zw}}l@{\hspace{2.5zw}}l}
+、=1 & 。=1 & ，=1 & ．=1 & ；=1 & ？=1\\
+（=2 & ）=1 & ［=2 & ］=1 & ｛=2 & ｝=1\\
+‘=2 & ’=1 & “=2 & ”=1 & 〔=2 & 〕=1\\
+＜=2 & ＞=1 & 《=2 & 》=1 & 「=2 & 」=1\\
+『=2 & 』=1 & 【=2 & 】=1 & −=0 & 〜=0\\
+…=0 & ￥=0 & °=0 & ′=1 & ″=1\\
+\end{tabular}
+\end{center}
+
+\end{document}
