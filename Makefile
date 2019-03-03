@@ -1,4 +1,4 @@
-DOCTARGET = ptex-manual uptex-manual eptexdoc jfm
+DOCTARGET = ptex-manual eptexdoc jfm
 # following documents are not maintained anymore;
 # even some descriptions might be different from
 # current status of pTeX
@@ -8,7 +8,7 @@ DOCTARGET = ptex-manual uptex-manual eptexdoc jfm
 PDFTARGET = $(addsuffix .pdf,$(DOCTARGET))
 DVITARGET = $(addsuffix .dvi,$(DOCTARGET))
 KANJI = -kanji=utf8
-FONTMAP = -f ipaex.map -f ptex-ipaex.map -f uptex-ipaex.map
+FONTMAP = -f ipaex.map -f ptex-ipaex.map
 TEXMF = $(shell kpsewhich -var-value=TEXMFHOME)
 
 default: $(DVITARGET)
@@ -20,13 +20,6 @@ ptex-manual.dvi: ptex-manual.tex
 #	makeindex -s gind.ist -o ptex-manual.ind ptex-manual.idx
 	mendex -U -s gind.ist -o ptex-manual.ind ptex-manual.idx
 	platex $(KANJI) ptex-manual.tex
-	rm -f *.aux *.log *.toc *.idx *.ind *.ilg *.out
-
-uptex-manual.dvi: uptex-manual.tex
-	uplatex $(KANJI) uptex-manual.tex
-	uplatex $(KANJI) uptex-manual.tex
-	upmendex -s gind.ist -o uptex-manual.ind uptex-manual.idx
-	uplatex $(KANJI) uptex-manual.tex
 	rm -f *.aux *.log *.toc *.idx *.ind *.ilg *.out
 
 eptexdoc.dvi: eptexdoc.tex fam256p.tex fam256d.tex
