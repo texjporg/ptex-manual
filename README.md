@@ -1,13 +1,28 @@
 # ptex-manual
 
-This is a project of preparing a manual of Japanese pTeX.
+This is a project of preparing a manual of Japanese pTeX and e-pTeX.
 Currently only Japanese version available.
 
-## この pTeX マニュアルについて
+## Contents
 
-[ptex-base issue #2](https://github.com/texjporg/ptex-base/issues/2)
-での議論を機に，pTeX のドキュメント化を進めようという取り組みです。
-まだ作成途中ですのでご注意ください。
+The following documents are maintained by Japanese TeX Development
+Community:
+
+    * ptex-manual.pdf: The manual of pTeX.
+    * eptexdoc.pdf: The manual of e-pTeX.
+    * jfm.pdf: Specification of JFM (Japanese Font Metric) format.
+
+This bundle also provides some old documents, which are no longer
+maintained by us:
+
+    * jtex_asciimw.pdf: Report on Japanization of TeX.
+    * jtexdoc_asciimw.pdf: Documentation of ASCII Nihongo TeX.
+    * ptexdoc_asciimw.pdf: Application of TeX for publishing -- pTeX.
+    * ptexskip_asciimw.pdf: Spacing arround math equations on pTeX.
+    * eptex_resume.pdf: Report on development of e-pTeX.
+
+They are included for historical reasons only.  Some descriptions
+may be inconsistent with the current versions of (e-)pTeX.
 
 ## Repository
 
