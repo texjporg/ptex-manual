@@ -1005,6 +1005,8 @@ p3.1.2で復活したという経緯がある．}．
 \end{verbatim}
   は「{\kansujichar1=`壱 \kansujichar2=\euc"C6F5\relax
        \kansujichar3=\jis"3B32\relax \kansuji 1234}」と出力される．
+  なお，|\kansuji|に続く数値<number>が負の場合は，空文字列になる
+  （ちょうど|\romannumeral|にゼロまたは負の値を与えた場合と同様）．
 
   |\kansujichar|で指定できるのは「和文文字の内部コードとして有効な値」であり，
   無効な値（例えば\pTeX では，|`A|は欧文文字コードであり，和文文字コードではない）
