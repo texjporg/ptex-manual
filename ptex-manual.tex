@@ -38,7 +38,7 @@
       \leavevmode\par\nopagebreak}
 \def\emph#1{{\bfseries\sffamily\gtfamily\mathversion{bold}#1}}
 \setlist{leftmargin=2zw}
-\setlist[description]{labelwidth=2zw,labelindent=1zw}
+\setlist[description]{labelwidth=2zw,labelindent=1zw,topsep=\medskipamount}
 
 \catcode`\<=13
 \xspcode`\\=3
@@ -59,7 +59,8 @@
 
 \usepackage{etoolbox}
 \patchcmd\@verbatim\@totalleftmargin{\dimexpr\@totalleftmargin+2zw\relax}{}{}
-\patchcmd\quote{\list{}}{\par\list{\topsep\medskipamount}}{}{}
+\patchcmd\quote{\list{}}{\par\addvspace\medskipamount\list{}}{}{}
+\patchcmd\endquote{\endlist}{\endlist\addvspace\medskipamount}{}{}
 \patchcmd\@verbatim{\trivlist}{\trivlist\addvspace\medskipamount\noautoxspacing}{}{}
 \patchcmd\endverbatim{\endtrivlist}{\endtrivlist\addvspace\medskipamount}{}{}
 \expandafter\let\csname endverbatim*\endcsname =\endverbatim
@@ -78,8 +79,8 @@
   \smallskipamount=.25\baselineskip
   \divide\@tempdima by\dimexpr1zw\relax\@tempcnta=\@tempdima
   \leftskip=\dimexpr\textwidth-\@tempcnta zw\relax
-    \@totalleftmargin\dimexpr\leftskip+0zw
-    \linewidth=\dimexpr\@tempcnta zw-0zw
+  \@totalleftmargin\dimexpr\leftskip+0zw
+  \linewidth=\dimexpr\@tempcnta zw-0zw
   \parindent1zw\noindent\kern-\leftskip\hbox to\leftskip{\dbend\hss}%
   \everypar{\everypar{}}\ignorespaces
 }{\par\addvspace\medskipamount}
@@ -173,6 +174,7 @@ e-mail: \texttt{issue(at)texjp.org}}}
 プリミティブを説明する．
 
 \section{\pTeX で利用可能な文字}
+\label{sec:ptexchar}
 
 \TeX82で扱える文字コードの範囲は0--255であった．
 \pTeX ではこれに加えてJIS X 0208の文字も利用可能であり，
@@ -199,15 +201,16 @@ e-mail: \texttt{issue(at)texjp.org}}}
 \end{description}
 である．
 
+入力ファイルの文字コードがUTF-8の場合，JIS X 0208にない文字は
+UTF-8のバイト列として読み込まれる．
+
 % この内部コードのパターンに合えば和文文字として扱われ，
 % 合わなければ欧文文字として扱われる，でよい？
+%% →is_char_kanji の実装を見るとそれっぽいです．
 
 % http://tutimura.ath.cx/ptexlive/?ptexenc%2FDetails
 % http://ajt.ktug.org/assets/2008/5/1/0201tsuchimura_kuroki.pdf
 % https://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=460
-
-入力ファイルの文字コードがUTF-8の場合，JIS X 0208にない文字は
-UTF-8のバイト列として読み込まれる．
 
 \pTeX の入力ファイルの文字コードは，起動時のオプション|-kanji|によって
 変更できる（可能な値は|utf8|，|euc|，|sjis|，|jis|）．
@@ -252,6 +255,27 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
 
 [TODO] \pTeX の内部コードはEUC-JPかShift-JISのいずれかであるが，
 DVIファイル内の和文文字コードとしてはJISコードを出力する．
+
+\begin{dangerous}
+ 以上で述べた「内部コードの範囲」はJIS~X~0213の漢字集合1面（Shift-JISの場合は2面も）を
+ まるまる含んでいるが，\emph{\pTeX はJIS~X~0213には対応していない．}
+
+ JIS~X~0213で規定された「85区1点」の位置の文字を入力ファイル中に書いた場合，
+ \begin{description}
+  \item[文字コードがEUC,~Shift-JISの場合] DVIには29985~(\texttt{"7521})%"
+    番の文字として出力される．
+  \item[文字コードがJISの場合] 「\verb+! Missing $ inserted.+」というエラーが発生する．
+    これは，\pTeX がJIS~X~0213の1面を指示するエスケープシーケンス
+    \texttt{1B 24 28 4F} (JIS2000), \texttt{1B 24 28 51} (JIS2004)を認識せず，
+    \texttt{24}~(\texttt{\$})を数式モード区切りと解釈してしまうためである．
+  \item[文字コードがUTF-8の場合] UTF-8のバイト列\texttt{E6 93 84}として読み込まれる．
+ \end{description}
+ なお，\.{char}により「\verb+\char\kuten"5521+」%"
+ のようにして区点コードを指定した場合は，DVIには29985~(\texttt{"7521})%"
+ 番の文字として出力される．
+ また，DVIに文字として出力されたからといって，それをPostScriptやPDFに変換したときに
+ 意図通りに出力されるかは全くの別問題である．
+\end{dangerous}
 
 \section{文字コードの取得と指定}
 
@@ -907,7 +931,6 @@ DtoU方向での数式ディレクションはそれぞれ非数式の場合と�
  }$か%$
 \end{verbatim}
 組版結果は以下のようになる：
-\medskip
 \begin{quote}
  \ybaselineshift=10pt\scriptbaselineshiftfactor=700
  漢字pqr$a\hbox{xあ}^{%
@@ -915,7 +938,6 @@ DtoU方向での数式ディレクションはそれぞれ非数式の場合と�
    \hbox{\scriptsize\ybaselineshift=7pt zえ}
  }$か%$
 \end{quote}
-\medskip
 
 この例で，ボックス|\hbox{\scriptsize yう}|内ではベースライン補正量は10\,ptのままである
 \footnote{|\scriptsize|などのフォントサイズ変更命令では，標準では|\ybaselineshift|の値は
@@ -985,10 +1007,19 @@ p3.1.2で復活したという経緯がある．}．
   たとえば，|\char\kuten"253C|は，「\char\kuten"253C」（37区60点）である．
 
 \csitem[\.{jis} <16-bit number>, \.{euc} <16-bit number>, \.{sjis} <16-bit number>]
-  それぞれJISコード，EUCコード，Shift\_JISコードから内部コードへの変換を行う．
+  それぞれJISコード，EUCコード，Shift-JISコードから内部コードへの変換を行う．
   たとえば，|\char\jis"346E|，|\char\euc"B0A5|，|\char\sjis"8A79|は，
   それぞれ「\char\jis"346E」，「\char\euc"B0A5」，「\char\sjis"8A79」である．
+\end{cslist}
 
+\begin{dangerous}
+ \ref{sec:ptexchar}節でも述べたように，
+ \emph{\pTeX はJIS X 0213には対応せず，JIS X 0208の範囲のみ扱える}．
+
+ [TODO] \.{kuten}, \.{jis}, \.{sjis}, \.{euc}が$-1$とならない範囲はどこ？
+\end{dangerous}
+
+\begin{cslist}
 \csitem[\.{kansuji} <number>, \.{kansujichar} <0--9>=<kanji code>]
   |\kansuji|は，続く数値<number>を漢数字の文字列で出力する．
   出力される文字は|\kansujichar|で指定できる（デフォルトは「〇一二三四五六七八九」）．
@@ -1026,7 +1057,6 @@ p3.1.2で復活したという経緯がある．}．
   展開可能(expandable)であり，
   内部整数を引数にとるが，実行結果は\emph{文字列}であることに注意
   （\TeX82の|\number|, |\romannumeral|と同様）．
-  また，\pTeX はJIS X 0213には対応せず，JIS X 0208の範囲のみ扱える．
 
 \medskip\noindent
 \begin{minipage}{.6\linewidth}
