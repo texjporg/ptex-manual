@@ -1,0 +1,127 @@
+%%% common macros for ptex-manual documents
+\def\headfont{\normalfont\mathversion{bold}\sffamily}
+\def\node#1{\textit{#1}}
+\def\.#1{\texorpdfstring{%
+     \leavevmode\hbox{\texttt{\textbackslash#1}}\ifmmode\else\textcompwordmark\fi}{\textbackslash #1}}
+
+\@ifpackageloaded{enumitem}{%
+\let\orig@cs=\.
+\def\ind@cs#1{\orig@cs{#1}\indcs{#1}}
+\def\indcs#1{\index{{\texttt{\textbackslash #1}}}}
+\newlist{cslist}{description}1
+\setlist[cslist]{%
+  itemsep=\medskipamount,listparindent=1zw,
+  font=\normalfont\mdseries, leftmargin=2zw,
+  before=\advance\@listdepth\@ne,
+  after=\advance\@listdepth\m@ne
+}
+\def\csitem[#1]{\item[\llap{$\blacktriangleright$~}\let\.=\ind@cs#1]
+      \leavevmode\par\nopagebreak}
+}{}
+
+\def\emph#1{{\bfseries\sffamily\gtfamily\mathversion{bold}#1}}
+\def\paragraph#1{\par\medskip\par\noindent\emph{■#1}\par\nobreak}
+
+\def\Pkg#1{\textsf{#1}}
+\catcode`\<=13
+\xspcode`\\=3
+\xspcode`\*=3
+\xspcode`\-=3
+\xspcode23=3 % \textcompwordmark
+\def<#1>{\ensuremath{\langle\hbox{\normalfont\textit{#1}}\rangle}}
+\def\hex#1{\ifmmode\mbox\fi{\texttt{"#1}}}%"
+
+\normalsize
+\bigskipamount=\baselineskip
+\medskipamount=.5\baselineskip
+\smallskipamount=.25\baselineskip
+
+\usepackage{etoolbox}
+\patchcmd\@verbatim\@totalleftmargin{\dimexpr\@totalleftmargin+2zw\relax}{}{}
+\patchcmd\quote{\list{}}{\par\addvspace\medskipamount\list{}}{}{}
+\patchcmd\endquote{\endlist}{\endlist\addvspace\medskipamount}{}{}
+\patchcmd\@verbatim{\trivlist}{\trivlist\addvspace\medskipamount\noautoxspacing}{}{}
+\patchcmd\endverbatim{\endtrivlist}{\endtrivlist\addvspace\medskipamount}{}{}
+\expandafter\let\csname endverbatim*\endcsname =\endverbatim
+\patchcmd\verb{\ifmmode\hbox\else\leavevmode\vadjust{}\fi\bgroup}
+  {\ifmmode\else\leavevmode\vadjust{}\fi\hbox
+  \bgroup\textcompwordmark\noautoxspacing\noautospacing}{}{}
+\patchcmd\verb@egroup{\egroup}{\egroup\textcompwordmark}{}{}
+
+\renewenvironment{theindex}{%
+    \def\presectionname{}\def\postsectionname{}%
+    \section*{\indexname}
+    \@mkboth{\indexname}{\indexname}%
+    \plainifnotempty % \thispagestyle{plain}
+    \parindent\z@
+    \parskip\z@ \@plus .3\p@\relax
+    \let\item\@idxitem
+    \raggedright
+    \begin{multicols}{2}
+  }{
+    \end{multicols}
+    \clearpage
+  }
+
+% multilist env.
+\newenvironment{multilist}[2]%
+ {$$\setbox\z@=\hbox\bgroup  % catch some funny things -> \mathord
+  \let\a=\empty
+  \let\b=\empty
+  \count@=\z@
+  \toks@={#2}%
+  \def\item##1\cr
+   {\ifnum \count@=\z@
+      \count@=#1%
+      \expandafter\def\expandafter\b\expandafter{\b\y{}}%
+    \fi
+    \advance\count@ by\m@ne
+    \expandafter\def\expandafter\a\expandafter{\a\x{##1}}}%
+  \ignorespaces}%
+ {\loop
+  \ifnum \count@>\z@
+    \expandafter\def\expandafter\a\expandafter{\a\expandafter\z\b\relax}%
+    \advance\count@ by\m@ne
+  \repeat
+  \def\x##1{\expandafter\y\b\relax{##1}}%
+  \def\y\y##1##2\relax##3%
+   {\ifx @##1@%
+      \def\b{##2\y{##3}}%
+    \else
+      \def\b{##2\y{##1&##3}}%
+    \fi}%
+  \def\z\y##1##2\relax{\def\b{##2\y{##1}}}%
+  \a
+  \def\x
+   {\expandafter\egroup\expandafter\halign\expandafter\bgroup
+    \expandafter&\the\toks@\cr}%
+  \def\y##1{\expandafter\def\expandafter\x\expandafter{\x##1\cr}}%
+  \b
+  \x\egroup $$}
+
+% dangerous env.
+\font\man=manfnt at 10pt
+\def\dbend{\raise0pt\hbox{\man\char'177}}
+\newenvironment{dangerous}{%
+  \ifnum\@listdepth>\z@
+    \GenericError{}{Do not use `dangerous' environment inside any list}{}{}
+  \fi
+  \par\addvspace\medskipamount
+  \@tempdima=\dimexpr\textwidth-2zw\relax\small
+  \bigskipamount=\baselineskip
+  \medskipamount=.5\baselineskip
+  \smallskipamount=.25\baselineskip
+  \divide\@tempdima by\dimexpr1zw\relax\@tempcnta=\@tempdima
+  \leftskip=\dimexpr\textwidth-\@tempcnta zw\relax
+  \@totalleftmargin\dimexpr\leftskip+0zw
+  \linewidth=\dimexpr\@tempcnta zw-0zw
+  \parindent1zw\noindent\kern-\leftskip\hbox to\leftskip{\dbend\hss}%
+  \everypar{\everypar{}}\ignorespaces
+}{\par\addvspace\medskipamount}
+
+% macros for index (simplified from doc.sty)
+\newif\ifscan@allowed
+\def\dotfill{\leaders\hbox to.6em{\hss .\hss}\hskip\z@ plus1fill}%
+\def\pfill{\unskip~\dotfill\nobreak}
+
+%%% EOF

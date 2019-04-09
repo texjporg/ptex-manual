@@ -1,7 +1,11 @@
 %#!make eptexdoc.pdf
 \documentclass[a4paper,11pt,nomag]{jsarticle}
+\usepackage[bold,deluxe]{otf}
 \input fam256p.tex
 \usepackage[textwidth=42zw,lines=40,truedimen,centering]{geometry}
+
+%%%%%%%%%%%%%%%%
+% additional packages
 \usepackage{amsmath}
 \usepackage{mathtools,amssymb,comment}
 \usepackage[dvipdfmx]{graphicx}
@@ -10,147 +14,29 @@
 \usepackage{lmodern}
 \usepackage[dvipdfmx,hyperfootnotes=false]{hyperref}
 \usepackage{pxjahyper}
-\usepackage[bold,deluxe]{otf}
 \usepackage{hologo}
 \usepackage{makeidx}\makeindex
 
+% common
+\usepackage{ptex-manual}
+
 %%%%%%%%%%%%%%%%
-\makeatletter
+\def\delbit#1#2{\underbracket[0.4pt]{#1}_{\text{#2}}}
+
+\usepackage{shortvrb}
+\MakeShortVerb*{|}
+%%%%%%%%%%%%%%%%
+
+% logos
 \newcommand{\OMEGA}{$\Omega$}
 \protected\def\epTeX{$\varepsilon$\nobreakdash-\pTeX}
 \protected\def\eTeX{$\varepsilon$\nobreakdash-\TeX}
 \def\upTeX{u\pTeX}\def\pTeX{p\kern-.15em\TeX}
 \def\NTS{\leavevmode\hbox{$\cal N\kern-0.35em\lower0.5ex\hbox{$\cal T$}%
   \kern-0.2emS$}\,}
-\def\headfont{\normalfont\mathversion{bold}\sffamily}
-\def\node#1{\textit{#1}}
-\def\.#1{\texorpdfstring{%
-     \leavevmode\hbox{\texttt{\textbackslash#1}}\ifmmode\else\textcompwordmark\fi}{\textbackslash #1}}
-\let\orig@cs=\.
-\def\ind@cs#1{\orig@cs{#1}\indcs{#1}}
-\def\indcs#1{\index{{\texttt{\textbackslash #1}}}}
-\newlist{cslist}{description}1
-\setlist[cslist]{%
-  itemsep=\medskipamount,listparindent=1zw,
-  font=\normalfont\mdseries, leftmargin=2zw,
-  before=\advance\@listdepth\@ne,
-  after=\advance\@listdepth\m@ne
-}
-\def\csitem[#1]{\item[\llap{$\blacktriangleright$~}\let\.=\ind@cs#1]
-      \leavevmode\par\nopagebreak}
-\def\emph#1{{\bfseries\sffamily\gtfamily\mathversion{bold}#1}}
-\def\listx{\def\makelabel{\hbox to 1em{\hfil\textbullet\hfil}}\def\@{\hfill}
-\labelwidth=13zw\leftmargin15zw\itemindent=0zw}
-\def\paragraph#1{\par\medskip\par\noindent\emph{■#1}\par\nobreak}
-\def\Pkg#1{\textsf{#1}}
-\catcode`\<=13
-\xspcode`\\=3
-\xspcode`\*=3
-\xspcode`\-=3
-\xspcode23=3 % \textcompwordmark
-\def<#1>{\ensuremath{\langle\hbox{\normalfont\textit{#1}}\rangle}}
-
-\font\man=manfnt at 10pt
-\def\dbend{\raise0pt\hbox{\man\char'177}}
-\AtBeginDvi{\special{pdf:mapfile otf-ipaex.map}}
-\def\delbit#1#2{\underbracket[0.4pt]{#1}_{\text{#2}}}
-
 \def\TeXXeT{\TeX-\reflectbox{\bfseries\TeX-}}
 
-\newenvironment{multilist}[2]%
- {$$\setbox\z@=\hbox\bgroup  % catch some funny things -> \mathord
-  \let\a=\empty
-  \let\b=\empty
-  \count@=\z@
-  \toks@={#2}%
-  \def\item##1\cr
-   {\ifnum \count@=\z@
-      \count@=#1%
-      \expandafter\def\expandafter\b\expandafter{\b\y{}}%
-    \fi
-    \advance\count@ by\m@ne
-    \expandafter\def\expandafter\a\expandafter{\a\x{##1}}}%
-  \ignorespaces}%
- {\loop
-  \ifnum \count@>\z@
-    \expandafter\def\expandafter\a\expandafter{\a\expandafter\z\b\relax}%
-    \advance\count@ by\m@ne
-  \repeat
-  \def\x##1{\expandafter\y\b\relax{##1}}%
-  \def\y\y##1##2\relax##3%
-   {\ifx @##1@%
-      \def\b{##2\y{##3}}%
-    \else
-      \def\b{##2\y{##1&##3}}%
-    \fi}%
-  \def\z\y##1##2\relax{\def\b{##2\y{##1}}}%
-  \a
-  \def\x
-   {\expandafter\egroup\expandafter\halign\expandafter\bgroup
-    \expandafter&\the\toks@\cr}%
-  \def\y##1{\expandafter\def\expandafter\x\expandafter{\x##1\cr}}%
-  \b
-  \x\egroup $$}
-
 \makeatletter
-\clubpenalty=8000\widowpenalty=8000
-
-\normalsize
-\bigskipamount=\baselineskip
-\medskipamount=.5\baselineskip
-\smallskipamount=.25\baselineskip
-
-\usepackage{etoolbox}
-\patchcmd\@verbatim\@totalleftmargin{\dimexpr\@totalleftmargin+2zw\relax}{}{}
-\patchcmd\quote{\list{}}{\par\addvspace\medskipamount\list{}}{}{}
-\patchcmd\endquote{\endlist}{\endlist\addvspace\medskipamount}{}{}
-\patchcmd\@verbatim{\trivlist}{\trivlist\addvspace\medskipamount\noautoxspacing}{}{}
-\patchcmd\endverbatim{\endtrivlist}{\endtrivlist\addvspace\medskipamount}{}{}
-\expandafter\let\csname endverbatim*\endcsname =\endverbatim
-\patchcmd\verb{\ifmmode\hbox\else\leavevmode\vadjust{}\fi\bgroup}
-  {\ifmmode\else\leavevmode\vadjust{}\fi\hbox
-  \bgroup\textcompwordmark\noautoxspacing\noautospacing}{}{}
-\patchcmd\verb@egroup{\egroup}{\egroup\textcompwordmark}{}{}
-
-\newenvironment{dangerous}{%
-  \ifnum\@listdepth>\z@
-    \GenericError{}{Do not use `dangerous' environment inside any list}{}{}
-  \fi
-  \par\addvspace\medskipamount
-  \@tempdima=\dimexpr\textwidth-2zw\relax\small
-  \bigskipamount=\baselineskip
-  \medskipamount=.5\baselineskip
-  \smallskipamount=.25\baselineskip
-  \divide\@tempdima by\dimexpr1zw\relax\@tempcnta=\@tempdima
-  \leftskip=\dimexpr\textwidth-\@tempcnta zw\relax
-  \@totalleftmargin\dimexpr\leftskip+0zw
-  \linewidth=\dimexpr\@tempcnta zw-0zw
-  \parindent1zw\noindent\kern-\leftskip\hbox to\leftskip{\dbend\hss}%
-  \everypar{\everypar{}}\ignorespaces
-}{\par\addvspace\medskipamount}
-
-\renewenvironment{theindex}{%
-    \def\presectionname{}\def\postsectionname{}%
-    \section*{\indexname}
-    \@mkboth{\indexname}{\indexname}%
-    \plainifnotempty % \thispagestyle{plain}
-    \parindent\z@
-    \parskip\z@ \@plus .3\p@\relax
-    \let\item\@idxitem
-    \raggedright
-    \begin{multicols}{2}
-  }{
-    \end{multicols}
-    \clearpage
-  }
-
-\usepackage{shortvrb}
-\MakeShortVerb*{|}
-%%%%%%%% macros for index (simplified from doc.sty)
-\newif\ifscan@allowed
-\def\dotfill{\leaders\hbox to.6em{\hss .\hss}\hskip\z@ plus1fill}%
-\def\pfill{\unskip~\dotfill\nobreak}
-
 {\lccode`\!=`\_
 \lowercase{%
 \protected\gdef\_{\ifdefstrequal{\f@family}{\ttdefault}{!}%
@@ -158,7 +44,8 @@
 }}
 }
 \makeatother
-%%%%%%%%%%%%%%%%
+
+\clubpenalty=8000 \widowpenalty=8000
 \frenchspacing
 \begin{document}
 \title{\emph{\epTeX について}}
