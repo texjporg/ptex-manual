@@ -1,11 +1,12 @@
 %#!make eptexdoc.pdf
-\documentclass[a4paper,11pt]{jsarticle}
+\documentclass[a4paper,11pt,nomag]{jsarticle}
 \input fam256p.tex
 \usepackage[textwidth=42zw,lines=40,truedimen,centering]{geometry}
-\usepackage{amsmath,mathtools,amssymb,multicol,comment}
+\usepackage{amsmath}
+\usepackage{mathtools,amssymb,comment}
 \usepackage[dvipdfmx]{graphicx}
 \usepackage[T1]{fontenc}
-\usepackage{booktabs,enumitem}
+\usepackage{booktabs,enumitem,multicol}
 \usepackage{lmodern}
 \usepackage[dvipdfmx,hyperfootnotes=false]{hyperref}
 \usepackage{pxjahyper}
@@ -21,7 +22,7 @@
 \def\upTeX{u\pTeX}\def\pTeX{p\kern-.15em\TeX}
 \def\NTS{\leavevmode\hbox{$\cal N\kern-0.35em\lower0.5ex\hbox{$\cal T$}%
   \kern-0.2emS$}\,}
-\def\headfont{\normalfont\mathversion{bold}\gtfamily\bfseries}
+\def\headfont{\normalfont\mathversion{bold}\sffamily}
 \def\node#1{\textit{#1}}
 \def\.#1{\texorpdfstring{%
      \leavevmode\hbox{\texttt{\textbackslash#1}}\ifmmode\else\textcompwordmark\fi}{\textbackslash #1}}
@@ -30,10 +31,14 @@
 \def\indcs#1{\index{{\texttt{\textbackslash #1}}}}
 \newlist{cslist}{description}1
 \setlist[cslist]{%
-  style=nextline,itemsep=\medskipamount,listparindent=1zw,
-  font=\normalfont\mdseries}
-\def\csitem[#1]{\item[\llap{$\blacktriangleright$~}\let\.=\ind@cs#1]}
-\def\emph#1{{\bfseries\gtfamily\mathversion{bold}#1}}
+  itemsep=\medskipamount,listparindent=1zw,
+  font=\normalfont\mdseries, leftmargin=2zw,
+  before=\advance\@listdepth\@ne,
+  after=\advance\@listdepth\m@ne
+}
+\def\csitem[#1]{\item[\llap{$\blacktriangleright$~}\let\.=\ind@cs#1]
+      \leavevmode\par\nopagebreak}
+\def\emph#1{{\bfseries\sffamily\gtfamily\mathversion{bold}#1}}
 \def\listx{\def\makelabel{\hbox to 1em{\hfil\textbullet\hfil}}\def\@{\hfill}
 \labelwidth=13zw\leftmargin15zw\itemindent=0zw}
 \def\paragraph#1{\par\medskip\par\noindent\emph{■#1}\par\nobreak}
@@ -43,7 +48,7 @@
 \xspcode`\*=3
 \xspcode`\-=3
 \xspcode23=3 % \textcompwordmark
-\def<#1>{\ensuremath{\langle\hbox{\normalfont\itshape #1\/}\rangle}}
+\def<#1>{\ensuremath{\langle\hbox{\normalfont\textit{#1}}\rangle}}
 
 \font\man=manfnt at 10pt
 \def\dbend{\raise0pt\hbox{\man\char'177}}
@@ -107,15 +112,33 @@
 \smallskipamount=.25\baselineskip
 
 \usepackage{etoolbox}
-\newenvironment{curve}{%
-  \par\medskip
-  \bgroup\small\leftskip=\dimexpr\textwidth-44zw\relax\@totalleftmargin=\leftskip
-  \parindent1zw\noindent\kern-\leftskip\hbox to\leftskip{\dbend\hss}%
+\patchcmd\@verbatim\@totalleftmargin{\dimexpr\@totalleftmargin+2zw\relax}{}{}
+\patchcmd\quote{\list{}}{\par\addvspace\medskipamount\list{}}{}{}
+\patchcmd\endquote{\endlist}{\endlist\addvspace\medskipamount}{}{}
+\patchcmd\@verbatim{\trivlist}{\trivlist\addvspace\medskipamount\noautoxspacing}{}{}
+\patchcmd\endverbatim{\endtrivlist}{\endtrivlist\addvspace\medskipamount}{}{}
+\expandafter\let\csname endverbatim*\endcsname =\endverbatim
+\patchcmd\verb{\ifmmode\hbox\else\leavevmode\vadjust{}\fi\bgroup}
+  {\ifmmode\else\leavevmode\vadjust{}\fi\hbox
+  \bgroup\textcompwordmark\noautoxspacing\noautospacing}{}{}
+\patchcmd\verb@egroup{\egroup}{\egroup\textcompwordmark}{}{}
+
+\newenvironment{dangerous}{%
+  \ifnum\@listdepth>\z@
+    \GenericError{}{Do not use `dangerous' environment inside any list}{}{}
+  \fi
+  \par\addvspace\medskipamount
+  \@tempdima=\dimexpr\textwidth-2zw\relax\small
   \bigskipamount=\baselineskip
   \medskipamount=.5\baselineskip
   \smallskipamount=.25\baselineskip
+  \divide\@tempdima by\dimexpr1zw\relax\@tempcnta=\@tempdima
+  \leftskip=\dimexpr\textwidth-\@tempcnta zw\relax
+  \@totalleftmargin\dimexpr\leftskip+0zw
+  \linewidth=\dimexpr\@tempcnta zw-0zw
+  \parindent1zw\noindent\kern-\leftskip\hbox to\leftskip{\dbend\hss}%
   \everypar{\everypar{}}\ignorespaces
-}{\par\egroup\medskip}
+}{\par\addvspace\medskipamount}
 
 \renewenvironment{theindex}{%
     \def\presectionname{}\def\postsectionname{}%
@@ -132,49 +155,12 @@
     \clearpage
   }
 
-\patchcmd\@verbatim\@totalleftmargin{\dimexpr\@totalleftmargin+2zw\relax}{}{}
-\patchcmd\quote{\list{}}{\par\list{\topsep\medskipamount}}{}{}
-\patchcmd\@verbatim{\trivlist}{\trivlist\addvspace\medskipamount\noautoxspacing}{}{}
-\patchcmd\endverbatim{\endtrivlist}{\endtrivlist\addvspace\medskipamount}{}{}
-\expandafter\let\csname endverbatim*\endcsname =\endverbatim
-\patchcmd\verb{\ifmmode\hbox\else\leavevmode\vadjust{}\fi\bgroup}
-  {\ifmmode\else\leavevmode\vadjust{}\fi\hbox
-  \bgroup\textcompwordmark\noautoxspacing\noautospacing}{}{}
-\patchcmd\verb@egroup{\egroup}{\egroup\textcompwordmark}{}{}
-
 \usepackage{shortvrb}
 \MakeShortVerb*{|}
 %%%%%%%% macros for index (simplified from doc.sty)
 \newif\ifscan@allowed
 \def\dotfill{\leaders\hbox to.6em{\hss .\hss}\hskip\z@ plus1fill}%
 \def\pfill{\unskip~\dotfill\nobreak}
-
-\long\def\@footnotetext{%
-  \insert\footins\bgroup
-    \normalfont\footnotesize
-    \interlinepenalty\interfootnotelinepenalty
-    \splittopskip\footnotesep
-    \splitmaxdepth \dp\strutbox \floatingpenalty \@MM
-    \hsize\columnwidth \@parboxrestore
-    \protected@edef\@currentlabel{%
-       \csname p@footnote\endcsname\@thefnmark
-    }%
-    \color@begingroup
-      \@makefntext{%
-        \rule\z@\footnotesep\ignorespaces}%
-      \futurelet\next\fo@t}
-\def\fo@t{\ifcat\bgroup\noexpand\next \let\next\f@@t
-                                \else \let\next\f@t\fi \next}
-\def\f@@t{\bgroup\aftergroup\@foot\let\next}
-\def\f@t#1{#1\@foot}
-\def\@foot{\@finalstrut\strutbox\color@endgroup\egroup
-  \ifx\pltx@foot@penalty\@undefined\else
-    \ifhmode\null\fi
-    \ifnum\pltx@foot@penalty=\z@\else
-      \penalty\pltx@foot@penalty
-      \pltx@foot@penalty\z@
-    \fi
-  \fi}
 
 {\lccode`\!=`\_
 \lowercase{%
@@ -790,7 +776,7 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 となり，見た目では同じ「fi」が\.{lastnodechar}実行時の「最後のノード」であるかのように見えても，
 それが合字の場合（左側）では\.{lastnodechar}の実行結果は最後の構成要素「i」のコード番号105となる．
 
-\begin{curve}
+\begin{dangerous}
   「|これは，|」とソース中に入力したときの
   ノードの状態を\.{showlists}で調べてみると次のようになっており，
   本当に一番最後のノードはJFMによって挿入される二分空きの空白
@@ -807,7 +793,7 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 \end{verbatim}
   しかし，数段落上の説明の通り，\.{lastnodechar}は\pTeX の和文処理によって自動的に挿入された
   これらJFM由来の空白を無視する．
-\end{curve}
+\end{dangerous}
 
 「最後のノード」を見ているので，
 \begin{verbatim}

@@ -22,6 +22,7 @@
 \def\eupTeX{$\varepsilon$-\upTeX}\def\upTeX{u\pTeX}
 \def\pTeX{p\kern-.10em\TeX}
 \def\headfont{\normalfont\mathversion{bold}\sffamily}
+\def\node#1{\textit{#1}}
 \def\.#1{\texorpdfstring{%
      \leavevmode\hbox{\texttt{\textbackslash#1}}\ifmmode\else\textcompwordmark\fi}{\textbackslash #1}}
 \let\orig@cs=\.
@@ -68,6 +69,7 @@
   {\ifmmode\else\leavevmode\vadjust{}\fi\hbox
   \bgroup\textcompwordmark\noautoxspacing\noautospacing}{}{}
 \patchcmd\verb@egroup{\egroup}{\egroup\textcompwordmark}{}{}
+
 \newenvironment{dangerous}{%
   \ifnum\@listdepth>\z@
     \GenericError{}{Do not use `dangerous' environment inside any list}{}{}
@@ -100,6 +102,10 @@
     \clearpage
   }
 
+\def\tsp{_{\mbox{\fontsize\sf@size\z@\ttfamily \char32}}}
+\def\tpar{_{\mbox{\fontsize\sf@size\z@\ttfamily \string\par}}}
+\def\tign{_{\mbox{\fontsize\sf@size\z@\selectfont --}}}
+
 \def\tableautorefname{表}
 \def\figureautorefname{図}
 \def\HyRef@autoref#1#2{%
@@ -108,38 +114,6 @@
     \expandafter\HyRef@autosetref\csname r@#2\endcsname{#2}{#1}%
   \endgroup\textcompwordmark %欧文ゴースト
 }
-
-\long\def\@footnotetext{%
-  \insert\footins\bgroup
-    \normalfont\footnotesize
-    \interlinepenalty\interfootnotelinepenalty
-    \splittopskip\footnotesep
-    \splitmaxdepth \dp\strutbox \floatingpenalty \@MM
-    \hsize\columnwidth \@parboxrestore
-    \protected@edef\@currentlabel{%
-       \csname p@footnote\endcsname\@thefnmark
-    }%
-    \color@begingroup
-      \@makefntext{%
-        \rule\z@\footnotesep\ignorespaces}%
-      \futurelet\next\fo@t}
-\def\fo@t{\ifcat\bgroup\noexpand\next \let\next\f@@t
-                                \else \let\next\f@t\fi \next}
-\def\f@@t{\bgroup\aftergroup\@foot\let\next}
-\def\f@t#1{#1\@foot}
-\def\@foot{\@finalstrut\strutbox\color@endgroup\egroup
-  \ifx\pltx@foot@penalty\@undefined\else
-    \ifhmode\null\fi
-    \ifnum\pltx@foot@penalty=\z@\else
-      \penalty\pltx@foot@penalty
-      \pltx@foot@penalty\z@
-    \fi
-  \fi}
-
-\def\tsp{_{\mbox{\fontsize\sf@size\z@\ttfamily \char32}}}
-\def\tpar{_{\mbox{\fontsize\sf@size\z@\ttfamily \string\par}}}
-\def\tign{_{\mbox{\fontsize\sf@size\z@\selectfont --}}}
-
 
 \usepackage{shortvrb}
 \MakeShortVerb*{|}
