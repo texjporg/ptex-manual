@@ -880,7 +880,7 @@ $10\,\mathrm{pt}-7\,\mathrm{pt}=3\,\mathrm{pt}$だけ上に配置されてしま
   というエラーが発生する．
 
 \csitem[\.{jfont}, \.{tfont}]
-  欧文フォントを定義したり，現在の欧文フォントを取得する|\font|の和文版である．
+  欧文フォントを定義したり，現在の欧文フォントを取得したりする|\font|の和文版である．
   一応|\jfont|が「和文の横組用フォント」の，|\tfont|が「和文の縦組用フォント」のために
   用いる命令である．
 \begin{itemize}
@@ -890,6 +890,16 @@ $10\,\mathrm{pt}-7\,\mathrm{pt}=3\,\mathrm{pt}$だけ上に配置されてしま
  \item |\the|等で「現在のフォント」を取得する際には，
        |\jfont|で「和文の横組用フォント」を，
        |\tfont|で「和文の縦組用フォント」を返す．
+ \item |\nullfont|は全ての文字が未定義な「空フォント」を指すが，
+  これは欧文フォントであり，和文版|\nullfont|という概念は存在しない．
+  これは，\pTeX では「全ての和文フォントには，和文文字コードとして有効な
+  全ての文字が存在する」という扱いになっているためである．
+  % [TODO] これは仕様とみなしてよい？
+  % 現状では，tikzpicture 環境のように|\selectfont|を|\nullfont|に
+  % 再定義した状態では，和文文字だけ消えずに残る．
+  % https://tex.stackexchange.com/questions/18602/
+  % https://twitter.com/doraTeX/status/1098584763277824000
+  % https://twitter.com/zr_tex8r/status/1098594165573722112
 \end{itemize}
 \end{cslist}
 
