@@ -1143,6 +1143,11 @@ has been |\let| equal to a non-active character token.
 コントロールシークエンスをカテゴリーコード0とみなしている．
 そのため，\pTeX 系列において和文文字トークンの|\kcatcode|の値が
 16である場合も，|\ifcat|判定でコントロールシークエンスと混同されることはない．
+
+一方，文字コードについては，確かにtex.webは|\if|判定において
+コントロールシークエンスを256とみなしている．しかし，\upTeX では
+文字コード256の和文文字と衝突するので，2019-05-06のコミット(r51021)で
+「原理的に文字コードが取り得ない値」に変更した(\cite{build68})．
 \end{dangerous}
 
 \begin{thebibliography}{99}
@@ -1167,6 +1172,9 @@ has been |\let| equal to a non-active character token.
  \bibitem{forum_2566} aminophen, 「\TeX~Live 2019 での |\inhibitglue| の挙動変更【予定】」，
   2019/02/06,\\
   \url{https://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=2566}
+ \bibitem{build68} aminophen, 「upTeX の |\if| と |\ifcat|」，
+  2019/01/17,\\
+  \url{https://github.com/texjporg/tex-jp-build/issues/68}
 \end{thebibliography}
 
 \newpage
