@@ -101,15 +101,14 @@ e-mail: \texttt{issue(at)texjp.org}}}
     $C_1=\{\hex{81},\dots,\hex{9f}\}\cup\{\hex{e0},\dots,\hex{fc}\}$,\\
     $C_2=\{\hex{40},\dots,\hex{7e}\}\cup\{\hex{80},\dots,\hex{fc}\}$.
 \end{description}
-である．
+である．この内部コードのパターンに合えば和文文字として扱われ，
+合わなければ欧文文字として扱われる．
+% 参考：kanji.c の |is_char_kanji| の実装
 
 入力ファイルの文字コードがUTF-8の場合，JIS X 0208にない文字は
 UTF-8のバイト列として読み込まれる．
 
-% この内部コードのパターンに合えば和文文字として扱われ，
-% 合わなければ欧文文字として扱われる，でよい？
-%% →is_char_kanji の実装を見るとそれっぽいです．
-
+% このマニュアルを英語化する際は以下も参照．
 % http://tutimura.ath.cx/ptexlive/?ptexenc%2FDetails
 % http://ajt.ktug.org/assets/2008/5/1/0201tsuchimura_kuroki.pdf
 % https://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=460
