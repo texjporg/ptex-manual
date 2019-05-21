@@ -98,28 +98,35 @@ JFMで扱うことを目的に仕様拡張した．}．
 のコードとタイプが2番目以降のエントリーとして存在しなければならない．
 
 \subsection{\node{char\_info}}
-{\it char\_type}をインデックスとしてこのテーブルを
-参照することにより，各{\it char\_type}の属性を検索する．
+\node{char\_type}をインデックスとしてこのテーブルを
+参照することにより，各\node{char\_type}の属性を検索する．
 各テーブルへのインデックス等の情報を次の順番でパッキング
 して1ワードに収めてある．
-\begin{description}
-\item{{\it width\_index} (8bits)} width\_tableへのインデックス
-\item{{\it height\_index} (4bits)} height\_tableへのインデックス
-\item{{\it depth\_index} (4bits)} depth\_tableへのインデックス
-\item{{\it italic\_index} (6bits)} italic\_tableへのインデックス
-\item{{\it tag} (2bits)}
-	\begin{description}
-	\item{${\it tag}=0$} {\it remainder}の項は無効であり
-		使用しないことを示す．
-	\item{${\it tag}=1$} {\it remainder}の項が{\it glue\_kern}への有効な
-		インデックスであることを示す．
-	\item{${\it tag}=2, 3$} JFMでは使用していない．
-	\end{description}
-\item{remainder (8bits)}
+\begin{description}\itemindent=2zw
+  \item[\node{width\_index} (8bits)]
+    \node{width\_table}へのインデックス
+  \item[\node{height\_index} (4bits)]
+    \node{height\_table}へのインデックス
+  \item[\node{depth\_index} (4bits)]
+    \node{depth\_table}へのインデックス
+  \item[\node{italic\_index} (6bits)]
+    \node{italic\_table}へのインデックス
+  \item[\node{tag} (2bits)]
+    \node{remainder}をどのような目的で使うかを示す．
+    \begin{description}\itemindent=1zw
+      \item[$\size{tag}=0$]
+        \node{remainder}の項は無効であり使用しないことを示す．
+      \item[$\size{tag}=1$]
+        \node{remainder}の項が\node{glue\_kern}への有効なインデックスであることを示す．
+      \item[$\size{tag}=2, 3$]
+        JFMでは使用していない．
+    \end{description}
+  \item[\node{remainder} (8bits)]
 \end{description}
-JFMでは$bc$は必ずゼロ\footnote{前節にある通り，文字コード及び
+
+JFMでは$\size{bc}$は必ずゼロ\footnote{前節にある通り，文字コード及び
 文字タイプの項が0のものが必ず1つ存在するため．}なので，
-1つのJFMに含まれる{\it char\_info}は全部で$ec+1$ワードになる．
+1つのJFMに含まれる\node{char\_info}は全部で$\size{ec}+1$ワードになる．
 
 \subsection{glue\_kern}
 特定の文字タイプの組み合せ時に挿入すべき{\it glue}又は{\it kern}を
