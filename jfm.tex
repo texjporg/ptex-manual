@@ -1,5 +1,6 @@
 \documentclass[a4paper,11pt,nomag]{jsarticle}
 \usepackage[textwidth=42zw,lines=40,truedimen,centering]{geometry}
+\usepackage{amsmath}
 \usepackage[defaultsups]{newpxtext}
 \usepackage[zerostyle=c,straightquotes]{newtxtt}
 \usepackage{newpxmath}
@@ -29,6 +30,12 @@
 日本語\TeX 開発コミュニティによって拡張されたJFMフォーマットに
 基づいて説明する．
 
+なお，\pTeX の内部コードをUnicode化した\upTeX でも，
+JFMフォーマットの仕様は全く同じであり，ただ
+\node{char\_type}テーブルに文字コードを格納するときに
+JISコードを用いる（\pTeX の場合）か，
+UCS-4の下位3バイトを用いる（\upTeX の場合）かだけが異なる．
+
 \section{JFMファイルの構成}
 
 JFMファイルのフォーマットは，
@@ -45,33 +52,41 @@ Table~\ref{構成}（\pageref{構成}ページ）に示すとおりである．
 \item \node{char\_type}のテーブルが付け加えられたこと．
 \item \node{exten}の換わりに\node{glue}のテーブルが設けられたこと．
 \item 2に関連して，\node{lig\_kern}から\node{glue\_kern}テーブルへ変更されたこと．
-\item これらに伴い，先頭のファイル内の各部分を規定する
-	パラメータ表が変更されている．
-	また，オリジナルのTFMとの区別のためにidを付加している．
+\item これらに伴い，先頭のファイル内の各部分を規定するパラメータ表が変更されている．
+  また，オリジナルのTFMとの区別のために$\size{id}$を付加しており，
+  先頭の半ワード（2バイト）が横組用は11，縦組用は9である
+  \footnote{欧文TFMの半ワードは$\size{lf}$すなわちファイルサイズであり，
+  11や9になることはない．}．
 \end{enumerate}
 最初の7ワードは半ワード（＝2バイト）ずつに区切られ，
-JFMファイルを構成する14個の要素のサイズが収められている．
+JFMファイルを構成する14個の要素のサイズが収められている
+\footnote{欧文TFMでは12個だが，JFMでは$\size{id}$と$\size{nt}$が増え，
+$\size{ne}$が$\size{ng}$に置き換わったため14個である．}．
 これらの値は，すべて$2^{15}$よりも小さい非負の値で，
 次の条件を満たしていなければならない：
-\begin{eqnarray*}
-\size{bc} &=& 0 \\
-\size{lf} &=& 7+\size{lh}+(\size{ec}-\size{bc}+1)+\size{nw}+\size{nh}
+\begin{align*}
+\size{bc} &= 0 \\
+0 &\leq \size{ec} \leq 255 \\
+\size{lf} &= 7+\size{nt}+\size{lh}+(\size{ec}-\size{bc}+1)+\size{nw}+\size{nh}
                +\size{nd}+\size{ni}+\size{nl}+\size{nk}+\size{ng}+\size{np}
-\end{eqnarray*}
+\end{align*}
+ここで，$\size{bc}$と$\size{ec}$は最小・最大の文字タイプ番号，
+$\size{nt}$は\node{char\_type}テーブルに登録された文字の数（文字タイプ0も含む），
+$\size{nl}$と$\size{ng}$はそれぞれは\node{glue\_kern}テーブルと
+\node{glue}テーブルのサイズであり，その他の値はTFMを踏襲する．
 
-\subsection{\node{char\_type}}
+\subsection{\node{char\_type}テーブル}
 \pTeX では欧文\TeX よりはるかに多くの文字を扱う必要があるが，
 そのほとんどは漢字であり，それらは全て同一の寸法（全角幅）を持つ．
 また，括弧や句読点などの約物も種類が増えるが，こちらも
 幾つかのパターンに分類すれば済む（例えば ``「'' と ``（'' は同様に扱える）．
 
-%今回の\TeX の日本語化においては，
 そこで，JFMフォーマットでは，
-同一の文字幅，高さ，前後に挿入されるグルー等，その文字が持つ属性全てが
-同じものを，1つの\emph{文字タイプ} (\node{char\_type})として
+同一の文字幅，高さ，前後に挿入されるグルー等，「その文字が持つ属性全てが
+同じもの」を1つの\emph{文字タイプ} (\node{char\_type})として，
 欧文フォントの1文字と同様にして扱うようにしている．
-そこで，漢字の文字コードとこの\node{char\_type}との対応付けを
-このテーブルを使って行う．
+そして，文字コードと文字タイプとの対応付けを，
+この\node{char\_type}テーブルを使って行う．
 
 このテーブルの各エントリーは1ワード（＝4バイト）で構成され，
 上位3バイトに文字コード（符合位置），下位1バイトに文字タイプを持つ
@@ -97,7 +112,7 @@ JFMで扱うことを目的に仕様拡張した．}．
 つまり，このデフォルト以外の文字幅，カーン等の属性を持つキャラクタ
 のコードとタイプが2番目以降のエントリーとして存在しなければならない．
 
-\subsection{\node{char\_info}}
+\subsection{\node{char\_info}テーブル}
 \node{char\_type}をインデックスとしてこのテーブルを
 参照することにより，各\node{char\_type}の属性を検索する．
 各テーブルへのインデックス等の情報を次の順番でパッキング
@@ -128,84 +143,95 @@ JFMでは$\size{bc}$は必ずゼロ\footnote{前節にある通り，文字コ�
 文字タイプの項が0のものが必ず1つ存在するため．}なので，
 1つのJFMに含まれる\node{char\_info}は全部で$\size{ec}+1$ワードになる．
 
-\subsection{glue\_kern}
-特定の文字タイプの組み合せ時に挿入すべき{\it glue}又は{\it kern}を
+% [TODO] char_info のサイズが ec+1 ということは，
+% 文字タイプは 0 から ec まで連続しなければならないのか？
+% （char_type テーブル内の文字コードの順序については説明があるが，
+%   文字タイプの連続性についてはどこにも明記されていない気がする…）
+
+\subsection{\node{glue\_kern}テーブル}
+特定の文字タイプの組み合せ時に挿入すべき\node{glue}又は\node{kern}を
 簡単なプログラム言語によって指定する．
 各命令は，以下の4バイトで構成される．
-\begin{description}
-\item{第1バイト({\it skip\_byte})}
-	\begin{itemize}
-	\item 128より大きいとき\\
-		現在のワードが{\it char\_info}から示された最初のワード
-		である場合は，実際の{\it glue\_kern}プログラムが
-		{\it glue\_kern}[$256*{\it op\_byte}+{\it remainder}$]から
-		収められている（すなわち，再配置されている）ことを示す
-		\footnote{「再配置」は，サイズが256を超える大きな
-		{\it glue\_kern}テーブルを格納するための方策であり，
-		欧文TFMの{\it lig\_kern}テーブルにおけるそれと同様である．
-		2018年2月に日本語\TeX{}開発コミュニティによって，
-		\pTeX{}及びpPLtoTFで新たにサポートされた．}．
-		最初のワードでない場合（すなわち，既に再配置先あるいは
-		プログラムのステップを開始した後のワードである場合）は，
-		その場でプログラムを終了する．
-	\item 128のとき\\
-		このワードを実行してプログラムを終了する．
-	\item 128より小さいとき\\
-		このワードを実行した後，次のステップまでスキップする
-		ワード数を示す
-		\footnote{「スキップ」(SKIP)は，元々アスキーの公式ページ
-		{\tt http://ascii.asciimw.jp/pb/ptex/tfm/jfm.html}に文書化
-		されてはいたが，実際には(p)PLtoTFの{\it glue\_kern}テーブル内で
-		SKIP命令を使用することができず，\pTeX{}もやはりSKIP命令を
-		サポートしていなかった．
-		2018年2月の日本語\TeX{}開発コミュニティの改修により，
-		新たにサポートが開始された．}．
-	\end{itemize}
-\item{第2バイト({\it char\_type})}
-	\begin{itemize}
-	\item 次の文字の文字タイプが，
-		このバイトで示す文字タイプ
-		\footnote{ここに文字タイプが格納されるため，
-		文字タイプの上限は255なのである．}と同じ場合，
-		第3バイトの処理を実行し，プログラム終了．
-	\item そうでなければ次のステップへ．
-	\end{itemize}
-\item{第3バイト({\it op\_byte})}\\
-	この値によってグルーを扱うかカーンを扱うかを規定する．
-	\begin{itemize}
-	\item 127以下の場合{\it glue[remainder$\times$3]}のグルーを挿入．
-	\item 128以上の場合{\it kern[remainder]}のカーンを挿入．
-	\end{itemize}
-\item{第4バイト({\it remainder})}\\
-	第3バイトにより規定される
-	{\it glue}または{\it kern}へのインデックスを示す．
+\begin{description}\itemindent=2zw
+\item[第1バイト] (\node{skip\_byte})
+  \begin{itemize}
+  \item 128より大きいとき\\
+    現在のワードが\node{char\_info}から示された最初のワード
+    である場合は，実際の\node{glue\_kern}プログラムが
+    \node{glue\_kern}[$256\times\size{op\_byte}+\size{remainder}$]から
+    収められている（すなわち，再配置されている）ことを示す
+    \footnote{「再配置」は，サイズが256を超える大きな
+    \node{glue\_kern}テーブルを格納するための方策であり，
+    欧文TFMの\node{lig\_kern}テーブルにおけるそれと同様である．
+    2018年2月に日本語\TeX{}開発コミュニティによって，
+    \pTeX{}及びpPLtoTFで新たにサポートされた．}．
+    最初のワードでない場合（すなわち，既に再配置先あるいは
+    プログラムのステップを開始した後のワードである場合）は，
+    その場でプログラムを終了する．
+  \item 128のとき\\
+    このワードを実行してプログラムを終了する．
+  \item 128より小さいとき\\
+    このワードを実行した後，次のステップまでスキップする
+    ワード数を示す
+    \footnote{「スキップ」(SKIP)は，元々アスキーの公式ページ
+    \texttt{http://ascii.asciimw.jp/pb/ptex/tfm/jfm.html}に文書化
+    されてはいたが，実際には(p)PLtoTFの\node{glue\_kern}テーブル内で
+    SKIP命令を使用することができず，\pTeX{}もやはりSKIP命令を
+    サポートしていなかった．
+    2018年2月の日本語\TeX{}開発コミュニティの改修により，
+    新たにサポートが開始された．}．
+  \end{itemize}
+\item[第2バイト] (\node{char\_type})
+  \begin{itemize}
+  \item 次の文字の文字タイプが，
+    このバイトで示す文字タイプ
+    \footnote{ここに文字タイプが格納されるため，
+    文字タイプの上限は255なのである．}と同じ場合，
+    第3バイトの処理を実行し，プログラム終了．
+  \item そうでなければ次のステップへ．
+  \end{itemize}
+\item[第3バイト] (\node{op\_byte})\\
+  この値によってグルーを扱うかカーンを扱うかを規定する．
+  \begin{itemize}
+  \item 127以下の場合\node{glue}[$\size{remainder}\times 3$]のグルーを挿入．
+  \item 128以上の場合\node{kern}[$\size{remainder}$]のカーンを挿入．
+  \end{itemize}
+\item[第4バイト] (\node{remainder})\\
+  第3バイトにより規定される
+  \node{glue}または\node{kern}へのインデックスを示す．
 \end{description}
-%
-\subsection{glueテーブル}
+
+\subsection{\node{glue}テーブル}
 自然長，伸び長，縮み長の3ワードで1つのグルーを構成する
 （したがって，$ng$は必ず3の倍数となる）．
 各値は，$\mathrm{design size}\times2^{-20}$を単位として表す．
-\begin{description}
-\item{第1ワード} width
-\item{第2ワード} stretch
-\item{第3ワード} shrink
+\begin{description}\itemindent=2zw
+  \item[第1ワード] width
+  \item[第2ワード] stretch
+  \item[第3ワード] shrink
 \end{description}
-%
-\subsection{paramテーブル}
-\begin{description}
-\item{param[1]} 文字の傾き (italic slant)．
-\item{param[2][3][4]} 漢字間に挿入するグルーのデフォルト値．
-\item{param[5]} \pTeX{}でzhで参照される寸法．
-\item{param[6]} \pTeX{}でzwで参照される寸法．
-\item{param[7][8][9]} 漢字と英字間に挿入するグルーのデフォルト値．
+
+\subsection{\node{param}テーブル}
+一応，以下のように定義されている．
+\begin{description}\itemindent=2zw
+  \item[\mbox{param[1]}]
+    文字の傾き (italic slant)．
+  \item[\mbox{param[2][3][4]}]
+    和文文字間に挿入するグルー(|\kanjiskip|)のデフォルト値．
+  \item[\mbox{param[5]}]
+    \pTeX{}でzhで参照される寸法．
+  \item[\mbox{param[6]}]
+    \pTeX{}でzwで参照される寸法．
+  \item[\mbox{param[7][8][9]}]
+    和文文字と欧文文字間に挿入するグルー(|\xkanjiskip|)のデフォルト値．
 \end{description}
 \begin{dangerous}
 このように書かれているが，実際には\pTeX で（明示的に|\fontdimen|で
-取得する場合を除き）JFMのparamテーブルの値が用いられることはなく，
+取得する場合を除き）JFMの\node{param}テーブルの値が用いられることはなく，
 \pTeX のzwは「文字タイプ0の文字の幅」，
 \pTeX のzhは「文字タイプ0の文字の高さと深さの和」である．
 \end{dangerous}
-%
+
 \newpage
 \DeleteShortVerb{|}
 \begin{table}[h]\small
@@ -219,60 +245,61 @@ $nd$ & $ni$ \\ \hline
 $nl$ & $nk$ \\ \hline
 $ng$ & $np$ \\ \hline
 \multicolumn{2}{|c|}{} \\
-\multicolumn{2}{|c|}{header} \\ 
+\multicolumn{2}{|c|}{\node{header}} \\ 
 \multicolumn{2}{|c|}{}\\ \hline
 \multicolumn{2}{|c|}{} \\
-\multicolumn{2}{|c|}{char\_type} \\ 
+\multicolumn{2}{|c|}{\node{char\_type}} \\ 
 \multicolumn{2}{|c|}{}\\ \hline
 \multicolumn{2}{|c|}{}\\
-\multicolumn{2}{|c|}{char\_info} \\
+\multicolumn{2}{|c|}{\node{char\_info}} \\
 \multicolumn{2}{|c|}{}\\ \hline
 \multicolumn{2}{|c|}{}\\
-\multicolumn{2}{|c|}{width} \\
+\multicolumn{2}{|c|}{\node{width}} \\
 \multicolumn{2}{|c|}{}\\ \hline
 \multicolumn{2}{|c|}{}\\
-\multicolumn{2}{|c|}{height} \\
+\multicolumn{2}{|c|}{\node{height}} \\
 \multicolumn{2}{|c|}{}\\ \hline
 \multicolumn{2}{|c|}{}\\
-\multicolumn{2}{|c|}{depth} \\
+\multicolumn{2}{|c|}{\node{depth}} \\
 \multicolumn{2}{|c|}{}\\ \hline
 \multicolumn{2}{|c|}{}\\
-\multicolumn{2}{|c|}{italic} \\
+\multicolumn{2}{|c|}{\node{italic}} \\
 \multicolumn{2}{|c|}{}\\ \hline
 \multicolumn{2}{|c|}{}\\
-\multicolumn{2}{|c|}{glue\_kern} \\
+\multicolumn{2}{|c|}{\node{glue\_kern}} \\
 \multicolumn{2}{|c|}{}\\ \hline
 \multicolumn{2}{|c|}{}\\
-\multicolumn{2}{|c|}{kern} \\
+\multicolumn{2}{|c|}{\node{kern}} \\
 \multicolumn{2}{|c|}{}\\ \hline
 \multicolumn{2}{|c|}{}\\
-\multicolumn{2}{|c|}{glue} \\
+\multicolumn{2}{|c|}{\node{glue}} \\
 \multicolumn{2}{|c|}{}\\ \hline
 \multicolumn{2}{|c|}{}\\
-\multicolumn{2}{|c|}{param} \\
+\multicolumn{2}{|c|}{\node{param}} \\
 \multicolumn{2}{|c|}{}\\ \hline
 \end{tabular}
 \end{minipage}
 \begin{minipage}[b]{3.3in}
 \noindent
 \begin{tabular}{l}
-$id=$ JFM\_ID number. ($=11$ for yoko, $9$ for tate) \\
-$nt=$ number of words in the character type table. \\
-$lf=$ length of the entire file, in words. \\
-$lh=$ length of the header data, in words. \\
-$bc=$ smallest character type in the font. ($=0$ for JFM) \\
-$ec=$ largest character type in the font. \\
-$nw=$ number of words in the width table. \\
-$nh=$ number of words in the height table. \\
-$nd=$ number of words in the depth table. \\
-$ni=$ number of words in the italic correction table. \\
-$nl=$ number of words in the glue/kern table. \\
-$nk=$ number of words in the kern table. \\
-$ng=$ number of words in the glue table. \\
-$np=$ number of font parameter words. \\
+  $\size{id}=$ JFM\_ID number. ($=11$ for yoko, $9$ for tate) \\
+  $\size{nt}=$ number of words in the character type table. \\
+  $\size{lf}=$ length of the entire file, in words. \\
+  $\size{lh}=$ length of the header data, in words. \\
+  $\size{bc}=$ smallest character type in the font. ($=0$ for JFM) \\
+  $\size{ec}=$ largest character type in the font. \\
+  $\size{nw}=$ number of words in the width table. \\
+  $\size{nh}=$ number of words in the height table. \\
+  $\size{nd}=$ number of words in the depth table. \\
+  $\size{ni}=$ number of words in the italic correction table. \\
+  $\size{nl}=$ number of words in the glue/kern table. \\
+  $\size{nk}=$ number of words in the kern table. \\
+  $\size{ng}=$ number of words in the glue table. \\
+  $\size{np}=$ number of font parameter words. \\
 \end{tabular}
 \end{minipage}
 \caption{JFMファイルの構成\label{構成}}
 \end{table}
 \MakeShortVerb*{|}
+
 \end{document}
