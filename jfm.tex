@@ -226,10 +226,14 @@ JFMでは$\size{bc}$は必ずゼロ\footnote{前節にある通り，文字コ�
     和文文字と欧文文字間に挿入するグルー(|\xkanjiskip|)のデフォルト値．
 \end{description}
 \begin{dangerous}
-このように書かれているが，実際には\pTeX で（明示的に|\fontdimen|で
-取得する場合を除き）JFMの\node{param}テーブルの値が用いられることはなく，
+このように書かれているが，実際には
 \pTeX のzwは「文字タイプ0の文字の幅」，
 \pTeX のzhは「文字タイプ0の文字の高さと深さの和」である．
+明示的に|\fontdimen|で取得する場合を除くと，JFMの\node{param}テーブルの
+値が用いられる状況は限られている．
+% [TODO] 例えばいつ？
+% ptex-manual によると，\accent で和文文字をアクセントにした場合の
+% 上下位置補正に \fontdimen5 の値が用いられるらしい．他には？
 \end{dangerous}
 
 \newpage
