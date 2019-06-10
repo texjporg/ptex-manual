@@ -46,7 +46,7 @@ TFMを拡張した形になっている．
 \TeX\ the program等のTFMの説明を参照してもらいたい．
 
 JFMファイル全体の構成は，
-Table~\ref{構成}（\pageref{構成}ページ）に示すとおりである．
+表\ref{構成}（\pageref{構成}ページ）に示すとおりである．
 ここでTFMと異なるのは次の点である．
 \begin{enumerate}
 \item \node{char\_type}のテーブルが付け加えられたこと．
@@ -236,9 +236,9 @@ JFMでは$\size{bc}$は必ずゼロ\footnote{前節にある通り，文字コ�
 % 上下位置補正に \fontdimen5 の値が用いられるらしい．他には？
 \end{dangerous}
 
-\newpage
 \DeleteShortVerb{|}
-\begin{table}[h]\small
+\begin{table}[tbp]\small
+\caption{JFMファイルの構成\label{構成}}
 \begin{minipage}[b]{2in}
 \begin{tabular}{|c|c|} \hline
 \hbox to.8in{\hfil$\size{id}$\hfil} &
@@ -303,8 +303,22 @@ $\size{ng}$ & $\size{np}$ \\ \hline
   $\size{np}=$ number of font parameter words. \\
 \end{tabular}
 \end{minipage}
-\caption{JFMファイルの構成\label{構成}}
 \end{table}
 \MakeShortVerb*{|}
+
+
+\section{JFMを扱うプログラム}
+
+\pTeX と\upTeX ，あるいはそれらが生成したDVIを扱うプログラムが
+JFMを扱うのは当然であるが，ここではJFMおよび関連するフォントフォーマットを
+扱うことに特化したプログラムの主なものを挙げる．
+
+\subsection{pPLtoTF, upPLtoTF}
+
+\subsection{pTFtoPL, upTFtoPL}
+
+\subsection{chkdvifont}
+
+\subsection{jfmutil}
 
 \end{document}
