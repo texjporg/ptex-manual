@@ -58,8 +58,7 @@
 \catcode`\<=13
 \title{\emph{\pTeX マニュアル}}
 \author{日本語\TeX 開発コミュニティ\null
-\thanks{\url{https://texjp.org},\ 
-e-mail: \texttt{issue(at)texjp.org}}}
+\thanks{\url{https://texjp.org},\ e-mail: \texttt{issue(at)texjp.org}}}
 \date{version p\the\ptexversion.\the\ptexminorversion\ptexrevision，\today}
 \maketitle
 
@@ -256,8 +255,8 @@ DVIファイル内の和文文字コードとしてはJISコードを出力す�
   \ar@(d,r)[]_{1,2,9\tign,J}
   \ar[d]_-{5,14}
   &*\txt{}\\
-  *\txt{}&*\txt{}&*\txt{}&*\txt{}  
-%  
+  *\txt{}&*\txt{}&*\txt{}&*\txt{}
+%
 }
 \]
 \begin{itemize}
@@ -269,10 +268,10 @@ DVIファイル内の和文文字コードとしてはJISコードを出力す�
   \item 図中央の「制御綴読み取り」の後で$S$,~$M$どちらの状態になるかは，
   次のように決まっている：
   \begin{itemize}
-	\item 制御綴が「|\ |」のようなカテゴリーコード10の文字
-	からなるコントロールシンボルのときは状態$S$に遷移する．
-	\item 制御綴が「|\#|」「|\】|」のようなその他のコントロールシンボルのときは状態$M$に遷移する．
-	\item 制御綴がコントロールワードのときは状態$S$に遷移する．
+    \item 制御綴が「|\ |」のようなカテゴリーコード10の文字
+    からなるコントロールシンボルのときは状態$S$に遷移する．
+    \item 制御綴が「|\#|」「|\】|」のようなその他のコントロールシンボルのときは状態$M$に遷移する．
+    \item 制御綴がコントロールワードのときは状態$S$に遷移する．
   \end{itemize}
 \end{itemize}
 \caption{\pTeX の入力プロセッサの状態遷移図}
@@ -290,11 +289,11 @@ DVIファイル内の和文文字コードとしてはJISコードを出力す�
     バージョンp3.7.2以前の\pTeX では「|\】 |」と後ろに余計な空白文字を補ってしまうという問題があった．
     \TeX~Live 2018の\pTeX~p3.8.1でこの問題は修正された(\cite{build37})．
 
-	また，バージョンp3.8.1以前では
-	「|\】|」のような和文のコントロールシンボルで行が終わった場合，「|\!|」のような
-	欧文コントロールシンボルと同様に改行由来の空白が追加されてしまい，
-	和文文字直後の改行は何も発生しないという原則に反していたが，
-	こちらは\TeX~Live 2019の\pTeX~p3.8.2で修正された(\cite{build37})．
+    また，バージョンp3.8.1以前では
+    「|\】|」のような和文のコントロールシンボルで行が終わった場合，「|\!|」のような
+    欧文コントロールシンボルと同様に改行由来の空白が追加されてしまい，
+    和文文字直後の改行は何も発生しないという原則に反していたが，
+    こちらは\TeX~Live 2019の\pTeX~p3.8.2で修正された(\cite{build37})．
   }．
   \item 後で説明する|\jcharwidowpenalty|は，カテゴリーコードが16,~17の和文文字の前にのみ
     挿入されうるもので，カテゴリーコードが18の和文文字の前には挿入されない．
@@ -310,12 +309,12 @@ DVIファイル内の和文文字コードとしてはJISコードを出力す�
   日本語\TeX 開発コミュニティ版の\pTeX では，和文文字のカテゴリーコード(|\kcatcode|)は
   DVI中の上位バイトごと（すなわち，JISコードでいう区ごと）に値が設定可能である
   \footnote{%
-	オリジナルのASCII~\pTeX では，内部コードの上位バイトごとに値が設定可能であった．
-	すなわち，内部コードがEUC-JPのときは区ごとに設定可能であったが，
-	内部コードがShift-JISのときは
-	$2n-1$区・$2n$区($1≦n≦47$)区は同一のカテゴリーコードを持つことになる．
+    オリジナルのASCII~\pTeX では，内部コードの上位バイトごとに値が設定可能であった．
+    すなわち，内部コードがEUC-JPのときは区ごとに設定可能であったが，
+    内部コードがShift-JISのときは
+    $2n-1$区・$2n$区($1≦n≦47$)は同一のカテゴリーコードを持つことになる．
   }．
-  
+
   \pTeX においては，|\kcatcode|を初期状態
   （1,~2, 7--15, 85--94区の文字の|\kcatcode|は18，3--6区の文字は17，
   16--84区の文字は16）から変更することは想定されていない．
@@ -511,7 +510,7 @@ DVIファイル内の和文文字コードとしてはJISコードを出力す�
 \csitem[\.{xkanjiskip}=<skip>]
   和文文字と欧文文字の間に標準で入るグルーを設定する．
   段落途中でこの値を変えても影響はなく，
-  段落終了時の値が段落全体にわたって用いられる．  
+  段落終了時の値が段落全体にわたって用いられる．
 \end{cslist}
 \begin{dangerous}
   |\kanjiskip|と異なり，|\xkanjiskip|はノードの形で挿入される．
@@ -604,10 +603,10 @@ DVIファイル内の和文文字コードとしてはJISコードを出力す�
   \TeX~Live 2019の\pTeX~p3.8.2以降では，明確に\emph{新たなノードが追加されない限り}，と
   定めた(\cite{build28,forum_2566})．すなわち，
   \begin{enumerate}
-	\item |\inhibitglue|は，ノード挿入処理を行う命令
-	(|\null|,~|\hskip|, |\kern|, |\vrule|,~\dots)が後ろに来た場合は無効化される．
-	\item 一方，|\relax|やレジスタへの代入などのノードを作らない処理では無効化されない．
-	\item |\inhibitglue|の効果は別レベルのリストには波及しない．
+    \item |\inhibitglue|は，ノード挿入処理を行う命令
+    (|\null|,~|\hskip|, |\kern|, |\vrule|,~\dots)が後ろに来た場合は無効化される．
+    \item 一方，|\relax|やレジスタへの代入などのノードを作らない処理では無効化されない．
+    \item |\inhibitglue|の効果は別レベルのリストには波及しない．
   \end{enumerate}
 \end{cslist}
 \begin{dangerous}
@@ -729,15 +728,15 @@ DtoU方向での数式ディレクションはそれぞれ非数式の場合と�
   での実行は禁止．
 
   \item 外部垂直モードの場合は，次の2点が同時に満たされる場合のみ実行可能である
-	\footnote{%
-	\TeX は，外部垂直モードでボックスその他のノードを追加する際に，まず
-	そのノードをrecent contributionsというリストの末尾に追加し，
-	その後recent contributionsの中身が徐々にcurrent pageという別のリストに移される
-	という処理を行っている．
+    \footnote{%
+    \TeX は，外部垂直モードでボックスその他のノードを追加する際に，まず
+    そのノードをrecent contributionsというリストの末尾に追加し，
+    その後recent contributionsの中身が徐々にcurrent pageという別のリストに移される
+    という処理を行っている．
 
-	そのため，単純にcurrent pageまたはrecent contributionsという1つのリストを
-	調べるだけでは「ページが空」か正しく判断できない．
-	}．
+    そのため，単純にcurrent pageまたはrecent contributionsという1つのリストを
+    調べるだけでは「ページが空」か正しく判断できない．
+    }．
   \begin{itemize}
     \item current pageの中身にはボックス，罫線(|\hrule|)，
       insertion~(|\insert|)はない．
@@ -790,7 +789,7 @@ DtoU方向での数式ディレクションはそれぞれ非数式の場合と�
   （DtoU方向）
 \fi
   \end{verbatim}
-  
+
 \csitem[\.{iftbox} <number>, \.{ifybox} <number>, \.{ifdbox} <number>, \.{ifmbox} <number>]
   <number>番のボックスの組方向を判定する．<number>は有効なboxレジスタでなければならない．
 
@@ -814,11 +813,11 @@ DtoU方向での数式ディレクションはそれぞれ非数式の場合と�
 \csitem[\.{tbaselineshift}=<dimen>, \.{ybaselineshift}=<dimen>]
  指定した箇所以降の欧文文字のベースラインシフト量を格納する．両者の使い分けは
  \begin{description}
-  \item[\texttt{\string\tbaselineshift}] 
-	     縦組用和文フォントが使われるとき（つまり組方向が縦組のとき），
-  \item[\texttt{\string\ybaselineshift}] 
-	     横組用和文フォントが使われるとき（横組，DtoU方向，縦数式ディレクション）
- \end{description} 
+  \item[\texttt{\string\tbaselineshift}]
+         縦組用和文フォントが使われるとき（つまり組方向が縦組のとき），
+  \item[\texttt{\string\ybaselineshift}]
+         横組用和文フォントが使われるとき（横組，DtoU方向，縦数式ディレクション）
+ \end{description}
  となっている．
  どちらの命令においても，
  正の値を指定すると行送り方向（横組ならば下，縦組ならば左）にずらすことになる．
@@ -839,18 +838,17 @@ DtoU方向での数式ディレクションはそれぞれ非数式の場合と�
 \pTeX~p3.7\footnote{\TeX~Live 2016，厳密には2016-03-05のコミット(r39938)．}で追加された．
 \begin{cslist}
  \csitem[\.{textbaselineshiftfactor}=<number>,
-  \.{scriptbaselineshiftfactor}=<number>]
-\vspace{-\itemsep}
+  \.{scriptbaselineshiftfactor}=<number>]\vspace{-\itemsep}
  \csitem[\.{scriptscriptbaselineshiftfactor}=<number>]
-	      文中数式全体にかかるベースライン補正量に対し，
-	      文中数式内の明示的なボックスを逆方向に移動させる割合を指定する．
-	      1000が1倍（ベースライン補正をちょうど打ち消す）に相当する．
+  文中数式全体にかかるベースライン補正量に対し，
+  文中数式内の明示的なボックスを逆方向に移動させる割合を指定する．
+  1000が1倍（ベースライン補正をちょうど打ち消す）に相当する．
 
-	      プリミティブが3つあるのは，数式のスタイルが
-	      |\textstyle|以上（|\displaystyle|含む），|\scriptstyle|, 
-	      |\scriptscriptstyle|のときにそれぞれ
-	      適用される値を変えられるようにするためである．
-	      既定値はそれぞれ1000（1倍），700（0.7倍），500（0.5倍）である．
+  プリミティブが3つあるのは，数式のスタイルが
+  |\textstyle|以上（|\displaystyle|含む），|\scriptstyle|,
+  |\scriptscriptstyle|のときにそれぞれ
+  適用される値を変えられるようにするためである．
+  既定値はそれぞれ1000（1倍），700（0.7倍），500（0.5倍）である．
 \end{cslist}
 
 \TeX~Live 2015以前の動作に戻すには，上記の3プリミティブに全て0を指定すれば良い．
@@ -1017,7 +1015,7 @@ p3.1.2で復活したという経緯がある．}．
 \end{minipage}
 \begin{minipage}{.3\linewidth}
     \newcount\hoge
-    \hoge="2423 
+    \hoge="2423
     \the\hoge, \kansuji\hoge\\
     \jis\hoge, \char\jis\hoge\\
     \kansuji1701
@@ -1117,7 +1115,7 @@ p3.1.2で復活したという経緯がある．}．
 \end{quote}
 
 \begin{dangerous}
-以前の\pTeX では， 
+以前の\pTeX では，
 これらの命令の文字コード部分に和文文字の内部コードを指定することもでき，
 その場合は「引数の上位バイトの値に対する操作」として扱われていた：
 \begin{verbatim}
@@ -1130,7 +1128,7 @@ p3.1.2で復活したという経緯がある．}．
 
 \section{和文に対応したプリミティブ}
 \begin{cslist}
- \csitem[\.{char} <character code>, 
+ \csitem[\.{char} <character code>,
    \.{chardef} <control sequence>=<character code>]
   引数として0--255に加えて和文文字の内部コードも指定できる．
   和文文字の内部コードを指定した場合は和文文字を出力する．
@@ -1148,16 +1146,16 @@ p3.1.2で復活したという経緯がある．}．
   アクセントのつく親文字を和文文字にすることもできる．
  \begin{itemize}
   \item 和文文字をアクセントにした場合，その上下位置が期待されない結果になる
-	可能性が大きい．
-	これは，アクセントの上下位置補正で用いる|\fontdimen5|の値が和文フォントでは
-	特に意味を持たない\footnote{欧文フォントではx-heightである．}ためである．
+    可能性が大きい．
+    これは，アクセントの上下位置補正で用いる|\fontdimen5|の値が和文フォントでは
+    特に意味を持たない\footnote{欧文フォントではx-heightである．}ためである．
   \item 和文文字にアクセントをつけた場合，
-	\begin{itemize}
-	 \item 前側にはJFMグルーや|\kanjiskip|は挿入されない
-	       （ただし|\xkanjiskip|は挿入されうる）．
-	 \item 後側にはJFMグルーは挿入されない
-	       （ただし|\kanjiskip|, |\xkanjiskip|は挿入されうる）．
-	\end{itemize}
+    \begin{itemize}
+     \item 前側にはJFMグルーや|\kanjiskip|は挿入されない
+           （ただし|\xkanjiskip|は挿入されうる）．
+     \item 後側にはJFMグルーは挿入されない
+           （ただし|\kanjiskip|, |\xkanjiskip|は挿入されうる）．
+    \end{itemize}
  \end{itemize}
 
  \csitem[\.{if} <token$_1$> <token$_2$>, \.{ifcat} <token$_1$> <token$_2$>]
