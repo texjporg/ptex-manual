@@ -75,6 +75,8 @@ $\size{nt}$は\node{char\_type}テーブルに登録された文字の数（文�
 $\size{nl}$と$\size{ng}$はそれぞれは\node{glue\_kern}テーブルと
 \node{glue}テーブルのサイズであり，その他の値はTFMを踏襲する．
 
+JFMファイルでもTFMファイルと同じく，拡張子は\code{.tfm}が用いられる．
+
 \subsection{\node{char\_type}テーブル}
 \pTeX では欧文\TeX よりはるかに多くの文字を扱う必要があるが，
 そのほとんどは漢字であり，それらは全て同一の寸法（全角幅）を持つ．
@@ -305,6 +307,15 @@ $\size{ng}$ & $\size{np}$ \\ \hline
 \end{minipage}
 \end{table}
 \MakeShortVerb*{|}
+
+
+\section{JPLファイル}
+
+TFMはバイナリ形式であるが，これをプロパティ（特性）という概念を使って
+テキスト形式で視覚化したものがPL (Property List)ファイルである．
+同様に，JFMをテキスト形式で視覚化したものが
+\emph{JPL (Japanese Property List)}ファイルである．
+JPLファイルでもPLファイルと同じく，拡張子は\code{.pl}が用いられる．
 
 
 \section{JFMを扱うプログラム}
