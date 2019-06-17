@@ -21,6 +21,8 @@
 % common
 \usepackage{ptex-manual}
 
+\def\code#1{\texttt{#1}}
+
 %%%%%%%%%%%%%%%%
 \makeatletter
 \setlist{leftmargin=2zw}
@@ -891,27 +893,32 @@ $10\,\mathrm{pt}-7\,\mathrm{pt}=3\,\mathrm{pt}$だけ上に配置されてしま
 \section{和文フォント}
 \label{sec:ptexfont}
 
+\TeX は組版を行うとき，文字の情報をTFMファイルから参照する．
+\pTeX も同様で，欧文文字についてはTFMファイルを参照するが，
+和文文字についてはJFMファイルを参照する．
+ファイル名はどちらも\code{フォント名.tfm}である．
+
+TFMファイルには，大別すると
+\begin{itemize}
+ \item それぞれの文字に関する事柄
+   （各文字の幅，高さ，深さなど）
+ \item そのTFMファイルに収められている文字に共通する事柄
+   （文字の傾き，デザインサイズ，そのフォントの基準値(em, ex)など）
+ \item 特定の文字の組み合わせのときの事柄
+   （合字やカーニングなど）
+\end{itemize}
+の3種類の情報が設定されている．
+JFMファイルもTFMファイルと同様の情報を持つが，
+\begin{itemize}
+ \item 日本語の文字は数が多いので，
+   文字を単位とするのではなく，共通する性質を持つ文字を
+   一つにまとめてタイプ別の設定を行う
+ \item 横組み用と縦組み用の区別がある
+\end{itemize}
+という点が異なる．JFMフォーマットの詳細は，
+この文書と同じディレクトリにある\cite{jfm}を参照されたい．
+
 \begin{cslist}
-\csitem[\.{jfam}=<number>]
-  現在の和文数式フォントファミリの番号を格納する
-  \footnote{\pTeX,~\upTeX では0--15の範囲が許される．
-  \epTeX, \eupTeX では欧文の|\fam|と共に0--255に範囲が拡張されている．}．
-  現在の欧文数式ファミリの番号を格納する|\fam|と原理的に同じ番号を指定することは
-  原理的には可能だが，数式ファミリは和文・欧文共用であるので実際には
-  異なる値を指定することになる．
-
-  欧文フォントが設定されている数式ファミリの番号を|\jfam|に指定し，
-  数式中で和文文字を記述すると
-\begin{verbatim}
-! Not two-byte family.
-\end{verbatim}
-  というエラーが発生する．逆に，和文フォントが設定されているファミリの番号を
-  |\fam|に指定し，数式中に欧文文字を記述すると
-\begin{verbatim}
-! Not one-byte family.
-\end{verbatim}
-  というエラーが発生する．
-
 \csitem[\.{jfont}, \.{tfont}]
   欧文フォントを定義したり，現在の欧文フォントを取得したりする|\font|の和文版である．
   一応|\jfont|が「和文の横組用フォント」の，|\tfont|が「和文の縦組用フォント」のために
@@ -934,6 +941,26 @@ $10\,\mathrm{pt}-7\,\mathrm{pt}=3\,\mathrm{pt}$だけ上に配置されてしま
   % https://twitter.com/doraTeX/status/1098584763277824000
   % https://twitter.com/zr_tex8r/status/1098594165573722112
 \end{itemize}
+
+\csitem[\.{jfam}=<number>]
+  現在の和文数式フォントファミリの番号を格納する
+  \footnote{\pTeX,~\upTeX では0--15の範囲が許される．
+  \epTeX, \eupTeX では欧文の|\fam|と共に0--255に範囲が拡張されている．}．
+  現在の欧文数式ファミリの番号を格納する|\fam|と原理的に同じ番号を指定することは
+  原理的には可能だが，数式ファミリは和文・欧文共用であるので実際には
+  異なる値を指定することになる．
+
+  欧文フォントが設定されている数式ファミリの番号を|\jfam|に指定し，
+  数式中で和文文字を記述すると
+\begin{verbatim}
+! Not two-byte family.
+\end{verbatim}
+  というエラーが発生する．逆に，和文フォントが設定されているファミリの番号を
+  |\fam|に指定し，数式中に欧文文字を記述すると
+\begin{verbatim}
+! Not one-byte family.
+\end{verbatim}
+  というエラーが発生する．
 \end{cslist}
 
 \section{文字コード変換，漢数字}
@@ -1203,6 +1230,8 @@ has been |\let| equal to a non-active character token.
  \bibitem{topic} Victor Eijkhout, \textit{\TeX\ by Topic, A \TeX nician's Reference},
   Addison-Wesley, 1992.\\
   \url{https://www.eijkhout.net/texbytopic/texbytopic.html}
+ \bibitem{jfm} ASCII Corporation \& Japanese \TeX\ Development Community, 「JFMファイルフォーマット」，
+  \texttt{./jfm.pdf}
  \bibitem{tatemath} aminophen, 「縦数式ディレクションとベースライン補正」，
   2016/09/05,\\
   \url{https://github.com/texjporg/platex/issues/22}
