@@ -52,7 +52,7 @@
 \author{北川 弘典\null
 \thanks{\url{http://osdn.jp/projects/eptex/wiki/},\ 
 e-mail: \texttt{h\_kitagawa2001(at)yahoo.co.jp}}}
-\date{version 190131，\today}
+\date{version 190709，\today}
 \maketitle
 \tableofcontents
 
@@ -241,8 +241,9 @@ tracing機能や条件判断文の強化などあるが，そこら辺はパッ�
 \vskip-\baselineskip
 
 \.{currentiftype}\indcs{currentiftype}における条件判断文とそれを表す数字との対応は，以
-下のようになっている．21--28が，\pTeX 拡張で追加された条件判断文に対応する．
-29の\.{ifpdfprimitive}は\hologo{pdfTeX}由来のプリミティブ（後述）である．
+下のようになっている．
+21,~22は\hologo{pdfTeX}由来の条件判断文（後述），
+23--30が，\pTeX 拡張で追加された条件判断文に対応する．
 \begin{multilist}{3}{\hfil\hskip1.5zw#:&\quad#\qquad\hfil}
 \item 1&\.{if}\cr\item 2&\.{ifcat}\cr\item 3&\.{ifnum}\cr\item 4&\.{ifdim}\cr
 \item 5&\.{ifodd}\cr\item 6&\.{ifvmode}\cr\item 7&\.{ifhmode}\cr
@@ -250,10 +251,10 @@ tracing機能や条件判断文の強化などあるが，そこら辺はパッ�
 \item 11&\.{ifhbox}\cr\item 12&\.{ifvbox}\cr\item 13&\.{ifx}\cr
 \item 14&\.{ifeof}\cr\item 15&\.{iftrue}\cr\item 16&\.{iffalse}\cr
 \item 17&\.{ifcase}\cr\item 18&\.{ifdefined}\cr\item 19&\.{ifcsname}\cr
-\item 20&\.{iffontchar}\cr\item \bf 21&\.{iftdir}\cr\item \bf 22&\.{ifydir}\cr
-\item \bf 23&\.{ifddir}\cr\item \bf 24&\.{ifmdir}\cr\item \bf 25&\.{iftbox}\cr
-\item \bf 26&\.{ifybox}\cr\item \bf 27&\.{ifdbox}\cr\item \bf 28&\.{ifmbox}\cr
-\item \bf 29&\.{ifpdfprimtive}\cr
+\item 20&\.{iffontchar}\cr\item \bf 21&\.{ifincsname}\cr\item \bf 22&\.{ifpdfprimtive}\cr
+\item \bf 23&\.{iftdir}\cr\item \bf 24&\.{ifydir}\cr
+\item \bf 25&\.{ifddir}\cr\item \bf 26&\.{ifmdir}\cr\item \bf 27&\.{iftbox}\cr
+\item \bf 28&\.{ifybox}\cr\item \bf 29&\.{ifdbox}\cr\item \bf 30&\.{ifmbox}\cr
 \end{multilist}
 
 \section{\OMEGA 由来の機能（旧名称：\texttt{FAM256}パッチ）}
@@ -558,6 +559,11 @@ delimiter codeを取得しようとしても，現時点のパッチでは，う
   しかし\cite{expanded1}をきっかけに，
   \hologo{pdfTeX}, \epTeX, \hologo{XeTeX}で一斉に実装された．
   \epTeX~180518以降で利用可能である．
+
+  \csitem[\.{ifincsname}]
+  \texttt{\.{csname}~...~\.{endcsname}}内で評価されたちょうどその時に真となる．
+  \LaTeX~2019--10--01（予定）で行われる変更(\cite{latex95,tjb83})で必要になったために
+  \epTeX~190709で導入された．
 \end{cslist}
 
 \section{バージョン番号}
@@ -914,6 +920,12 @@ $3$\,sp）だが，どこか気になるところである．
 \bibitem{expanded}
   Joseph Wright, ``A `new' primitive: |\expanded|'', 2018/12/06.\\
   \url{https://www.texdev.net/2018/12/06/a-new-primitive-expanded}
+\bibitem{latex95}
+  Volker-Weissmann, ``Feature Request: Better error messages for non-ASCII symbols in labels.'',
+  2018/12/03.\\
+  \url{https://github.com/latex3/latex2e/issues/95}
+\bibitem{tjb83} aminophen，「[e-pTeX] |\ifincsname|」，2019/07/09．\\
+	\url{https://github.com/texjporg/tex-jp-build/issues/83}．
 \end{thebibliography}
 
 \newpage
