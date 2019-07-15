@@ -366,13 +366,14 @@ delimiter codeを取得しようとしても，現時点のパッチでは，う
 実装方法は，大まかには\OMEGA で\texttt{fi}の実装を行っているchange file\
 \texttt{omfi.ch}の通りであるのだが，これに\pTeX や\eTeX に伴う少々の修正を行っている．
 \begin{itemize}
-\item プリミティブ|\pagefistretch|, |\hfi|, |\vfi|を新たに定義している
-\footnote{%
+  \item プリミティブ|\pagefistretch|\indcs{pagefistretch},
+      |\hfi|\indcs{hfi}, |\vfi|\indcs{vfi}を新たに定義している
+    \footnote{%
       |\hfi|, |\vfi|については\cite{omegaman}に記述があるが，
       \TeX~Liveに収録されている$\aleph$（\OMEGA は\TeX~Liveに収録されていない）では
       実装されていない．|\pagefistretch|を実装したのは北川の完全な勘違いである．
-}．
-\item |\gluestretchorder|, |\glueshrinkorder|の動作を\eTeX のそれと合わせた．
+    }．
+  \item |\gluestretchorder|, |\glueshrinkorder|の動作を\eTeX のそれと合わせた．
       具体的には，ある適当なglue~|\someglue|の伸び量を<stretch>とおくとき，
 \[
  \hbox{|\gluestretchorder\someglue|}=
@@ -383,8 +384,8 @@ delimiter codeを取得しようとしても，現時点のパッチでは，う
 3&<stretch>\text{がちょうど\texttt{filll}レベルの無限量}
 \end{cases}
 \]
-となっている．内部では\texttt{fi}レベルが1，\texttt{fil}レベルが2，……として処
-      理している．
+      となっている．内部では\texttt{fi}レベルが1，\texttt{fil}レベルが2，……として
+      処理している．
 \end{itemize}
 
 \paragraph{レジスタについて}
