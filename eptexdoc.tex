@@ -30,6 +30,7 @@
 % logos
 \newcommand{\OMEGA}{$\Omega$}
 \protected\def\epTeX{$\varepsilon$\nobreakdash-\pTeX}
+\protected\def\eupTeX{$\varepsilon$\nobreakdash-\upTeX}
 \protected\def\eTeX{$\varepsilon$\nobreakdash-\TeX}
 \def\upTeX{u\pTeX}\def\pTeX{p\kern-.15em\TeX}
 \def\NTS{\leavevmode\hbox{$\cal N\kern-0.35em\lower0.5ex\hbox{$\cal T$}%
@@ -214,48 +215,102 @@ tracing機能や条件判断文の強化などあるが，そこら辺はパッ�
 の位置がずれたり空白がおかしかったりするけれども，そこの修正は大変に思え
 るし，苦労して実装する意味があるのか疑問なので放置している．
 
-\medskip
+以下，\eTeX 拡張を\pTeX 拡張とマージするにあたって調整した箇所を述べる．
+\begin{cslist}
+ \csitem[\.{lastnodetype}]
+  \pTeX 拡張では，\TeX と比較して\node{dir\_node}と\node{disp\_node}という2種類のノードが
+  追加された．前者は，現在のリストの中に違う組方向のboxを挿入する際に寸法を補正するために作られ，
+  \.{hbox}や\.{vbox}のコンテナとなっている．
+  また後者は，欧文文字のベースライン補正のために使われる．
 
-\pTeX 拡張では，\TeX と比較して\node{dir\_node}と\node{disp\_node}という2種類のノードが
-追加された．前者は，現在のリストの中に違う組方向のboxを挿入する際に寸法を補正するために作られ，
-\.{hbox}や\.{vbox}のコンテナとなっている．
-また後者は，欧文文字のベースライン補正のために使われる．
+  \epTeX~110102まではこれらのノードも\.{lastnodetype}の値として出力させるようにした．
+  しかし，両者ともに\epTeX が自動的に挿入する（ユーザーが意識する必要はない）ノードであることから，
+  \epTeX~110227以降では\node{dir\_node}と\node{disp\_node}は
+  \.{lastnodetype}の対象とする「最後のノード」とはならないようにしている
+  \footnote{%
+    最後のノードが\node{dir\_node}であった場合，\.{lastnodetype}はそのノードが格納している
+    \node{hlist\_node}か\node{vlist\_node}の種類を返す．
+  }．\\
+  \parbox{.9\linewidth}{%
+  \begin{multilist}{3}{\hfil\hskip1.5zw#:&\quad#\qquad\hfil}
+  \item $-1$&none (empty list)\cr\item 0&char node\cr\item 1&hlist node\cr
+  \item 2&vlist node\cr\item 3&rule node\cr\item 4&ins node\cr
+  \item 5&mark node\cr\item 6&adjust node\cr\item 7&ligature node\cr
+  \item 8&disc node\cr\item 9&whatsit node\cr\item 10&math node\cr
+  \item 11&glue node\cr\item 12&kern node\cr\item 13&penalty node\cr
+  \item 14&unset node\cr\item 15&math mode nodes\cr
+  \end{multilist}}
 
-\epTeX~110102 まではこれらのノードも\.{lastnodetype}の値として出力させるようにした．
-しかし，両者ともに\epTeX が自動的に挿入する（ユーザーが意識する必要はない）ノードであることから，
-\epTeX~110227以降では\node{dir\_node}と\node{disp\_node}は
-\.{lastnodetype}\indcs{lastnodetype}の対象とする「最後のノード」とはならないようにしている
-\footnote{%
-  最後のノードが\node{dir\_node}であった場合，\.{lastnodetype}はそのノードが格納している
-  \node{hlist\_node}か\node{vlist\_node}の種類を返す．
-}．
-\begin{multilist}{3}{\hfil\hskip1.5zw#:&\quad#\qquad\hfil}
-\item $-1$&none (empty list)\cr\item 0&char node\cr\item 1&hlist node\cr
-\item 2&vlist node\cr\item 3&rule node\cr\item 4&ins node\cr
-\item 5&mark node\cr\item 6&adjust node\cr\item 7&ligature node\cr
-\item 8&disc node\cr\item 9&whatsit node\cr\item 10&math node\cr
-\item 11&glue node\cr\item 12&kern node\cr\item 13&penalty node\cr
-\item 14&unset node\cr\item 15&math mode nodes\cr
-\end{multilist}
+ \csitem[\.{currentiftype}]
+  条件判断文とそれを表す数字との対応は以下のようになっている
+  （\epTeX~190709以降）．
+  21,~22は\hologo{pdfTeX}由来の条件判断文（後述），
+  23--30が，\pTeX 拡張で追加された条件判断文に対応する．\\
+  \parbox{.9\linewidth}{%
+  \begin{multilist}{3}{\hfil\hskip1.5zw#:&\quad#\qquad\hfil}
+  \item 1&\.{if}\cr\item 2&\.{ifcat}\cr\item 3&\.{ifnum}\cr\item 4&\.{ifdim}\cr
+  \item 5&\.{ifodd}\cr\item 6&\.{ifvmode}\cr\item 7&\.{ifhmode}\cr
+  \item 8&\.{ifmmode}\cr\item 9&\.{ifinner}\cr\item 10&\.{ifvoid}\cr
+  \item 11&\.{ifhbox}\cr\item 12&\.{ifvbox}\cr\item 13&\.{ifx}\cr
+  \item 14&\.{ifeof}\cr\item 15&\.{iftrue}\cr\item 16&\.{iffalse}\cr
+  \item 17&\.{ifcase}\cr\item 18&\.{ifdefined}\cr\item 19&\.{ifcsname}\cr
+  \item 20&\.{iffontchar}\cr\item \bf 21&\.{ifincsname}\cr\item \bf 22&\.{ifpdfprimtive}\cr
+  \item \bf 23&\.{iftdir}\cr\item \bf 24&\.{ifydir}\cr
+  \item \bf 25&\.{ifddir}\cr\item \bf 26&\.{ifmdir}\cr\item \bf 27&\.{iftbox}\cr
+  \item \bf 28&\.{ifybox}\cr\item \bf 29&\.{ifdbox}\cr\item \bf 30&\.{ifmbox}\cr
+  \end{multilist}}
 
-\vskip-\baselineskip
+ \csitem[\.{fontcharwd}, \.{fontcharht}, \.{fontchardp}, \.{fontcharic}]
+  欧文フォントと和文フォントを判別し，それに応じて処理が分かれる．
+  それに伴い，許容される引数範囲と意味が異なることに注意
+  （\epTeX~190709以降）．
+  以下，|??|は|wd|, |ht|, |dp|, |ic|のいずれかを表す．
+  \begin{itemize}
+    \item 和文フォントの場合： |\fontchar??| <Japanese font> <number>\\
+      <Japanese font>を$f$，<number>を$c$とおくと，
+      \begin{itemize}
+        \item $c \geq 0$の場合は，$c$を\emph{文字コード}とみなす．
+          $c$が和文文字コードとして有効であれば，
+          和文フォント$f$における文字コード$c$の和文文字の寸法値を返す．
+          和文文字コードとして無効であれば0を返す．
+        \item $c < 0$の場合は，$-(c+1)$を\emph{文字タイプ}とみなす．
+          和文フォント$f$に文字タイプ$-(c+1)$が定義されていればその寸法値を返し，
+          未定義であれば0を返す．
+      \end{itemize}
+    \item 欧文フォントの場合： |\fontchar??| <font> <8-bit number>\\
+      オリジナルの\eTeX と同じ挙動である．すなわち，
+      引数に$c \geq 256$や$c < 0$を与えると
+      \verb+! Bad character code (256).+
+      のようにエラーが出る．
+  \end{itemize}
 
-\.{currentiftype}\indcs{currentiftype}における条件判断文とそれを表す数字との対応は，以
-下のようになっている．
-21,~22は\hologo{pdfTeX}由来の条件判断文（後述），
-23--30が，\pTeX 拡張で追加された条件判断文に対応する．
-\begin{multilist}{3}{\hfil\hskip1.5zw#:&\quad#\qquad\hfil}
-\item 1&\.{if}\cr\item 2&\.{ifcat}\cr\item 3&\.{ifnum}\cr\item 4&\.{ifdim}\cr
-\item 5&\.{ifodd}\cr\item 6&\.{ifvmode}\cr\item 7&\.{ifhmode}\cr
-\item 8&\.{ifmmode}\cr\item 9&\.{ifinner}\cr\item 10&\.{ifvoid}\cr
-\item 11&\.{ifhbox}\cr\item 12&\.{ifvbox}\cr\item 13&\.{ifx}\cr
-\item 14&\.{ifeof}\cr\item 15&\.{iftrue}\cr\item 16&\.{iffalse}\cr
-\item 17&\.{ifcase}\cr\item 18&\.{ifdefined}\cr\item 19&\.{ifcsname}\cr
-\item 20&\.{iffontchar}\cr\item \bf 21&\.{ifincsname}\cr\item \bf 22&\.{ifpdfprimtive}\cr
-\item \bf 23&\.{iftdir}\cr\item \bf 24&\.{ifydir}\cr
-\item \bf 25&\.{ifddir}\cr\item \bf 26&\.{ifmdir}\cr\item \bf 27&\.{iftbox}\cr
-\item \bf 28&\.{ifybox}\cr\item \bf 29&\.{ifdbox}\cr\item \bf 30&\.{ifmbox}\cr
-\end{multilist}
+ \csitem[\.{iffontchar}]
+  \begin{itemize}
+    \item 和文フォントの場合： |\iffontchar| <Japanese font> <number>\\
+      <Japanese font>を$f$，<number>を$c$とおくと，
+      \begin{itemize}
+        \item $c \geq 0$の場合は$c$を\emph{文字コード}とみなし，
+          $c$が和文文字コードとして有効かどうかを判定する
+          \footnote{\pTeX では「任意の和文フォントには，和文文字コードとして有効な
+          全ての文字が存在する」という扱いであるため，和文フォント$f$によらない．}．
+        \item $c < 0$の場合は$-(c+1)$を\emph{文字タイプ}とみなし，
+          和文フォント$f$に文字タイプ$-(c+1)$が定義されているかどうかを判定する．
+      \end{itemize}
+    \item 欧文フォントの場合： |\iffontchar| <font> <8-bit number>\\
+      オリジナルの\eTeX と同じ挙動である．すなわち，
+      引数に$c \geq 256$や$c < 0$を与えると
+      \verb+! Bad character code (256).+
+      のようにエラーが出る．
+  \end{itemize}
+\end{cslist}
+
+\begin{dangerous}
+  上記で「和文文字コードとして有効かどうか」は，関数|is_char_kanji|を参照．
+  この関数は内部コードによって異なるため，マクロで実装するのは面倒であるが，
+  \epTeX~190709以降では|\iffontchar|で容易に実現できる．
+  なお，\upTeX では任意の非負の値が和文文字コードとして有効なため，
+  |is_char_kanji|は非負かどうかの判定になっている．
+\end{dangerous}
 
 \section{\OMEGA 由来の機能（旧名称：\texttt{FAM256}パッチ）}
 \epTeX には，掲示板\TeX\ Q\ \&\ Aの山本氏の書き込み

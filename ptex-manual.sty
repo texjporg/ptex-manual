@@ -23,12 +23,14 @@
 \def\paragraph#1{\par\medskip\par\noindent\emph{■#1}\par\nobreak}
 
 \def\Pkg#1{\textsf{#1}}
+\let\@lessthan <
 \catcode`\<=13
 \xspcode`\\=3
 \xspcode`\*=3
 \xspcode`\-=3
 \xspcode23=3 % \textcompwordmark
-\def<#1>{\ensuremath{\langle\hbox{\normalfont\textit{#1}}\rangle}}
+\def<{\ifmmode\@lessthan\else\expandafter\@@meta\fi}
+\def\@@meta#1>{\ensuremath{\langle\hbox{\normalfont\textit{#1}}\rangle}}
 \def\hex#1{\ifmmode\mbox\fi{\texttt{"#1}}}%"
 
 \normalsize
