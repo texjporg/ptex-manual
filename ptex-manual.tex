@@ -413,8 +413,47 @@ DVIファイル内の和文文字コードとしてはJISコードを出力す�
 \end{cslist}
 
 |\prebreakpenalty|, |\postbreakpenalty|は
-和文文字，欧文文字の区別無しに指定できるが，同一の文字に対して
-両方のペナルティを同時に与えるような指定はできない
+和文文字，欧文文字の区別無しに指定できる．
+ただし，欧文文字に設定されたこれらのペナルティが実際に挿入されるのは
+以下の場合に限られる（つまり，欧文組版だけの範囲では挿入されない）．
+\begin{itemize}
+  \item 当該の欧文文字の直前が和文文字（後方に禁則ペナルティを伴っても構わない）の
+    場合に限り，その欧文文字に設定された|\postbreakpenalty|を挿入する．
+  \item 当該の欧文文字の直後が和文文字（前方に禁則ペナルティを伴っても構わない）の
+    場合に限り，その欧文文字に設定された|\prebreakpenalty|を挿入する．
+\end{itemize}
+\begin{dangerous}
+上記の「欧文文字に設定された禁則ペナルティが挿入される状況」は
+欧文文字と和文文字の境界であり，
+ベースライン補正（\ref{sec:baselineshift}節を参照）を実現する
+|disp_node|の挿入箇所でもある．
+ベースライン補正がゼロでないとき，|penalty_node|と|disp_node|の
+挿入順序は以下のようにしている． % tex-jp-build@2c83eb0
+\begin{itemize}
+  \item 欧文→和文文字間： |disp_node| → |penalty_node| (\.{postbreakpenalty}) の順
+  \item 和文→欧文文字間： |penalty_node| (\.{prebreakpenalty}) → |disp_node| の順
+\end{itemize}
+\end{dangerous}
+
+\begin{dangerous}
+禁則ペナルティはリスト構築中に自動的に挿入されるので，\.{showlists}で
+\begin{verbatim}
+\penalty 10000(for kinsoku)
+\end{verbatim}
+のように表示される．
+
+また，和文文字の後方に挿入された\.{postbreakpenalty}は
+\.{lastpenalty}で取得できるし，\.{unpenalty}で取り除くこともできる．
+しかし，上述のとおり，欧文文字に設定された\.{postbreakpenalty}は
+後に和文文字が連続して初めて挿入されるため，
+\.{lastpenalty}で取得できないし，\.{unpenalty}で取り除くこともできない．
+
+\.{prebreakpenalty}は和文・欧文によらず，その直後に文字ノードを伴うため，
+原理的に\.{lastpenalty}で取得できないし，\.{unpenalty}で取り除くこともできない．
+\end{dangerous}
+
+同一の文字に対して|\prebreakpenalty|と|\postbreakpenalty|の両方を
+同時に与えるような指定はできない
 （もし両方指定された場合，後から指定されたものに置き換えられる）．
 禁則テーブルには256文字分の領域しかないので，
 禁則ペナルティを指定できる文字数は最大で256文字までである．
@@ -827,6 +866,7 @@ DtoU方向での数式ディレクションはそれぞれ非数式の場合と�
 \end{cslist}
 
 \section{ベースライン補正}
+\label{sec:baselineshift}
 
 和文文字のベースラインと欧文文字のベースラインが一致した状態で組むと，
 行がずれて見えてしまう場合がある．特に縦組の状況が典型的である
