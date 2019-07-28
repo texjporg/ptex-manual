@@ -417,9 +417,9 @@ DVIファイル内の和文文字コードとしてはJISコードを出力す�
 ただし，欧文文字に設定されたこれらのペナルティが実際に挿入されるのは
 以下の場合に限られる（つまり，欧文組版だけの範囲では挿入されない）．
 \begin{itemize}
-  \item 当該の欧文文字の直前が和文文字（後方に禁則ペナルティを伴っても構わない）の
-    場合に限り，その欧文文字に設定された|\postbreakpenalty|を挿入する．
   \item 当該の欧文文字の直後が和文文字（前方に禁則ペナルティを伴っても構わない）の
+    場合に限り，その欧文文字に設定された|\postbreakpenalty|を挿入する．
+  \item 当該の欧文文字の直前が和文文字（後方に禁則ペナルティを伴っても構わない）の
     場合に限り，その欧文文字に設定された|\prebreakpenalty|を挿入する．
 \end{itemize}
 \begin{dangerous}
@@ -443,7 +443,12 @@ DVIファイル内の和文文字コードとしてはJISコードを出力す�
 のように表示される．
 
 また，和文文字の後方に挿入された\.{postbreakpenalty}は
-\.{lastpenalty}で取得できるし，\.{unpenalty}で取り除くこともできる．
+\.{lastpenalty}で取得できるし，\.{unpenalty}で取り除くこともできる
+\footnote{以前の\pTeX では，\.{unpenalty}したはずの
+和文文字の後方の\.{postbreakpenalty}が復活してしまう場合があったが，
+2017-04-06のコミット(r43707)で修正された\cite{build11}．}．
+% ただ，JFMグルーが後方に挿入される和文文字では上手くいかない．
+% https://github.com/texjporg/tex-jp-build/issues/67
 しかし，上述のとおり，欧文文字に設定された\.{postbreakpenalty}は
 後に和文文字が連続して初めて挿入されるため，
 \.{lastpenalty}で取得できないし，\.{unpenalty}で取り除くこともできない．
@@ -1317,6 +1322,9 @@ has been |\let| equal to a non-active character token.
  \bibitem{build57} Man-Ting-Fang, \textit{[upTeX] Unexpected behaviour in kinsoku processing},
   2018/04/13,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/57}
+ \bibitem{build11} aminophen, 「pTeX の後禁則ペナルティ」，
+  2017/04/05,\\
+  \url{https://github.com/texjporg/tex-jp-build/issues/11}
  \bibitem{build28} h-kitagawa, 「[ptex] |\inhibitglue|の効力」，
   2017/09/20,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/28}
