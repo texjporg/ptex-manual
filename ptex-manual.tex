@@ -366,6 +366,7 @@ DVIファイル内の和文文字コードとしてはJISコードを出力す�
 
 % jtex.tex の「ラインブレーク」を簡略化
 \section{禁則}
+\label{sec:kinsoku}
 欧文と和文の処理で見かけ上最も大きな違いは，行分割処理であろう．
 \begin{itemize}
 \item 欧文中での行分割は，ハイフネーション処理等の
@@ -509,7 +510,7 @@ DVIファイル内の和文文字コードとしてはJISコードを出力す�
 \begin{enumerate}
 \item 連続する和文文字間に自動的にグルー（伸縮する空白）を挿入\label{kanjiskip}
 \item 和欧文間に（ソース中に空白文字を含めずとも）自動的にグルーを挿入\label{xkanjiskip}
-\item 和文の約物類にグルーを設定\label{jfmglue}
+\item 和文の約物類にグルーもしくはカーンを設定\label{jfmglue}
 \end{enumerate}
 上記のうち，\ref{kanjiskip}と\ref{xkanjiskip}についてはそれぞれ
 \.{kanjiskip}, \.{xkanjiskip}というパラメータを設けている．
@@ -521,8 +522,22 @@ DVIファイル内の和文文字コードとしてはJISコードを出力す�
  \item メトリック由来空白の挿入処理は展開不能トークンが来たら中断
  \item 展開不能トークンや欧文文字は「文字クラス0」扱い．「\verb+）\relax（+」の例
  \item 禁則ペナルティ（\.{prebreakpenalty}や\.{postbreakpenalty}）と
-  メトリック由来空白が同じ箇所に発行される場合は，
-  禁則ペナルティ→メトリック由来空白の順に発行される．
+  が同じ箇所に発行される場合は
+  「禁則ペナルティ→JFM由来空白」の順に発行される．
+ \item より一般に，禁則ペナルティ，JFM由来空白，ベースライン補正，
+  欧文TFM由来カーンが同じ箇所に発行される場合は
+  次の順になる（\ref{sec:kinsoku}節の注意の一般化）．% tex-jp-build/f6f500d or 9e7e21aa
+  \begin{itemize}
+   \item 和文→欧文：禁則ペナルティ→JFM由来空白→ベースライン補正→%
+   欧文TFM由来カーン
+   \item 欧文→和文：ベースライン補正→禁則ペナルティ→JFM由来空白
+   \footnote{[TODO] \TeX~Live~2019の\pTeX~3.8.2では，欧文TFM由来カーンは欧文→和文の
+   切替時には挿入されない．}
+  \end{itemize}
+ \item もし水平ボックス(\.{hbox})や\.{noindent}で開始された段落がJFM由来グルーで始まった
+   場合は，そのグルーは取り除かれる（カーンは除かれない）．
+   また水平ボックスがJFM由来グルーで終了した場合は，そのグルーは自然長・伸び量・縮み量の
+   すべてが0となる．
 \end{itemize}
 
 \begin{cslist}
