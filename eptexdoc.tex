@@ -539,11 +539,17 @@ delimiter codeを取得しようとしても，現時点のパッチでは，う
   
  \csitem[\.{pdfcreationdate}]
   エンジン起動時の時刻を，\texttt{\pdfcreationdate}の形式で表した文字列に展開する．
-  これは\Pkg{standalone}パッケージを\epTeX で扱うために2013/06/05に実装されたプリミティブであるが，
-  現在時刻の「秒」まで得るためにも使用できる（\TeX 82では分単位でしか取得できない）．
-  
+  末尾に|+09'00'|などと表示されるのはローカルのタイムゾーンであるが，
+  例えば|SOURCE_DATE_EPOCH=1000000000|のように環境変数を設定すると
+  |D:20010909014640Z|のようにタイムゾーンは|Z|と表示される．
+  % [TODO] |FORCE_SOURCE_DATE|が0か1かは関係する？
+  % https://tug.org/pipermail/tex-live/2018-November/042575.html
+
   \epTeX においてプリミティブを実装した当初は「最初にこのプリミティブが実行された時刻を…」と
   していたが，\epTeX~161030から\hologo{pdfTeX}と同じ挙動に修正した．
+
+  これは\Pkg{standalone}パッケージを\epTeX で扱うために2013/06/05に実装されたプリミティブであるが，
+  現在時刻の「秒」まで得るためにも使用できる（\TeX 82では分単位でしか取得できない）．
 
  \csitem[\.{pdffilemoddate} <filename>, \.{pdffilesize} <filename>]
   それぞれ<filename>の更新時刻（\.{pdfcreationdate}と同じ形式）と
