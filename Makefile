@@ -43,7 +43,6 @@ install:
 	mkdir -p ${TEXMF}/doc/ptex/ptex-manual
 	cp ./LICENSE ${TEXMF}/doc/ptex/ptex-manual/
 	cp ./README* ${TEXMF}/doc/ptex/ptex-manual/
-	cp ./Makefile ${TEXMF}/doc/ptex/ptex-manual/
 	cp ./*.tex ${TEXMF}/doc/ptex/ptex-manual/
 	cp ./*.pdf ${TEXMF}/doc/ptex/ptex-manual/
 clean:
