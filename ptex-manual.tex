@@ -1237,7 +1237,11 @@ p3.1.2で復活したという経緯がある．}．
  |\lccode|,
  |\uccode|
 \end{quote}
-
+違反すると
+\begin{verbatim}
+! Bad character code (42146).
+\end{verbatim}
+というエラーが発生する．
 \begin{dangerous}
 以前の\pTeX では，
 これらの命令の文字コード部分に和文文字の内部コードを指定することもでき，
@@ -1248,6 +1252,18 @@ p3.1.2で復活したという経緯がある．}．
 しかしこの挙動は2016-09-06のコミット(r41998)により禁止され，
 \TeX~Live 2017の\pTeX~(p3.7.1)で反映されている．
 \end{dangerous}
+
+また，下記のプリミティブは名称が|\...char|であるが，値は0--255の範囲のみ
+有効であり，256以上あるいは負の値を指定すると無視される
+（オリジナルの\TeX 同様，エラーにはならない）．
+\begin{quote}
+ |\endlinechar|,
+ |\newlinechar|,
+ |\escapechar|,\\
+ |\defaulthyphenchar|,
+ |\defaultskewchar|
+\end{quote}
+
 % 他にもあるか？
 
 \section{和文に対応したプリミティブ}
