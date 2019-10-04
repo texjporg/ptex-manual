@@ -1,0 +1,171 @@
+%#!make ptex-manual.pdf
+\documentclass[a4paper,11pt]{article}
+\usepackage[textwidth=42zw,lines=40,truedimen,centering]{geometry}
+
+%%%%%%%%%%%%%%%%
+% additional packages
+\usepackage{amsmath}
+\usepackage{array}\usepackage[all]{xy}
+\SelectTips{cm}{}
+%\usepackage[dvipdfmx]{graphicx}
+\usepackage[T1]{fontenc}
+\usepackage{booktabs,enumitem,multicol}
+\usepackage[defaultsups]{newpxtext}
+\usepackage[zerostyle=c,straightquotes]{newtxtt}
+\usepackage{newpxmath}
+\usepackage[dvipdfmx,hyperfootnotes=false]{hyperref}
+\usepackage{pxjahyper}
+\usepackage{hologo}
+\usepackage{makeidx}\makeindex
+
+% common
+\usepackage{ptex-manual}
+
+\def\code#1{\texttt{#1}}
+
+%%%%%%%%%%%%%%%%
+\makeatletter
+\setlist{leftmargin=2zw}
+\setlist[description]{labelwidth=2zw,labelindent=1zw,topsep=\medskipamount}
+
+\def\>{\ifhmode\hskip\xkanjiskip\fi}
+
+\def\tsp{_{\mbox{\fontsize\sf@size\z@\ttfamily \char32}}}
+\def\tpar{_{\mbox{\fontsize\sf@size\z@\ttfamily \string\par}}}
+\def\tign{_{\mbox{\fontsize\sf@size\z@\selectfont --}}}
+
+\usepackage{shortvrb}
+\MakeShortVerb*{|}
+%%%%%%%%%%%%%%%%
+
+% logos
+\def\epTeX{$\varepsilon$-\pTeX}\def\eTeX{$\varepsilon$-\TeX}
+\def\eupTeX{$\varepsilon$-\upTeX}\def\upTeX{u\pTeX}
+\def\pTeX{p\kern-.10em\TeX}
+
+\def\_{\leavevmode\vrule width .45em height -.2ex depth .3ex\relax}
+
+\frenchspacing
+\begin{document}
+\catcode`\<=13
+\title{\emph{\pTeX\ manual}}
+\author{Japanese \TeX\ Development Community\null
+\thanks{\url{https://texjp.org},\ e-mail: \texttt{issue(at)texjp.org}}}
+\date{version p\the\ptexversion.\the\ptexminorversion\ptexrevision, \today}
+\maketitle
+
+\pTeX\ is a \TeX\ engine with native Japanese support.
+% [TODO] Mention difference between \pTeX, \upTeX, \epTeX\ and \eupTeX.
+Its output is always a DVI file, which can be processed by several
+DVI drivers with Japanese support including {\em dvips} and {\em dvipdfmx}).
+
+Note: This English edition (ptex-manual-en.pdf) is {\em not} meant
+to be a complete translation of Japanese edition (ptex-manual.pdf).
+We hope that this document helps authors of packages or classes
+to support Japanese-enabled engines.
+
+\tableofcontents
+
+\newpage
+
+%%%%%
+\part{Japanese Typesetting with \pTeX\ and additional primitives}
+
+\newpage
+
+%%%%%
+\part{Compatibility with original \TeX}
+
+\section{Primitives with limitations in handling Japanese}
+
+Each of the following primitives allows only character codes 0--255;
+other codes will give an error ``! Bad character code.''
+\begin{quote}
+ |\catcode|,
+ |\sfcode|,
+ |\mathcode|,
+ |\delcode|,
+ |\mathchardef|,
+ |\lccode|,
+ |\uccode|.
+\end{quote}
+
+Each of the following primivies has |\...char| in its name,
+however, the effective values are restricted to 0--255.
+\begin{quote}
+ |\endlinechar|,
+ |\newlinechar|,
+ |\escapechar|,\\
+ |\defaulthyphenchar|,
+ |\defaultskewchar|.
+\end{quote}
+
+\section{Primitives capable of handling Japanese}
+
+The following primitives are extended to support Japanese characters:
+\begin{cslist}
+ \csitem[\.{char} <character code>,
+   \.{chardef} <control sequence>=<character code>]
+  In addition to 0--255, internal codes of Japanese characters are allowed.
+  For putting Japanese characters, a Japanese font is chosen.
+
+ \csitem[\.{font}, \.{fontname}, \.{fontdimen}]
+  % [TODO]
+
+ \csitem[\.{accent} <character code>=<character>]
+  % [TODO]
+
+ \csitem[\.{if} <token$_1$> <token$_2$>, \.{ifcat} <token$_1$> <token$_2$>]
+  Japanese character token is also allowed.
+  In that case,
+  \begin{itemize}
+    \item |\if| tests the internal character code of the Japanese character.
+    \item |\ifcat| tests the |\kcatcode| of the Japanese character.
+  \end{itemize}
+\end{cslist}
+
+\begin{dangerous}
+\TeX book describes the behavior of |\if| and |\ifcat| as follows;
+\begin{quote}
+If either token is a control sequence,
+\TeX\ considers it to have character code 256 and category code 16,
+unless the current equivalent of that control sequence
+has been |\let| equal to a non-active character token.
+\end{quote}
+However, this includes a lie; in the real implementation of tex.web,
+a control sequence is considered to have a category code 0.
+\end{dangerous}
+
+\newpage
+
+%%%%%
+\part{DVI drivers with Japanese support}
+
+Nowadays most of casual Japanese users are using {\em dvipdfmx} as a DVI driver.
+On the other hand, users of {\em dvips} are unignorable, especially those
+working in publishing industry.
+
+\section{Using {\em dvipdfmx}}
+
+A DVI file which is output by \pTeX\ can be converted directly to a PDF file
+using dvipdfmx.
+% [TODO] Mention kanji-config-updmap for font setup
+
+\section{Using {\em dvips}}
+
+A DVI file which is output by \pTeX\ can be converted to a PostScript file
+using dvips.
+% [TODO] Mention kanji-config-updmap again
+
+The resulting PostScript file can then be converted to
+a PDF file using Ghostscript (ps2pdf) or Adobe Distiller.
+When using Ghostscript, a proper setup of Japanese font must be done
+before converting PostScript into PDF.
+An easy solution for the setup is a script ``cjk-gs-integrate''
+developed by Japanese \TeX\ Development Community.
+
+\newpage
+\printindex
+
+
+\end{document}
