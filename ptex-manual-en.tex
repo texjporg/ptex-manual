@@ -42,6 +42,7 @@
 \def\epTeX{$\varepsilon$-\pTeX}\def\eTeX{$\varepsilon$-\TeX}
 \def\eupTeX{$\varepsilon$-\upTeX}\def\upTeX{u\pTeX}
 \def\pTeX{p\kern-.10em\TeX}
+\def\pLaTeX{p\LaTeX}\def\upLaTeX{u\pLaTeX}
 
 \def\_{\leavevmode\vrule width .45em height -.2ex depth .3ex\relax}
 
@@ -57,7 +58,7 @@
 \pTeX\ is a \TeX\ engine with native Japanese support.
 % [TODO] Mention difference between \pTeX, \upTeX, \epTeX\ and \eupTeX.
 Its output is always a DVI file, which can be processed by several
-DVI drivers with Japanese support including {\em dvips} and {\em dvipdfmx}).
+DVI drivers with Japanese support including {\em dvips} and {\em dvipdfmx}.
 
 Note: This English edition (ptex-manual-en.pdf) is {\em not} meant
 to be a complete translation of Japanese edition (ptex-manual.pdf).
@@ -150,6 +151,21 @@ working in publishing industry.
 A DVI file which is output by \pTeX\ can be converted directly to a PDF file
 using dvipdfmx.
 % [TODO] Mention kanji-config-updmap for font setup
+
+{\em Note for casual \LaTeX\ users} ---
+when you choose to process the resulting DVI file with dvipdfmx
+after running \LaTeX\ (command |platex| or |uplatex|),
+you need to pass a proper driver option |[dvipdfmx]| for
+all driver-dependent packages, such as |graphicx| and |color|.
+This is because the default for such packages is set to |dvips| mode
+as with the original \LaTeX\ in DVI mode (command |latex|).
+For simplicity, we recommend a global driver option |[dvipdfmx]|
+as in the following example:
+\begin{verbatim}
+  \documentclass[dvipdfmx,...]{article}
+  \usepackage{graphicx}
+  \usepackage{color}
+\end{verbatim}
 
 \section{Using {\em dvips}}
 
