@@ -43,41 +43,291 @@
 \def\eupTeX{$\varepsilon$-\upTeX}\def\upTeX{u\pTeX}
 \def\pTeX{p\kern-.10em\TeX}
 \def\pLaTeX{p\LaTeX}\def\upLaTeX{u\pLaTeX}
+\def\pdfTeX{pdf\TeX}
 
 \def\_{\leavevmode\vrule width .45em height -.2ex depth .3ex\relax}
 
 \frenchspacing
 \begin{document}
 \catcode`\<=13
-\title{\emph{\pTeX\ manual}}
+\title{\emph{Guide of \pTeX\ for developers not interested in Japanese}}
 \author{Japanese \TeX\ Development Community\null
 \thanks{\url{https://texjp.org},\ e-mail: \texttt{issue(at)texjp.org}}}
 \date{version p\the\ptexversion.\the\ptexminorversion\ptexrevision, \today}
 \maketitle
 
-\pTeX\ is a \TeX\ engine with native Japanese support.
-% [TODO] Mention difference between \pTeX, \upTeX, \epTeX\ and \eupTeX.
+\pTeX\ and its variants, \upTeX, \epTeX\ and \eupTeX, are all \TeX\ engines
+with native Japanese support.
 Its output is always a DVI file, which can be processed by several
 DVI drivers with Japanese support including {\em dvips} and {\em dvipdfmx}.
+Formats based on \LaTeX\ is called \pLaTeX\ when running on \pTeX/\epTeX,
+and called \upLaTeX\ when running on \upTeX/\eupTeX.
 
+%%% Target readers of this document: 日本語機能でないパッケージ作者に絞る
+\section*{Purpose of this document}
+
+This document is written for developers of \TeX/\LaTeX, who aim to
+support \pTeX/\pLaTeX\ and its variants \upTeX/\upLaTeX.
+Knowledge of the followings are assumed:
+\begin{itemize}
+  \item Basic knowledge of Western \TeX\ (Knuthian \TeX, \eTeX\ and \pdfTeX),
+  \item ... and its programming conventions.
+\end{itemize}
+
+%%% 日本語（の組版・文字コード）の知識は要らない。その話はできる限り避ける
+Any knowledge of Japanese (characters, encodings, typesetting conventions etc.)
+is not assumed; some explanations are provided in this document when needed.
+We hope that this document helps authors of packages or classes
+to proceed with supporting \pTeX\ family smoothly.
+
+\begin{quotation}
 Note: This English edition (ptex-manual-en.pdf) is {\em not} meant
 to be a complete translation of Japanese edition (ptex-manual.pdf).
-We hope that this document helps authors of packages or classes
-to support Japanese-enabled engines.
+For example, this document does not cover the following aspects of \pTeX:
+\begin{itemize}
+  \item Typesetting conventions of Japanese characters
+  \item Details of vertical writing
+\end{itemize}
+For beginners of writing Japanese texts,
+please refer to the Japanese edition.
+\end{quotation}
 
 \tableofcontents
 
-\newpage
-
-%%%%%
-\part{Japanese Typesetting with \pTeX\ and additional primitives}
 
 \newpage
 
-%%%%%
-\part{Compatibility with original \TeX}
 
-\section{Primitives with limitations in handling Japanese}
+%%%%%
+\part{Brief introduction}% 概論
+
+%%% pTeX とその仲間
+\section{\pTeX\ and its variants}
+
+% [TODO] \pTeX, \upTeX, \epTeX, \eupTeX を簡単に紹介
+
+%%% e-(u)pTeX の話がメイン
+There is no advantage to choose \pTeX/\upTeX\ over \epTeX/\eupTeX,
+so we focus mainly on \epTeX/\eupTeX.
+
+% [TODO] pLaTeX/upLaTeX も e- で走っていて，これで十分であると付け加える
+% [TODO] 既に pTeX/upTeX が暗に e-pTeX/e-upTeX を指す文献もあることに言及
+
+%%% 欧文 TeX との互換性
+\section{Compatibility with Western \TeX}
+
+%%% pTeX/upTeX は Knuthian TeX に対してほぼ上位互換
+\pTeX/\upTeX\ are almost uppercompatible with Knuthian \TeX,
+however, they do not pass TRIP test.
+%%% 入力の8bitの扱いが異なる。フォントの8bitはそのまま
+In \pTeX/\upTeX, input handling is different from Knuthian \TeX;
+if a pair of two or more 8-bit codes matches Japanese character code,
+it is regarded as one Japanese character.
+There is no difference in handling 8-bit TFM font.
+
+%%% e-pTeX/e-upTeX は e-TeX に対してほぼ上位互換
+\epTeX/\eupTeX\ are almost uppercompatible with \eTeX,
+however, input handling is similar to \pTeX/\upTeX.
+It does not pass e-TRIP test.
+%%% だけど e-TeX はもうなく，pdfTeX の DVI モードがあるだけ
+That said, please note that ``raw \eTeX'' is unavailable anymore
+in \TeX\ Live and derived distributions;
+they provide a command |etex| only as ``DVI mode of \pdfTeX.''
+%%% e-pTeX/e-upTeX は pdfTeX の DVI モードに対して上位互換ではない
+We should note that
+\epTeX/\eupTeX\ are {\em not} uppercompatible with DVI mode of \pdfTeX,
+which will be discussed later in section \ref{dvi-pdftex}.
+
+%%% LaTeX ムニャムニャ
+\section{\LaTeX\ on \pTeX/\upTeX}
+
+%%% pLaTeX と upLaTeX ムニャムニャ
+Formats based on \LaTeX\ is called \pLaTeX\ when running on \pTeX/\epTeX,
+and called \upLaTeX\ when running on \upTeX/\eupTeX.
+In recent versions (around 2011) of \TeX\ Live and its derivatives,
+the default engines of \pLaTeX\ and \upLaTeX\ are \epTeX\ and \eupTeX.
+That is, the command |platex| starts \epTeX\ (not \pTeX) with
+preloaded format |platex.fmt|.
+
+%%% カーネルが拡張されている
+In the kernel level (|platex.ltx| and |uplatex.ltx|),
+\pLaTeX\ and \upLaTeX\ adds some additional commands
+related to the followings:
+\begin{itemize}
+  \item Selection of Japanese fonts
+  \item Crop marks (called ``tombow'') for printings
+  \item Adjustment for mixing horizontal and vertical texts
+\end{itemize}
+%%% author レベルでは LaTeX とほぼ互換，ただし例外あり
+For authors, \pLaTeX/\upLaTeX\ is almost uppercompatible with
+original \LaTeX, except for the followings:
+\begin{itemize}
+  \item Order of float objects; in \pLaTeX/\upLaTeX,
+    <bottom float> is placed above <footnote>.
+    That is, the complete order is
+    <top float> $\rightarrow$ <body text> $\rightarrow$
+    <bottom float> $\rightarrow$ <footnote>.
+  % [TODO] 他にもあるか？
+\end{itemize}
+%%% developer レベルでは pdfTeX 拡張や pLaTeX カーネルでムニャムニャ
+For developers, additional cares may be needed,
+for changes in the kernel macros and/or absence of \pdfTeX\ features.
+
+%%% 際立った pTeX 系列の特徴
+\section{Eminent characteristics of \pTeX/\upTeX}
+
+The most important characteristics of \pTeX/\upTeX\ can be
+summarized as follows:
+%%% 欧文と和文が別個に存在する・縦組がある
+\begin{itemize}
+  \item Japanese characters are interpret and handled completely apart from
+    Western characters.
+  \item Texts can be aligned vertically, called ``tate-gumi'' (縦組).
+    The horizontal alignment of texts is called ``yoko-gumi'' (横組),
+    and both ``tate-gumi'' and ``yoko-gumi'' can be mixed
+    even within a single document.
+\end{itemize}
+
+
+\newpage
+
+
+%%%%%
+\part{Details}% 各論
+
+%%% 出力フォーマット
+\section{Output format --- DVI}
+
+%%% DVI だけ
+The output of \pTeX/\upTeX\ is always a DVI file.
+%%% pTeX の DVI は欧文の横組みだけなら普通。和文が入ると特殊，縦組ならIDも変化
+Its DVI format is completely compatible with Knuthian \TeX,
+as long as the following conditions are met:
+\begin{itemize}
+  \item No Japanese characters are typeset.
+  \item There is no portion of vertical text alignment.
+\end{itemize}
+
+\subsection{Extensions of DVI format}
+
+In \pTeX/\upTeX,
+some additional DVI commands that is defined in the standard \cite{dvistd0}
+but never used in \TeX82 are used.
+\begin{itemize}
+  \item |set2| (129), |put2| (134):
+    Appears in both \pTeX\ and \upTeX\ DVI.
+    Used to typeset a Japanese character with 2-byte code. 
+  \item |set3| (130), |put3| (135): Appears in only \upTeX\ DVI.
+    Used to typeset a Japanese character with 3-byte code.
+  \item |dir| (255):
+    Appears in both \pTeX\ and \upTeX\ DVI.
+    Used to change directions of text alignment.
+\end{itemize}
+
+When \pTeX\ is going to typeset a Japanese character into DVI,
+it is encoded in JIS, which is always a 2-byte code.
+For this purpose, |set2| or |put2| are used.
+When \upTeX\ is going to output a Japanese character into DVI,
+it is encoded in UTF-32.
+If the code is equal to or less than |U+FFFF|,
+the lower 16-bit is used with |set2| or |put2|.
+If the code is equal to or greater than |U+10000|,
+the lower 24-bit is used with |set3| or |put3|.
+
+The DVI format in the preamble is always set to 2, as with \TeX82.
+On the other hand, the DVI ID in the postamble can be special.
+Normally it is set to 2, as with \TeX82; however,
+when |dir| (255) appears at least once in a single \pTeX/\upTeX\ DVI,
+the |post_post| table of postamble contains $\mathrm{ID} = 3$.
+
+%%% 日本の DVI ドライバの状況
+\subsection{DVI drivers with Japanese support}
+
+There is some DVI drivers with Japanese support.
+The most eminent drivers are {\em dvips} and {\em dvipdfmx}.
+Nowadays most of casual Japanese users are using {\em dvipdfmx} as a DVI driver.
+On the other hand, users of {\em dvips} are unignorable, especially those
+working in publishing industry.
+
+\subsubsection{Using {\em dvipdfmx}}
+
+A DVI file which is output by \pTeX\ can be converted directly to a PDF file
+using dvipdfmx.
+% [TODO] Mention kanji-config-updmap for font setup
+
+{\em Note for casual \LaTeX\ users} ---
+when you choose to process the resulting DVI file with dvipdfmx
+after running \LaTeX\ (command |platex| or |uplatex|),
+you need to pass a proper driver option |[dvipdfmx]| for
+all driver-dependent packages, such as |graphicx| and |color|.
+This is because the default for such packages is set to |dvips| mode
+as with the original \LaTeX\ in DVI mode (command |latex|).
+For simplicity, we recommend a global driver option |[dvipdfmx]|
+as in the following example:
+\begin{verbatim}
+  \documentclass[dvipdfmx,...]{article}
+  \usepackage{graphicx}
+  \usepackage{color}
+\end{verbatim}
+
+\subsubsection{Using {\em dvips}}
+
+A DVI file which is output by \pTeX\ can be converted to a PostScript file
+using dvips.
+% [TODO] Mention kanji-config-updmap again
+
+The resulting PostScript file can then be converted to
+a PDF file using Ghostscript (ps2pdf) or Adobe Distiller.
+When using Ghostscript, a proper setup of Japanese font must be done
+before converting PostScript into PDF.
+An easy solution for the setup is a script ``cjk-gs-integrate''
+developed by Japanese \TeX\ Development Community.
+
+\section{Programming on \pTeX\ family}
+
+We focus on programming aspects of \pTeX\ and its variants.
+
+%%% レジスタの数
+\subsection{Number of registers}
+
+\pTeX\ and \upTeX\ have exactly the same number of registers
+as Knuthian \TeX.
+\epTeX\ and \eupTeX\ in extended mode have more registers.
+
+% [TODO] まとめて 65536 個と書いて良い？ レジスタの種類毎に書くべき？
+
+%%% 拡張プリミティブ
+\subsection{Additional primitives}
+
+Here we provide only complete lists of additional primitives of \pTeX\ family.
+Feature of each primitive can be found in Japanese edition.
+
+%%% pTeX のやつ
+%%% upTeX のやつ
+%%% e-pTeX/e-upTeX の pdfTeX 由来
+%%% e-pTeX/e-upTeX の Omega 由来
+%%% その他の独自拡張
+
+% [TODO] 引数は何で返り値は何か，expandable?
+
+%%% (e-)TeX にあるが (e-)upTeX にないもの
+\subsection{Omitted primitives and unsupported features}
+
+Compared to Knuthian \TeX\ and \eTeX,
+some primitives are omitted due to conflict with Japanese handling.
+%%% encTeX 拡張など
+One is enc\TeX\ extension, such as |\mubyte|.
+The ML\TeX\ extension, such as |\charsubdef| is included, but not well-tested.
+%%% コマンドラインオプションの話
+
+% [TODO] ptex.man1.pdf も参照
+
+\subsection{Behavior of Western \TeX\ primitives}
+
+Here we provide some notes on behavior of Knuthian \TeX\ and \eTeX\ primitives
+when used within \pTeX\ family.
+
+\subsubsection{Primitives with limitations in handling Japanese}
 
 Each of the following primitives allows only character codes 0--255;
 other codes will give an error ``! Bad character code.''
@@ -96,12 +346,12 @@ however, the effective values are restricted to 0--255.
 \begin{quote}
  |\endlinechar|,
  |\newlinechar|,
- |\escapechar|,\\
+ |\escapechar|,
  |\defaulthyphenchar|,
  |\defaultskewchar|.
 \end{quote}
 
-\section{Primitives capable of handling Japanese}
+\subsubsection{Primitives capable of handling Japanese}
 
 The following primitives are extended to support Japanese characters:
 \begin{cslist}
@@ -137,48 +387,92 @@ However, this includes a lie; in the real implementation of tex.web,
 a control sequence is considered to have a category code 0.
 \end{dangerous}
 
-\newpage
+\subsection{Case study}
 
-%%%%%
-\part{DVI drivers with Japanese support}
+Based on the above knowledge, we provide some code examples
+which may be useful for package developers.
 
-Nowadays most of casual Japanese users are using {\em dvipdfmx} as a DVI driver.
-On the other hand, users of {\em dvips} are unignorable, especially those
-working in publishing industry.
+%%% pTeX かどうかの判定
+\subsubsection{Detecting \pTeX}
 
-\section{Using {\em dvipdfmx}}
-
-A DVI file which is output by \pTeX\ can be converted directly to a PDF file
-using dvipdfmx.
-% [TODO] Mention kanji-config-updmap for font setup
-
-{\em Note for casual \LaTeX\ users} ---
-when you choose to process the resulting DVI file with dvipdfmx
-after running \LaTeX\ (command |platex| or |uplatex|),
-you need to pass a proper driver option |[dvipdfmx]| for
-all driver-dependent packages, such as |graphicx| and |color|.
-This is because the default for such packages is set to |dvips| mode
-as with the original \LaTeX\ in DVI mode (command |latex|).
-For simplicity, we recommend a global driver option |[dvipdfmx]|
-as in the following example:
+Since the primitive |\ptexversion| is rather new (added in 2018),
+the safer solution for detecting \pTeX\ is
+to test if a primitive |\kanjiskip| is defined.
 \begin{verbatim}
-  \documentclass[dvipdfmx,...]{article}
-  \usepackage{graphicx}
-  \usepackage{color}
+  \ifx\kanjiskip\undefined
+    % not pTeX, upTeX, e-pTeX and e-upTeX
+  \else
+    % pTeX, upTeX, e-pTeX and e-upTeX
+  \fi
 \end{verbatim}
 
-\section{Using {\em dvips}}
+% [TODO] upTeX 系列は \enablecjktoken か \ucs か？
+% [TODO] \forcecjktoken は比較的新しい？
+% [TODO] 内部コードが uptex かどうかの判定
 
-A DVI file which is output by \pTeX\ can be converted to a PostScript file
-using dvips.
-% [TODO] Mention kanji-config-updmap again
+%%% pTeX のバージョン判定
 
-The resulting PostScript file can then be converted to
-a PDF file using Ghostscript (ps2pdf) or Adobe Distiller.
-When using Ghostscript, a proper setup of Japanese font must be done
-before converting PostScript into PDF.
-An easy solution for the setup is a script ``cjk-gs-integrate''
-developed by Japanese \TeX\ Development Community.
+%%% pdfTeX と違うところ
+\subsection{Difference from \pdfTeX\ in DVI mode}\label{dvi-pdftex}
+
+As stated above,
+\epTeX/\eupTeX\ are {\em not} uppercompatible with DVI mode of \pdfTeX.
+
+%%% pdfTeX の DVI モードにあって e-(u)pTeX にないプリミティブ
+%%% その他ムニャムニャ
+
+%%% ファイルの文字コードはどうするか
+\subsection{Recommendation for file encoding}
+
+%%% 全部アスキーにしてしまえ
+%%% UTF-8 にしたい場合はムニャムニャ
+%%% \epTeXinputencoding を使う話
+
+%%% e-upTeX の入力解析：euc/sjis を語りたくないので utf8.uptex 前提
+\subsection{Input handling}
+
+For simplicity, first we introduce of input handling of \eupTeX.
+
+%%% 文字の和文扱い・欧文扱い
+%%% 和文カテゴリーコード
+%%% \...cjktoken
+%%% ちなみに e-pTeX では：euc/sjis があることにだけ触れる
+
+%%% e-upTeX の和文トークンの話：和文トークンが混ざっているので注意
+\subsection{Japanese tokens}
+
+%%% 和文組版の厳選トピック
+\section{Basic introduction to Japanese typesetting}
+
+%%% 和文をやり過ごすために注意すべきこと
+This section does not aim to explain Japanese typesetting completely;
+here we provide a minimum requirement for ``getting away'' with Japanese.
+
+%%% 空白・ペナルティ挿入：勝手に入ってくる！
+\subsection{Automatic insertion of glues and penalties}
+
+Sometimes \pTeX\ family automatically inserts glues and penalties
+between characters.
+% [TODO] もう少しだけ詳しく
+
+%%% 和文フォント
+\subsection{Japanese fonts}
+
+For typesetting Japanese characters, a JFM (Japanese \TeX\ font metric)
+format is used. It is a modified version of \TeX\ TFM.
+
+%%% 欧文とは別個
+%%% \nullfont しても全部消えない
+
+%%% 縦組は諦めよう
+
+\newpage
+
+\begin{thebibliography}{99}
+ \bibitem{dvistd0} TUG DVI Standards Working Group,
+  \textit{The DVI Driver Standard, Level 0}.\\
+  \url{https://ctan.org/pkg/dvistd}
+\end{thebibliography}
 
 \newpage
 \printindex
