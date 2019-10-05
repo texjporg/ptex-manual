@@ -50,6 +50,7 @@
   \bgroup\textcompwordmark\noautoxspacing\noautospacing}{}{}
 \patchcmd\verb@egroup{\egroup}{\egroup\textcompwordmark}{}{}
 
+\ifx\jsc@clsname\@undefined\else % jsclasses-specific
 \renewenvironment{theindex}{%
     \def\presectionname{}\def\postsectionname{}%
     \section*{\indexname}
@@ -64,6 +65,7 @@
     \end{multicols}
     \clearpage
   }
+\fi
 
 % multilist env.
 \newenvironment{multilist}[2]%

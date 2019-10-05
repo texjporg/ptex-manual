@@ -1,4 +1,5 @@
-DOCTARGET = ptex-manual eptexdoc jfm
+DOCTARGET = ptex-manual eptexdoc jfm \
+	ptex-manual-en
 # following documents are not maintained anymore;
 # even some descriptions might be different from
 # current status of pTeX
@@ -20,6 +21,14 @@ ptex-manual.dvi: ptex-manual.tex
 #	makeindex -s gind.ist -o ptex-manual.ind ptex-manual.idx
 	mendex -U -s gind.ist -o ptex-manual.ind ptex-manual.idx
 	platex $(KANJI) ptex-manual.tex
+	rm -f *.aux *.log *.toc *.idx *.ind *.ilg *.out
+
+ptex-manual-en.dvi: ptex-manual-en.tex
+	platex $(KANJI) ptex-manual-en.tex
+	platex $(KANJI) ptex-manual-en.tex
+#	makeindex -s gind.ist -o ptex-manual-en.ind ptex-manual-en.idx
+	mendex -U -s gind.ist -o ptex-manual-en.ind ptex-manual-en.idx
+	platex $(KANJI) ptex-manual-en.tex
 	rm -f *.aux *.log *.toc *.idx *.ind *.ilg *.out
 
 eptexdoc.dvi: eptexdoc.tex fam256p.tex fam256d.tex
