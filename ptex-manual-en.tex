@@ -139,7 +139,7 @@ We should note that
 which will be discussed later in section \ref{dvi-pdftex}.
 
 %%% LaTeX ムニャムニャ
-\section{\LaTeX\ on \pTeX/\upTeX}
+\section{\LaTeX\ on \pTeX/\upTeX\ --- \pLaTeX/\upLaTeX}
 
 %%% pLaTeX と upLaTeX ムニャムニャ
 Formats based on \LaTeX\ is called \pLaTeX\ when running on \pTeX/\epTeX,
@@ -217,11 +217,9 @@ but never used in \TeX82 are used.
   \item |set2| (129), |put2| (134):
     Appears in both \pTeX\ and \upTeX\ DVI.
     Used to typeset a Japanese character with 2-byte code. 
-  \item |set3| (130), |put3| (135): Appears in only \upTeX\ DVI.
+  \item |set3| (130), |put3| (135):
+    Appears in only \upTeX\ DVI.
     Used to typeset a Japanese character with 3-byte code.
-  \item |dir| (255):
-    Appears in both \pTeX\ and \upTeX\ DVI.
-    Used to change directions of text alignment.
 \end{itemize}
 
 When \pTeX\ is going to typeset a Japanese character into DVI,
@@ -234,6 +232,11 @@ the lower 16-bit is used with |set2| or |put2|.
 If the code is equal to or greater than |U+10000|,
 the lower 24-bit is used with |set3| or |put3|.
 
+In addition, \pTeX/\upTeX\ defines one additional DVI command.
+\begin{itemize}
+  \item |dir| (255):
+    Used to change directions of text alignment.
+\end{itemize}
 The DVI format in the preamble is always set to 2, as with \TeX82.
 On the other hand, the DVI ID in the postamble can be special.
 Normally it is set to 2, as with \TeX82; however,
