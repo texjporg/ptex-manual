@@ -21,6 +21,16 @@
 % common
 \usepackage{ptex-manual}
 
+\makeatletter
+\newlist{simplelist}{description}1
+\setlist[simplelist]{%
+  itemsep=0pt, listparindent=1zw, itemindent=10pt,
+  font=\normalfont\mdseries, leftmargin=2zw,
+  before=\advance\@listdepth\@ne,
+  after=\advance\@listdepth\m@ne
+}
+\makeatother
+
 \def\code#1{\texttt{#1}}
 
 %%%%%%%%%%%%%%%%
@@ -44,6 +54,8 @@
 \def\pTeX{p\kern-.10em\TeX}
 \def\pLaTeX{p\LaTeX}\def\upLaTeX{u\pLaTeX}
 \def\pdfTeX{pdf\TeX}
+\def\OMEGA{$\Omega$}
+\def\TL{\TeX\ Live\ }
 
 \def\_{\leavevmode\vrule width .45em height -.2ex depth .3ex\relax}
 
@@ -211,8 +223,8 @@ as long as the following conditions are met:
 \subsection{Extensions of DVI format}
 
 In \pTeX/\upTeX,
-some additional DVI commands that is defined in the standard \cite{dvistd0}
-but never used in \TeX82 are used.
+some additional DVI commands, which are defined in the
+standard \cite{dvistd0} but never used in \TeX82, are used.
 \begin{itemize}
   \item |set2| (129), |put2| (134):
     Appears in both \pTeX\ and \upTeX\ DVI.
@@ -221,7 +233,6 @@ but never used in \TeX82 are used.
     Appears in only \upTeX\ DVI.
     Used to typeset a Japanese character with 3-byte code.
 \end{itemize}
-
 When \pTeX\ is going to typeset a Japanese character into DVI,
 it is encoded in JIS, which is always a 2-byte code.
 For this purpose, |set2| or |put2| are used.
@@ -293,23 +304,134 @@ We focus on programming aspects of \pTeX\ and its variants.
 %%% レジスタの数
 \subsection{Number of registers}
 
-\pTeX\ and \upTeX\ have exactly the same number of registers
+\pTeX\ and \upTeX\ have exactly the same number ($=256$) of registers
 as Knuthian \TeX.
-\epTeX\ and \eupTeX\ in extended mode have more registers.
+\epTeX\ and \eupTeX\ in extended mode have more registers;
+there are 65536, which is twice as many as 32768 of \eTeX.
 
 % [TODO] まとめて 65536 個と書いて良い？ レジスタの種類毎に書くべき？
 
 %%% 拡張プリミティブ
 \subsection{Additional primitives}
 
-Here we provide only complete lists of additional primitives of \pTeX\ family.
+Here we provide only complete lists of additional primitives
+of \pTeX\ family in alphabetical order.
 Feature of each primitive can be found in Japanese edition.
 
+% [TODO] 抜けがないか？
+% [TODO] アルファベット順に正しく並んでいるか？
+% [TODO] 追加されたバージョン情報は正しいか？
+
+\def\New#1{--- New primitive since #1}
+
 %%% pTeX のやつ
+\subsubsection{\pTeX\ additions (available in \pTeX, \upTeX, \epTeX, \eupTeX)}
+\begin{simplelist}
+ \csitem[\.{autospacing}]
+ \csitem[\.{autoxspacing}]
+ \csitem[\.{disinhibitglue} \New{p3.8.2 (\TL2019)}]
+ \csitem[\.{dtou}]
+ \csitem[\.{euc}]
+ \csitem[\.{ifdbox} \New{p3.2 (\TL2011)}]
+ \csitem[\.{ifddir} \New{p3.2 (\TL2011)}]
+ \csitem[\.{ifmbox} \New{p3.7.1 (\TL2017)}]
+ \csitem[\.{ifmdir}]
+ \csitem[\.{iftbox}]
+ \csitem[\.{iftdir}]
+ \csitem[\.{ifybox}]
+ \csitem[\.{ifydir}]
+ \csitem[\.{inhibitglue}]
+ \csitem[\.{inhibitxspcode}]
+ \csitem[\.{jcharwidowpenalty}]
+ \csitem[\.{jfam}]
+ \csitem[\.{jfont}]
+ \csitem[\.{jis}]
+ \csitem[\.{kanjiskip}]
+ \csitem[\.{kansuji}]
+ \csitem[\.{kansujichar}]
+ \csitem[\.{kcatcode}]
+ \csitem[\.{kuten}]
+ \csitem[\.{noautospacing}]
+ \csitem[\.{noautoxspacing}]
+ \csitem[\.{postbreakpenalty}]
+ \csitem[\.{prebreakpenalty}]
+ \csitem[\.{ptexminorversion} \New{p3.8.0 (\TL2018)}]
+ \csitem[\.{ptexrevision} \New{p3.8.0 (\TL2018)}]
+ \csitem[\.{ptexversion} \New{p3.8.0 (\TL2018)}]
+ \csitem[\.{scriptbaselineshiftfactor} \New{p3.7 (\TL2016)}]
+ \csitem[\.{scriptscriptbaselineshiftfactor} \New{p3.7 (\TL2016)}]
+ \csitem[\.{showmode}]
+ \csitem[\.{sjis}]
+ \csitem[\.{tate}]
+ \csitem[\.{tbaselineshift}]
+ \csitem[\.{textbaselineshiftfactor} \New{p3.7 (\TL2016)}]
+ \csitem[\.{tfont}]
+ \csitem[\.{xkanjiskip}]
+ \csitem[\.{xspcode}]
+ \csitem[\.{ybaselineshift}]
+ \csitem[\.{yoko}]
+ \csitem[\texttt{H}\index{H=\texttt{H}}]
+ \csitem[\texttt{Q}\index{Q=\texttt{Q}}]
+ \csitem[\texttt{zh}\index{zh=\texttt{zh}}]
+ \csitem[\texttt{zw}\index{zw=\texttt{zw}}]
+\end{simplelist}
+
 %%% upTeX のやつ
+\subsubsection{\upTeX\ additions (available in \upTeX, \eupTeX)}
+\begin{simplelist}
+ \csitem[\.{disablecjktoken}]
+ \csitem[\.{enablecjktoken}]
+ \csitem[\.{forcecjktoken}]
+ \csitem[\.{kchar}]
+ \csitem[\.{kchardef}]
+ \csitem[\.{ucs}]
+ \csitem[\.{uptexrevision} \New{u1.23 (\TL2018)}]
+ \csitem[\.{uptexversion} \New{u1.23 (\TL2018)}]
+\end{simplelist}
+
 %%% e-pTeX/e-upTeX の pdfTeX 由来
 %%% e-pTeX/e-upTeX の Omega 由来
 %%% その他の独自拡張
+\subsubsection{\epTeX\ additions (available in \epTeX, \eupTeX)}
+\begin{simplelist}
+ \csitem[\.{epTeXinputencoding} \New{160201 (\TL2016)}]
+ \csitem[\.{epTeXversion} \New{180121 (\TL2018)}]
+ \csitem[\.{expanded} \New{180518 (\TL2019)}]
+ \csitem[\.{hfi}]
+ \csitem[\.{ifincsname} \New{190709 (\TL2020)}]
+ \csitem[\.{ifpdfprimitive} \New{150805 (\TL2016)}]
+ \csitem[\.{lastnodechar} \New{141108 (\TL2015)}]
+ \csitem[\.{lastnodesubtype} \New{180226 (\TL2018)}]
+ \csitem[\.{odelcode}]
+ \csitem[\.{odelimiter}]
+ \csitem[\.{omathaccent}]
+ \csitem[\.{omathchar}]
+ \csitem[\.{omathchardef}]
+ \csitem[\.{omathcode}]
+ \csitem[\.{oradical}]
+ \csitem[\.{pagefistretch}]
+ \csitem[\.{pdfcreationdate} \New{130605 (\TL2014)}]
+ \csitem[\.{pdfelapsedtime} \New{161114 (\TL2017)}]
+ \csitem[\.{pdffiledump} \New{140506 (\TL2015)}]
+ \csitem[\.{pdffilemoddate} \New{130605 (\TL2014)}]
+ \csitem[\.{pdffilesize} \New{130605 (\TL2014)}]
+ \csitem[\.{pdflastxpos}]
+ \csitem[\.{pdflastypos}]
+ \csitem[\.{pdfmdfivesum} \New{150702 (\TL2016)}]
+ \csitem[\.{pdfnormaldeviate} \New{161114 (\TL2017)}]
+ \csitem[\.{pdfpageheight}]
+ \csitem[\.{pdfpagewidth}]
+ \csitem[\.{pdfprimitive} \New{150805 (\TL2016)}]
+ \csitem[\.{pdfrandomseed} \New{161114 (\TL2017)}]
+ \csitem[\.{pdfresettimer} \New{161114 (\TL2017)}]
+ \csitem[\.{pdfsavepos}]
+ \csitem[\.{pdfsetrandomseed} \New{161114 (\TL2017)}]
+ \csitem[\.{pdfshellescape} \New{141108 (\TL2015)}]
+ \csitem[\.{pdfstrcmp}]
+ \csitem[\.{pdfuniformdeviate} \New{161114 (\TL2017)}]
+ \csitem[\.{readpapersizespecial} \New{180901 (\TL2019)}]
+ \csitem[\.{vfi}]
+\end{simplelist}
 
 % [TODO] 引数は何で返り値は何か，expandable?
 
