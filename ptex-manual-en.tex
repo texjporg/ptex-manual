@@ -294,7 +294,7 @@ The resulting PostScript file can then be converted to
 a PDF file using Ghostscript (ps2pdf) or Adobe Distiller.
 When using Ghostscript, a proper setup of Japanese font must be done
 before converting PostScript into PDF.
-An easy solution for the setup is a script ``cjk-gs-integrate''
+An easy solution for the setup is a script |cjk-gs-integrate|
 developed by Japanese \TeX\ Development Community.
 
 \section{Programming on \pTeX\ family}
@@ -333,8 +333,14 @@ Feature of each primitive can be found in Japanese edition.
 
 \def\New#1{--- New primitive since #1}
 
+\subsubsection{Sync\TeX\ additions (available in \pTeX, \upTeX, \epTeX, \eupTeX)}
+In the standard build of \TL, Sync\TeX\ extension is unavailable in
+Knuthian \TeX; however, it is enabled in \pTeX\ family.
+\begin{simplelist}
+ \csitem[\.{synctex}]
+\end{simplelist}
+
 %%% pTeX のやつ
-% [TODO] tex -ini と ptex -ini の差が 44 なのにリストは 43 ??? -> \synctex !!!
 \subsubsection{\pTeX\ additions (available in \pTeX, \upTeX, \epTeX, \eupTeX)}
 \begin{simplelist}
  \csitem[\.{autospacing}]
