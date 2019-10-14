@@ -412,8 +412,8 @@ delimiter codeを取得しようとしても，現時点のパッチでは，う
 \paragraph{無限のレベル}
 \TeX では，glueの伸縮量に\texttt{fil}, \texttt{fill}, \texttt{filll}
 という3つの無限大のレベルが存在し，\texttt{l}が多いほど無限大のオーダーが高くなっていた．
-\OMEGA では，「inter-letter spacingのために」\texttt{fi}という，有限と
-\texttt{fil}の中間にあたる無限大のレベルが付け加えられた．そこで，この無限大レベル
+\OMEGA では，「inter-letter spacingのために」\texttt{fi}\index{fi=\texttt{fi}}という，
+有限と\texttt{fil}の中間にあたる無限大のレベルが付け加えられた．そこで，この無限大レベル
 \texttt{fi}も採用することにした．
 
 \medskip
@@ -428,7 +428,8 @@ delimiter codeを取得しようとしても，現時点のパッチでは，う
       \TeX~Liveに収録されている$\aleph$（\OMEGA は\TeX~Liveに収録されていない）では
       実装されていない．|\pagefistretch|を実装したのは北川の完全な勘違いである．
     }．
-  \item |\gluestretchorder|, |\glueshrinkorder|の動作を\eTeX のそれと合わせた．
+  \item |\gluestretchorder|\indcs{gluestretchorder},
+      |\glueshrinkorder|\indcs{glueshrinkorder}の動作を\eTeX のそれと合わせた．
       具体的には，ある適当なglue~|\someglue|の伸び量を<stretch>とおくとき，
 \[
  \hbox{|\gluestretchorder\someglue|}=
