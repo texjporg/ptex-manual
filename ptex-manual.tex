@@ -1120,6 +1120,15 @@ p3.1.2で復活したという経緯がある．}．
   基本的にこのエラーは発生しない．}．
 \end{cslist}
 
+\begin{dangerous}
+  |\kansujichar|は整数値パラメータであるが，p3.8.2までは
+  「代入できるが取得はできない」という挙動であった
+  （例えば|\count255=\kansujichar1|はエラー）．
+  \pTeX~p3.8.3で取得もできるように修正された(\cite{build93})が，
+  以前の\pTeX も考慮すると，値の取得は以下のようにするのが安全である：
+  |\count255=\expandafter`\kansuji1|
+\end{dangerous}
+
 % luatexja.dtx より pTeX 用に移植
 \begin{dangerous}
   以上に挙げたプリミティブ(|\kuten|, |\jis|, |\euc|, |\sjis|, |\kansuji|)は
@@ -1363,6 +1372,9 @@ has been |\let| equal to a non-active character token.
  \bibitem{build36} aminophen, 「欧文文字の|\kansujichar|，|\inhibitxspcode|」，
   2017/11/26,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/36}
+ \bibitem{build93} aminophen, 「[ptex] reading |\kansujichar|」，
+  2019/10/14,\\
+  \url{https://github.com/texjporg/tex-jp-build/issues/93}
  \bibitem{build37} aminophen, 「和文のコントロールシンボル」，
   2017/11/29,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/37}
