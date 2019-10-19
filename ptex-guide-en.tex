@@ -302,14 +302,33 @@ developed by Japanese \TeX\ Development Community.
 We focus on programming aspects of \pTeX\ and its variants.
 
 %%% レジスタの数
-\subsection{Number of registers}
+\subsection{Number of registers and marks}
 
 \pTeX\ and \upTeX\ have exactly the same number ($=256$) of registers
-as Knuthian \TeX.
+(count, dimen, skip, muskip, box, and token) as Knuthian \TeX.
 \epTeX\ and \eupTeX\ in extended mode have more registers;
 there are 65536, which is twice as many as 32768 of \eTeX.
+Similarly \epTeX\ and \eupTeX\ have 65536 mark classes,
+which is twice as many as 32768 of \eTeX.
 
-% [TODO] まとめて 65536 個と書いて良い？ レジスタの種類毎に書くべき？
+The following code presents an example of detecting the number of
+regsiters and mark classes available:
+\begin{verbatim}
+  \ifx\eTeXversion\undefined
+    % Knuthian TeX, pTeX, upTeX:
+    %   256 registers, 1 mark
+  \else
+    \ifx\omathchar\undefined
+      % e-TeX, pdfTeX (in extended mode):
+      %   32768 registers, 32768 mark classes
+    \else
+      % e-pTeX, e-upTeX (in extended mode):
+      %   65536 registers, 65536 mark classes
+    \fi
+  \fi
+\end{verbatim}
+Here a primitive \.{omathchar}, which is derived from \OMEGA, is used
+as a marker of a change file \code{fam256.ch}.
 
 %%% 拡張プリミティブ
 \subsection{Additional primitives}
@@ -525,7 +544,7 @@ If either token is a control sequence,
 unless the current equivalent of that control sequence
 has been |\let| equal to a non-active character token.
 \end{quote}
-However, this includes a lie; in the real implementation of tex.web,
+However, this includes a lie; in the real implementation of \code{tex.web},
 a control sequence is considered to have a category code 0.
 \end{dangerous}
 
