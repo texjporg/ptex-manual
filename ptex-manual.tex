@@ -424,6 +424,7 @@ DVIファイル内の和文文字コードとしてはJISコードを出力す�
   \item 当該の欧文文字の直前が和文文字（後方に禁則ペナルティを伴っても構わない）の
     場合に限り，その欧文文字に設定された|\prebreakpenalty|を挿入する．
 \end{itemize}
+\iffalse %%%%% TL2019-hack
 \begin{dangerous}
 上記の「欧文文字に設定された禁則ペナルティが挿入される状況」は
 欧文文字と和文文字の境界であり，
@@ -436,6 +437,7 @@ DVIファイル内の和文文字コードとしてはJISコードを出力す�
   \item 和文→欧文文字間： |penalty_node| (\.{prebreakpenalty}) → |disp_node| の順
 \end{itemize}
 \end{dangerous}
+\fi %%%%% TL2019-hack
 
 \begin{dangerous}
 禁則ペナルティはリスト構築中に自動的に挿入されるので，\.{showlists}で
@@ -525,6 +527,7 @@ DVIファイル内の和文文字コードとしてはJISコードを出力す�
  \item 禁則ペナルティ（\.{prebreakpenalty}や\.{postbreakpenalty}）と
   が同じ箇所に発行される場合は
   「禁則ペナルティ→JFM由来空白」の順に発行される．
+\iffalse %%%%% TL2019-hack
  \item より一般に，禁則ペナルティ，JFM由来空白，ベースライン補正，
   欧文TFM由来カーンが同じ箇所に発行される場合は
   次の順になる（\ref{sec:kinsoku}節の注意の一般化）．% tex-jp-build/f6f500d or 9e7e21aa
@@ -535,6 +538,7 @@ DVIファイル内の和文文字コードとしてはJISコードを出力す�
    \footnote{[TODO] \TeX~Live~2019の\pTeX~3.8.2では，欧文TFM由来カーンは欧文→和文の
    切替時には挿入されない．}% tex-jp-build/78c8605 で解決
   \end{itemize}
+\fi %%%%% TL2019-hack
  \item もし水平ボックス(\.{hbox})や\.{noindent}で開始された段落がJFM由来グルーで始まった
    場合は，そのグルーは取り除かれる（カーンは除かれない）．
    また水平ボックスがJFM由来グルーで終了した場合は，そのグルーは自然長・伸び量・縮み量の
@@ -1124,9 +1128,11 @@ p3.1.2で復活したという経緯がある．}．
   |\kansujichar|は整数値パラメータであるが，p3.8.2までは
   「代入できるが取得はできない」という挙動であった
   （例えば|\count255=\kansujichar1|はエラー）．
+\iffalse %%%%% TL2019-hack
   \pTeX~p3.8.3で取得もできるように修正された(\cite{build93})が，
   以前の\pTeX も考慮すると，値の取得は以下のようにするのが安全である：
   |\count255=\expandafter`\kansuji1|
+\fi %%%%% TL2019-hack
 \end{dangerous}
 
 % luatexja.dtx より pTeX 用に移植
@@ -1372,9 +1378,11 @@ has been |\let| equal to a non-active character token.
  \bibitem{build36} aminophen, 「欧文文字の|\kansujichar|，|\inhibitxspcode|」，
   2017/11/26,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/36}
+\iffalse %%%%% TL2019-hack
  \bibitem{build93} aminophen, 「[ptex] reading |\kansujichar|」，
   2019/10/14,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/93}
+\fi %%%%% TL2019-hack
  \bibitem{build37} aminophen, 「和文のコントロールシンボル」，
   2017/11/29,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/37}
