@@ -519,6 +519,7 @@ The following primitives are extended to support Japanese characters:
    \.{chardef} <control sequence>=<character code>]
   In addition to 0--255, internal codes of Japanese characters are allowed.
   For putting Japanese characters, a Japanese font is chosen.
+  More information can be found in \ref{chardef}.
 
  \csitem[\.{font}, \.{fontname}, \.{fontdimen}]
   % [TODO]
@@ -567,10 +568,56 @@ to test if a primitive |\kanjiskip| is defined.
 \end{verbatim}
 
 % [TODO] upTeX 系列は \enablecjktoken か \ucs か？
-% [TODO] \forcecjktoken は比較的新しい？
 % [TODO] 内部コードが uptex かどうかの判定
 
 %%% pTeX のバージョン判定
+
+%%% 大きな定数を定義する話
+\subsubsection{Defining large integer constants}
+\label{chardef}
+
+According to \cite{topic} (Section 3.3),
+\begin{quote}
+A control sequence that has been defined with a \.{chardef} command
+can also be used as a <number>.
+This fact is used in allocation commands such as |\newbox|.
+Tokens defined with \.{mathchardef} can also be used this way.
+\end{quote}
+Here is the list of primitives which can be used for this purpose
+in \pTeX\ family:
+\begin{simplelist}
+ \csitem[\.{chardef} <control sequence>=<character code>]
+  Defines a control sequence to be a synonym for
+  \.{char} <character code>.
+
+ \csitem[\.{kchardef} <control sequence>=<character code> (for \upTeX/\eupTeX)]
+  Defines a control sequence to be a synonym for
+  \.{kchar} <character code>.
+
+ \csitem[\.{mathchardef} <control sequence>=<15-bit number>]
+  Defines a control sequence to be a synonym for
+  \.{mathchar} <15-bit number>.
+
+ \csitem[\.{omathchardef} <control sequence>=<27-bit number> (for \epTeX/\eupTeX)]
+  Defines a control sequence to be a synonym for
+  \.{omathchar} <27-bit number>.
+\end{simplelist}
+
+The first two (\.{chardef} and \.{kchardef}) are usable only when
+the integer being defined is in the range of valid character codes,
+which is not necessarily continuous (see \ref{kanji-internal}).
+The most efficient and convenient way of defining integer constants
+is as follows:
+\begin{itemize}
+ \item 0--255: \.{chardef}
+   % "FF = 255
+ \item 256--32767: \.{mathchardef}
+   % "7FFF = 32767
+ \item 32768--134217727: \.{omathchardef} (only for \epTeX/\eupTeX)
+   % "7FFFFFF = 134217727
+ \item (optional) 256--2147483647: \.{chardef} (only for \upTeX/\eupTeX)
+   % "7FFFFFFF = 2147483647 (+1 => ! Number too big.)
+\end{itemize}
 
 %%% pdfTeX と違うところ
 \subsection{Difference from \pdfTeX\ in DVI mode}\label{dvi-pdftex}
@@ -624,7 +671,37 @@ format is used. It is a modified version of \TeX\ TFM.
 %%% 欧文とは別個
 %%% \nullfont しても全部消えない
 
+\section{Other strange beasts}
+
 %%% 縦組は諦めよう
+
+% [TODO] どこに書くか困ったので最後に：内部コードのアレな話
+\subsection{Internal kanji encodings}\label{kanji-internal}
+
+The <character code> is a union of the following two:
+\begin{itemize}
+ \item Range of numbers between 0--255, and
+ \item Numbers allowed for internal code of Japanese characters.
+\end{itemize}
+The former is the same as Knuthian \TeX, but the latter is a problem.
+In \upTeX/\eupTeX\ with \code{-kanji-internal=uptex} (default on),
+the range is very simple:
+\[ c \ge 0 \]
+However in \pTeX/\epTeX, only legacy encodings (EUC-JP as |euc|,
+or Shift-JIS as |sjis|) are available for \code{-kanji-internal}.
+In this case, the range can be represented as follows:
+\[
+  c = 256c_1+c_2 (c_i\in C_i)
+\]
+where
+\[
+  \begin{cases}
+    C_1=C_2=\{\hex{a1},\dots,\hex{fe}\} & (\mathtt{euc}), \\
+    C_1=\{\hex{81},\dots,\hex{9f}\}\cup\{\hex{e0},\dots,\hex{fc}\},
+    C_2=\{\hex{40},\dots,\hex{7e}\}\cup\{\hex{80},\dots,\hex{fc}\} & (\mathtt{sjis}).
+  \end{cases}
+\]
+Therefore, the overall range of <character code> is {\em not} continuous.
 
 \newpage
 
@@ -632,6 +709,9 @@ format is used. It is a modified version of \TeX\ TFM.
  \bibitem{dvistd0} TUG DVI Standards Working Group,
   \textit{The DVI Driver Standard, Level 0}.\\
   \url{https://ctan.org/pkg/dvistd}
+ \bibitem{topic} Victor Eijkhout, \textit{\TeX\ by Topic, A \TeX nician's Reference},
+  Addison-Wesley, 1992.\\
+  \url{https://www.eijkhout.net/texbytopic/texbytopic.html}
 \end{thebibliography}
 
 \newpage
