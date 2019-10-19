@@ -850,6 +850,8 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
   現在読み込んでいるファイルの文字コードを<encoding>に変更する．
   実際に変更されるのは「次の行」であり，また現在のファイルからさらに\.{input}等で
   読まれたファイルには効力を及ぼさない．
+  <encoding>の末尾は，空白トークンや展開不能トークンによって区切られる．
+  % [TODO] これで合っていますか？ -- aminophen
 
   <encoding>の値は，基本的には\pTeX の\texttt{-kanji}オプションで指定できる値
   (\texttt{euc}, \texttt{sjis}, \texttt{jis}, \texttt{utf8})である．
