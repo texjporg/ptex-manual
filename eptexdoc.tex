@@ -287,7 +287,7 @@ tracing機能や条件判断文の強化などあるが，そこら辺はパッ�
   （\epTeX~190709以降）．
   以下，|??|は|wd|, |ht|, |dp|, |ic|のいずれかを表す．
   \begin{itemize}
-    \item 和文フォントの場合： |\fontchar??| <Japanese font> <number>\\
+    \item 和文フォントの場合： \.{fontchar??} <Japanese font> <number>\\
       <Japanese font>を$f$，<number>を$c$とおくと，
       \begin{itemize}
         \item $c \geq 0$の場合は，$c$を\emph{文字コード}とみなす．
@@ -298,7 +298,7 @@ tracing機能や条件判断文の強化などあるが，そこら辺はパッ�
           和文フォント$f$に文字タイプ$-(c+1)$が定義されていればその寸法値を返し，
           未定義であれば|0pt|を返す．
       \end{itemize}
-    \item 欧文フォントの場合： |\fontchar??| <font> <8-bit number>\\
+    \item 欧文フォントの場合： \.{fontchar??} <font> <8-bit number>\\
       オリジナルの\eTeX と同じ挙動である．すなわち，
       引数に$c \geq 256$や$c < 0$を与えると
       \verb+! Bad character code (256).+
@@ -307,7 +307,7 @@ tracing機能や条件判断文の強化などあるが，そこら辺はパッ�
 
  \csitem[\.{iffontchar}]
   \begin{itemize}
-    \item 和文フォントの場合： |\iffontchar| <Japanese font> <number>\\
+    \item 和文フォントの場合： \.{iffontchar} <Japanese font> <number>\\
       <Japanese font>を$f$，<number>を$c$とおくと，
       \begin{itemize}
         \item $c \geq 0$の場合は$c$を\emph{文字コード}とみなし，
@@ -317,7 +317,7 @@ tracing機能や条件判断文の強化などあるが，そこら辺はパッ�
         \item $c < 0$の場合は$-(c+1)$を\emph{文字タイプ}とみなし，
           和文フォント$f$に文字タイプ$-(c+1)$が定義されているかどうかを判定する．
       \end{itemize}
-    \item 欧文フォントの場合： |\iffontchar| <font> <8-bit number>\\
+    \item 欧文フォントの場合： \.{iffontchar} <font> <8-bit number>\\
       オリジナルの\eTeX と同じ挙動である．すなわち，
       引数に$c \geq 256$や$c < 0$を与えると
       \verb+! Bad character code (256).+
@@ -330,7 +330,7 @@ tracing機能や条件判断文の強化などあるが，そこら辺はパッ�
 \begin{dangerous}
   上記で「和文文字コードとして有効かどうか」は，関数|is_char_kanji|を参照．
   この関数は内部コードによって異なるため，マクロで実装するのは面倒であるが，
-  \epTeX~190709以降では|\iffontchar|で容易に実現できる．
+  \epTeX~190709以降では\.{iffontchar}で容易に実現できる．
   なお，\upTeX では任意の非負の値が和文文字コードとして有効なため，
   |is_char_kanji|は非負かどうかの判定になっている．
 \end{dangerous}
