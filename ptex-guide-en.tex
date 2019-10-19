@@ -62,7 +62,7 @@
 \frenchspacing
 \begin{document}
 \catcode`\<=13
-\title{\emph{Guide of \pTeX\ for developers not interested in Japanese}}
+\title{\emph{Guide to \pTeX\ for developers unfamiliar with Japanese}}
 \author{Japanese \TeX\ Development Community\null
 \thanks{\url{https://texjp.org},\ e-mail: \texttt{issue(at)texjp.org}}}
 \date{version p\the\ptexversion.\the\ptexminorversion\ptexrevision, \today}
@@ -129,8 +129,8 @@ so we focus mainly on \epTeX/\eupTeX.
 \section{Compatibility with Western \TeX}
 
 %%% pTeX/upTeX は Knuthian TeX に対してほぼ上位互換
-\pTeX/\upTeX\ are almost uppercompatible with Knuthian \TeX,
-however, they do not pass TRIP test.
+\pTeX/\upTeX\ are almost upward compatible with Knuthian \TeX,
+however, they do not pass the TRIP test.
 %%% 入力の8bitの扱いが異なる。フォントの8bitはそのまま
 In \pTeX/\upTeX, input handling is different from Knuthian \TeX;
 if a pair of two or more 8-bit codes matches Japanese character code,
@@ -138,16 +138,16 @@ it is regarded as one Japanese character.
 There is no difference in handling 8-bit TFM font.
 
 %%% e-pTeX/e-upTeX は e-TeX に対してほぼ上位互換
-\epTeX/\eupTeX\ are almost uppercompatible with \eTeX,
+\epTeX/\eupTeX\ are almost upward compatible with \eTeX,
 however, input handling is similar to \pTeX/\upTeX.
-It does not pass e-TRIP test.
+It does not pass the e-TRIP test.
 %%% だけど e-TeX はもうなく，pdfTeX の DVI モードがあるだけ
 That said, please note that ``raw \eTeX'' is unavailable anymore
 in \TeX\ Live and derived distributions;
 they provide a command |etex| only as ``DVI mode of \pdfTeX.''
 %%% e-pTeX/e-upTeX は pdfTeX の DVI モードに対して上位互換ではない
 We should note that
-\epTeX/\eupTeX\ are {\em not} uppercompatible with DVI mode of \pdfTeX,
+\epTeX/\eupTeX\ are {\em not} upward compatible with DVI mode of \pdfTeX,
 which will be discussed later in section \ref{dvi-pdftex}.
 
 %%% LaTeX ムニャムニャ
@@ -171,7 +171,7 @@ related to the followings:
   \item Adjustment for mixing horizontal and vertical texts
 \end{itemize}
 %%% author レベルでは LaTeX とほぼ互換，ただし例外あり
-For authors, \pLaTeX/\upLaTeX\ is almost uppercompatible with
+For authors, \pLaTeX/\upLaTeX\ is almost upward compatible with
 original \LaTeX, except for the followings:
 \begin{itemize}
   \item Order of float objects; in \pLaTeX/\upLaTeX,
@@ -182,7 +182,7 @@ original \LaTeX, except for the followings:
   % [TODO] 他にもあるか？
 \end{itemize}
 %%% developer レベルでは pdfTeX 拡張や pLaTeX カーネルでムニャムニャ
-For developers, additional cares may be needed,
+For developers, additional care may be needed,
 for changes in the kernel macros and/or absence of \pdfTeX\ features.
 
 %%% 際立った pTeX 系列の特徴
@@ -192,7 +192,7 @@ The most important characteristics of \pTeX/\upTeX\ can be
 summarized as follows:
 %%% 欧文と和文が別個に存在する・縦組がある
 \begin{itemize}
-  \item Japanese characters are interpret and handled completely apart from
+  \item Japanese characters are interpreted and handled completely apart from
     Western characters.
   \item Texts can be aligned vertically, called ``tate-gumi'' (縦組).
     The horizontal alignment of texts is called ``yoko-gumi'' (横組),
@@ -257,7 +257,7 @@ the |post_post| table of postamble contains $\mathrm{ID} = 3$.
 %%% 日本の DVI ドライバの状況
 \subsection{DVI drivers with Japanese support}
 
-There is some DVI drivers with Japanese support.
+There are some DVI drivers with Japanese support.
 The most eminent drivers are {\em dvips} and {\em dvipdfmx}.
 Nowadays most of casual Japanese users are using {\em dvipdfmx} as a DVI driver.
 On the other hand, users of {\em dvips} are unignorable, especially those
@@ -325,7 +325,7 @@ there are 65536, which is twice as many as 32768 of \eTeX.
 
 Here we provide only complete lists of additional primitives
 of \pTeX\ family in alphabetical order.
-Feature of each primitive can be found in Japanese edition.
+The features of each primitive can be found in Japanese edition.
 
 % [TODO] 抜けがないか？
 % [TODO] アルファベット順に正しく並んでいるか？
@@ -558,7 +558,7 @@ to test if a primitive |\kanjiskip| is defined.
 \subsection{Difference from \pdfTeX\ in DVI mode}\label{dvi-pdftex}
 
 As stated above,
-\epTeX/\eupTeX\ are {\em not} uppercompatible with DVI mode of \pdfTeX.
+\epTeX/\eupTeX\ are {\em not} upward compatible with DVI mode of \pdfTeX.
 
 %%% pdfTeX の DVI モードにあって e-(u)pTeX にないプリミティブ
 %%% その他ムニャムニャ
@@ -591,9 +591,9 @@ This section does not aim to explain Japanese typesetting completely;
 here we provide a minimum requirement for ``getting away'' with Japanese.
 
 %%% 空白・ペナルティ挿入：勝手に入ってくる！
-\subsection{Automatic insertion of glues and penalties}
+\subsection{Automatic insertion of glue and penalties}
 
-Sometimes \pTeX\ family automatically inserts glues and penalties
+Sometimes \pTeX\ family automatically inserts glue and penalties
 between characters.
 % [TODO] もう少しだけ詳しく
 

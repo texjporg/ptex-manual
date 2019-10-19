@@ -7,7 +7,7 @@ This is a project of preparing a manual of Japanese pTeX and e-pTeX.
 The following documents are maintained by Japanese TeX Development
 Community:
 
-    * ptex-guide-en.pdf: Guide of pTeX and friends (in English)
+    * ptex-guide-en.pdf: Guide to pTeX and friends (in English)
     * ptex-manual.pdf: The manual of pTeX.
     * eptexdoc.pdf: The manual of e-pTeX.
     * jfm.pdf: Specification of JFM (Japanese Font Metric) format.
