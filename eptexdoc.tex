@@ -217,7 +217,7 @@ tracing機能や条件判断文の強化などあるが，そこら辺はパッ�
 
 以下，\eTeX 拡張を\pTeX 拡張とマージするにあたって調整した箇所を述べる．
 \begin{cslist}
- \csitem[\.{lastnodetype}]
+ \csitem[\.{lastnodetype} (read-only integer)]
   \pTeX 拡張では，\TeX と比較して\node{dir\_node}と\node{disp\_node}という2種類のノードが
   追加された．前者は，現在のリストの中に違う組方向のboxを挿入する際に寸法を補正するために作られ，
   \.{hbox}や\.{vbox}のコンテナとなっている．
@@ -241,7 +241,7 @@ tracing機能や条件判断文の強化などあるが，そこら辺はパッ�
   \item 14&unset node\cr\item 15&math mode nodes\cr
   \end{multilist}}
 
- \csitem[\.{currentiftype}]
+ \csitem[\.{currentiftype} (read-only integer)]
 \ifnum\epTeXversion>190131 %%%%% TL2019-hack
   条件判断文とそれを表す数字との対応は以下のようになっている
   （\epTeX~190709以降）．
@@ -305,7 +305,7 @@ tracing機能や条件判断文の強化などあるが，そこら辺はパッ�
       のようにエラーが出る．
   \end{itemize}
 
- \csitem[\.{iffontchar}]
+ \csitem[\.{iffontchar} <font> <number>]
   \begin{itemize}
     \item 和文フォントの場合： \.{iffontchar} <Japanese font> <number>\\
       <Japanese font>を$f$，<number>を$c$とおくと，
@@ -355,13 +355,18 @@ fam256d.tex}（本文）と\texttt{fam256p.tex}（preamble部）に対応する�
 extended modeの時に限り有効になる．
 
 \paragraph{数式フォント制限の緩和}
-\OMEGA の大きな特徴としては，\TeX 内部のデータ構造を倍の領域を用いるよう
-に改変し\footnote{詳しい話は\texttt{texk/web2c/texmfmem.h}中の共用体%
+\OMEGA の大きな特徴としては，\TeX 内部のデータ構造を改変し
+\footnote{詳しくは\texttt{texk/web2c/texmfmem.h}中の共用体%
 \texttt{memoryword}の定義を参照．大雑把に言うと，1つの「メモリ要素」に2つの32\,bit整
-数を同時に格納できるようになっている．}，\TeX に従来から存在し
-ていた「256個制限」を$2^{16}$個にまで緩和したことが挙げられる．同様に，
-\OMEGA では（\cite{yamamoto}にもあるように）数式フォントを同時に256個まで
-用いることができ，各フォントも65536文字まで許されるようになっている．
+数を同時に格納できるようになっている．
+なお，少なくともtetex3以降では\texttt{memoryword}は8バイトであるが，
+\TeX 82では1つの「メモリ要素」を2つの32\,bit整数として使うことはしていない．
+%  [TODO] 正確には "big TeX" からだが，
+%  ・big TeX はいつからあるのか？ ・それが標準になったのはいつから？
+}，
+\TeX に従来から存在していたいくつかの「256個制限」を$2^{16}$個にまで緩和したことが挙げられる．
+同様に，\OMEGA では（\cite{yamamoto}にもあるように）数式フォントを
+同時に256個まで用いることができ，各フォントも65536文字まで許されるようになっている．
 
 \medskip
 
@@ -403,12 +408,14 @@ extended modeの時に限り有効になる．
 \OMEGA の行を参照して欲しい．上に書いた内部のデータ構造から推測できる通り，
 \.{omathchar}等のcharacter codeの指定に使われる16\,bitの数値のうち実際に使われるのは下位
 8\,bitであり，上位8\,bitは無視される．
-例えば，|\omathchar"4012345|と|\omathchar"4010045|は内部表現としては全く同じである．
+例えば，|\omathchar"4012345|と|\omathchar"4010045|は同義である．
 
-なお，|\odelcode|~\bits 8として
-delimiter codeを取得しようとしても，現時点のパッチでは，うまく動作しない
-\footnote{51\,bit自然数を返さないといけないですからねえ．やる気があれば
-検討してみます．}．
+なお，|\mathcode|~\bits 8としてmath code値を取得できる文字はファミリ番号が16未満のもの
+（すなわち，\TeX82における|\mathcode|格納値の形式に当てはまるもの）に限られる．
+delimiter codeについても同様である．
+さらに，|\odelcode|~\bits 8として51\,bitの形式のdelimiter codeを取得することはできない
+（$-1$が返る）．
+
 
 \medskip
 \LaTeX において数式フォントを同時に16個以上使うには，|\omathchar|%
@@ -454,7 +461,7 @@ delimiter codeを取得しようとしても，現時点のパッチでは，う
     }．
   \item |\gluestretchorder|\indcs{gluestretchorder},
       |\glueshrinkorder|\indcs{glueshrinkorder}の動作を\eTeX のそれと合わせた．
-      具体的には，ある適当なglue~|\someglue|の伸び量を<stretch>とおくとき，
+      具体的には，あるglue~|\someglue|の伸び量を<stretch>とおくとき，
 \[
  \hbox{|\gluestretchorder\someglue|}=
 \begin{cases}
@@ -470,20 +477,22 @@ delimiter codeを取得しようとしても，現時点のパッチでは，う
 
 \paragraph{レジスタについて}
 \OMEGA では（前にも書いたが）データ構造の変更が行われ，それによってレジスタが
-各種類あたり65536個使えるようになっている．
+各種類あたり0番から65535番までの65536個を使えるようになっている．
 
 一方，\eTeX では，256番以降のレジスタを専用のsparse treeに格納することにより，
 32767番までのレジスタの使用を可能にしていた．このツリー構造を分析してみる
-と，65536個までレジスタを拡張するのはさほど難しくないことのよう
-に思われた．具体的には，ツリーの階層を1つ増やしてみた（だから，おそらく
-各種類あたり$16\cdot 32768=524288$個まで使えるとは思うが，これはきりが悪い）．
-そこで，\epTeX では\eTeX 流の方法を用いながらも，レジスタ(count, dimen,
-skip, muskip, box, token)をさらに65536個まで増やしている．
+と，65536個までレジスタを拡張するのはさほど難しくないことが分かった．
+そこで，\epTeX では\eTeX 流の方法を用いながらも，
+ツリーの階層を1つ増やして，レジスタ(count, dimen, skip, muskip, box, token)を
+\OMEGA と同じように0番から65535番までの65536個を使えるようにした．
 同様に，マーク(mark)のクラス数も32768個から65536個まで増やしている．
 
 \section{\hologo{pdfTeX}由来の機能}
 開発中の\LaTeX 3では，\eTeX 拡張の他に，\hologo{pdfTeX}で導入された
-\.{pdfstrcmp}（又はその同等品）が必要となっており，もはや純粋な\eTeX ですら
+プリミティブ\.{pdfstrcmp}（またはその同等品%
+\footnote{\hologo{XeTeX}では\.{strcmp}という名称で，
+\hologo{LuaTeX}ではLuaを用いて実装されている．}）%
+が必要となっており，もはや純粋な\eTeX ですら
 \LaTeX 3を利用することはできない状況である (\cite{expl31,expl32,expl33})．
 その他にも，\hologo{pdfTeX}由来のいくつかのプリミティブ(\cite{pdftexman})の実装が
 日本の\TeX ユーザからあり，
@@ -512,17 +521,20 @@ skip, muskip, box, token)をさらに65536個まで増やしている．
     |\UseRawInputEncoding|の実行が必要になる．
   }．
 
- \csitem[\.{pdfpagewidth}, \.{pdfpageheight}]
+ \csitem[\.{pdfpagewidth}, \.{pdfpageheight} (dimension)]
   ページの「幅」「高さ」を表す内部長さであるが，
   \emph{ここで言う「幅」は「字送り方向」のことではなく，物理的な意味である}．
 
   この2つの内部長さを設定するだけではdviに何の影響も与えない．
-  すぐ後で述べる\.{pdflastxpos}, \.{pdflastypos}による出力位置の取得
+  後で述べる\.{pdflastxpos}, \.{pdflastypos}による出力位置の取得
   の際の原点位置を設定するためだけに使われ，初期値は0である．
 
+  \csitem[\.{readpapersizespecial} (integer)]
+  \pTeX 系列では，
   用紙サイズの指定には伝統的にpapersize specialが利用されてきた．それを考慮して，
+  本内部整数\.{readpapersizespecial}（既定値は1）が正の場合は
   papersize specialがdvi中に書き出される時，\epTeX にはその内容を解釈して
-  自動的に\.{pdfpagewidth}, \.{pdfpageheight}の値を設定する機能がある
+  自動的に\.{pdfpagewidth}, \.{pdfpageheight}の値を設定する
   \footnote{%
   papersize specialで指定した長さは常に\texttt{true}付きで解釈するのが慣習と
   なっているが，\epTeX~180901より前では\texttt{true}なしの寸法として解釈するという
@@ -541,12 +553,13 @@ skip, muskip, box, token)をさらに65536個まで増やしている．
   負の符号や小数点としての「\texttt{,}」，そして一切の空白を許容しないところに
   注目してほしい．また，\texttt{zw},~\texttt{zh},~\texttt{em},~\texttt{ex}という
   現在のフォントに依存する単位も使用不可能である．
-  }．\epTeX~180901より前ではこの機能は常に有効
-  であったが，\epTeX~180901以降では内部整数
-  \.{readpapersizespecial}\indcs{readpapersizespecial}（既定値は1）が正の場合のみ有効となる．
- 
- \csitem[\.{pdflastxpos}, \.{pdflastypos}]
-  \.{pdfsavepos}\indcs{pdfsavepos}が置かれた場所の，dviにおける出力位置を返す内部整数（読み取り専用）．
+  }．
+  
+  このプリミティブは\epTeX~180901で追加された．それより前のバージョンでは
+  前段落で述べた機能は常に有効であった．
+  
+ \csitem[\.{pdflastxpos}, \.{pdflastypos} (read-only integer)]
+  \.{pdfsavepos}\indcs{pdfsavepos}が置かれた場所の，dviにおける出力位置を返す内部整数．
   原点はページの（物理的な意味の）左下隅であり，$y$軸は（物理的な）上方向に向かって増加する．
  \begin{itemize}
   \item ページの物理的な幅と高さはすぐ上の\.{pdfpagewidth}, \.{pdfpageheight}で設定する．
@@ -589,8 +602,8 @@ skip, muskip, box, token)をさらに65536個まで増やしている．
   本プリミティブはHeiko Oberdiek氏による\Pkg{bmpsize}パッケージを\epTeX でも使うために
   角藤さんが実装したものである(2014/05/06)．
   
- \csitem[\.{pdfshellescape}]
-  \.{write18}によるshell-escapeが利用可能になっているかを示す内部整数（読み取り専用）．
+ \csitem[\.{pdfshellescape} (read-only integer)]
+  \.{write18}によるshell-escapeが利用可能になっているかを示す内部整数．
   0ならば不許可，1ならば許可，2ならばrestricted shell-escape%
   \footnote{あらかじめ「安全」と認められたプログラム（\texttt{texmf.cnf}中で指定する）
     のみ実行を許可する仕組み．}%
@@ -608,7 +621,7 @@ skip, muskip, box, token)をさらに65536個まで増やしている．
   このプリミティブは\cite{xe5}以降の議論を元に，角藤さんがリクエストしたもので，
   2015/07/04に\epTeX に実装されている．
   
- \csitem[\.{pdfpritimive}, \.{ifpdfprimitive}]
+ \csitem[\.{pdfpritimive} <control sequence>, \.{ifpdfprimitive} <control sequence>]
   \.{pdfprimitive}は次に続く制御綴がプリミティブと同じ名称であった場合に，
   プリミティブ本来の意味で実行させるものである．例えば
 \begin{verbatim}
@@ -620,20 +633,21 @@ skip, muskip, box, token)をさらに65536個まで増やしている．
 
   これらのプリミティブは2015/07/15版の\Pkg{expl3}パッケージで使われた
   (\cite{15715})ことを受けて実装されたものだが，
-  現在ではこれらのプリミティブは使われていない．
+  現在では\Pkg{expl3}パッケージではこれらのプリミティブは要求していない．
 
  \csitem[\.{pdfuniformdeviate} <number>, \.{pdfnormaldeviate}]
   \.{pdfuniformdeviate}は，0以上<number>未満の一様分布に従う乱数（整数値）を生成する．
   \.{pdfnormaldeviate}は，平均値0，標準偏差65536の正規分布に従う乱数（整数値）を生成する．
+
+  \csitem[\.{pdfrandomseed} (read-only integer), \.{pdfsetrandomseed} <number>]
+  乱数生成の種の値は，\.{pdfrandomseed}で取得できる．
+  種の初期化にはシステムのマイクロ秒単位での現在時刻情報が使われる．また，種の値を
+  設定するには\.{pdfsetrandomseed}に引数として渡せば良い．
   
-  現在の乱数生成の種の値は，\.{pdfrandomseed}\indcs{pdfrandomseed}で取得できる（読み取り専用）．
-  種の初期化にはシステムのマイクロ秒単位での現在時刻情報が使われる．また，種の値は
-  \.{pdfsetrandomseed} <number>\indcs{pdfsetrandomseed}によって特定の値に設定可能である．
-  
-  \LaTeX3のl3fpにおいて，2016/11/12あたりから実装された乱数生成機能(\cite{random})を
+  \LaTeX3の\Pkg{l3fp}において，2016/11/12あたりから実装された乱数生成機能(\cite{random})を
   サポートするために\epTeX~161114から実装された．
 
- \csitem[\.{pdfelapsedtime}, \.{pdfresettimer}]
+ \csitem[\.{pdfelapsedtime} (read-only integer), \.{pdfresettimer}]
   \.{pdfelapsedtime}は，エンジン起動からの経過時間を``scaled seconds''すなわち
   $1/65536$秒単位で返す．この値は\.{pdfresettimer}によって再び0にリセットできる．
   すぐ上の乱数生成プリミティブと同時に実装された．
@@ -660,7 +674,7 @@ skip, muskip, box, token)をさらに65536個まで増やしている．
 取得する\.{epTeXversion}プリミティブが\epTeX~180121から追加された．
 
 \begin{cslist}
- \csitem[\.{epTeXversion}]
+ \csitem[\.{epTeXversion} (read-only integer)]
   \epTeX のバージョン番号（例えば\the\epTeXversion）を内部整数で返す．\epTeX 起動時のバナーでは
   \eTeX, \pTeX のバージョン番号も表示されるので，それを再現しようとすると以下のようになる．
 \begin{verbatim}
@@ -707,7 +721,7 @@ min10フォントメトリックで「ちょっと」を組むと「ょっ」の
 改善する助けになることを目指して実装された．
 
 \begin{cslist}
-  \csitem[\.{lastnodechar}]
+  \csitem[\.{lastnodechar} (read-only integer)]
   現在構築中のリストの「最後のノード」が文字由来であれば，そのコード番号（内部コード）を内部整数として返す．
   
   上記「最後のノード」では，\pTeX によって自動挿入される
@@ -770,11 +784,12 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 \begin{verbatim}
 これは，\relax\sffamily{}\the\lastnodechar\textmc{『ほげ党宣言』}……
 \end{verbatim}
-などとノードに関係しないものが途中にあっても，それは単純に無視されて
+のようにノードを作らない\.{relax}, |{}|, \.{sffamily}などが途中にあっても，
+それらは単純に無視されて
 \begin{quote}
 これは，\relax\sffamily{}\the\lastnodechar\textmc{『ほげ党宣言』}……
 \end{quote}
-となる．
+と「，」の内部コードが取得される．
 
 \section{\.{lastnodesubtype}プリミティブ}
 \cite{tjb28,plt63}などの議論で，「最後のグルーがJFMグルーだけ\.{unskip}する」処理の必要性が
@@ -783,7 +798,7 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 そのため，\epTeX~180226で\.{lastnodesubtype}プリミティブを追加した．
 
 \begin{cslist}
- \csitem[\.{lastnodesubtype}]
+ \csitem[\.{lastnodesubtype} (read-only integer)]
  現在構築中のリストの「最後のノード」（\.{lastnodechar}プリミティブと同様）の
  subtype値を内部整数として返す．
 \begin{itemize}
@@ -876,11 +891,27 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
   現在読み込んでいるファイルの文字コードを<encoding>に変更する．
   実際に変更されるのは「次の行」であり，また現在のファイルからさらに\.{input}等で
   読まれたファイルには効力を及ぼさない．
+  
+  引数<encoding>の読み取りは，
+  （\LaTeX で定義が上書きされていない，プリミティブの）\.{input}の引数（ファイル名）を
+  取得するのと同じルーチンが用いられる．
+  そのため，
+\begin{verbatim}
+\epTeXinputencoding sjis
+\end{verbatim}
+  のように，<encoding>は|{}|で囲まないこと．
   <encoding>の末尾は，空白トークンや展開不能トークンによって区切られる．
+
   % [TODO] これで合っていますか？ -- aminophen
+  %% scan_file_name で<encoding> を取得しているので，
+  %% \epTeXinputencoding "euc" \epTeXinputencoding ""e""u""c"" も OK.
 
   <encoding>の値は，基本的には\pTeX の\texttt{-kanji}オプションで指定できる値
   (\texttt{euc}, \texttt{sjis}, \texttt{jis}, \texttt{utf8})である．
+  大文字小文字は考慮しない（\TeX の\.{uccode}, \.{lccode}は参照しない）．
+  % BINARY, ISO-2022-JP, EUC-JP, Shift_JIS, UTF-8 (, uptex) も OK
+  % ptexenc 側で strcasecmp で比較しているので，大文字・小文字の区別はしない
+  % （\uccode, \lccode は参照しない）
 \end{cslist}
 
 \begin{comment}

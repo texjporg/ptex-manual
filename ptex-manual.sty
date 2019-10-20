@@ -19,7 +19,8 @@
       \leavevmode\par\nopagebreak}
 }{}
 
-\def\emph#1{{\bfseries\sffamily\gtfamily\mathversion{bold}#1}}
+\let\origemph=\emph
+\def\emph#1{{\bfseries\sffamily\gtfamily\selectfont\mathversion{bold}#1}}
 \def\paragraph#1{\par\medskip\par\noindent\emph{■#1}\par\nobreak}
 
 \def\Pkg#1{\textsf{#1}}
@@ -115,6 +116,7 @@
   \bigskipamount=\baselineskip
   \medskipamount=.5\baselineskip
   \smallskipamount=.25\baselineskip
+  \clubpenalty=10000 \widowpenalty=9999
   \divide\@tempdima by\dimexpr1zw\relax\@tempcnta=\@tempdima
   \leftskip=\dimexpr\textwidth-\@tempcnta zw\relax
   \@totalleftmargin\dimexpr\leftskip+0zw

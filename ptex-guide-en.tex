@@ -20,7 +20,7 @@
 
 % common
 \usepackage{ptex-manual}
-
+\let\emph=\origemph
 \makeatletter
 \newlist{simplelist}{description}1
 \setlist[simplelist]{%
@@ -71,7 +71,7 @@
 \pTeX\ and its variants, \upTeX, \epTeX\ and \eupTeX, are all \TeX\ engines
 with native Japanese support.
 Its output is always a DVI file, which can be processed by several
-DVI drivers with Japanese support including {\em dvips} and {\em dvipdfmx}.
+DVI drivers with Japanese support including \emph{dvips} and \emph{dvipdfmx}.
 Formats based on \LaTeX\ is called \pLaTeX\ when running on \pTeX/\epTeX,
 and called \upLaTeX\ when running on \upTeX/\eupTeX.
 
@@ -93,7 +93,7 @@ We hope that this document helps authors of packages or classes
 to proceed with supporting \pTeX\ family smoothly.
 
 \begin{quotation}
-Note: This English edition (\jobname.pdf) is {\em not} meant
+Note: This English edition (\jobname.pdf) is \emph{not} meant
 to be a complete translation of Japanese edition (ptex-manual.pdf).
 For example, this document does not cover the following aspects of \pTeX:
 \begin{itemize}
@@ -147,7 +147,7 @@ in \TeX\ Live and derived distributions;
 they provide a command |etex| only as ``DVI mode of \pdfTeX.''
 %%% e-pTeX/e-upTeX は pdfTeX の DVI モードに対して上位互換ではない
 We should note that
-\epTeX/\eupTeX\ are {\em not} upward compatible with DVI mode of \pdfTeX,
+\epTeX/\eupTeX\ are \emph{not} upward compatible with DVI mode of \pdfTeX,
 which will be discussed later in section \ref{dvi-pdftex}.
 
 %%% LaTeX ムニャムニャ
@@ -258,18 +258,18 @@ the |post_post| table of postamble contains $\mathrm{ID} = 3$.
 \subsection{DVI drivers with Japanese support}
 
 There are some DVI drivers with Japanese support.
-The most eminent drivers are {\em dvips} and {\em dvipdfmx}.
-Nowadays most of casual Japanese users are using {\em dvipdfmx} as a DVI driver.
-On the other hand, users of {\em dvips} are unignorable, especially those
+The most eminent drivers are \emph{dvips} and \emph{dvipdfmx}.
+Nowadays most of casual Japanese users are using \emph{dvipdfmx} as a DVI driver.
+On the other hand, users of \emph{dvips} are unignorable, especially those
 working in publishing industry.
 
-\subsubsection{Using {\em dvipdfmx}}
+\subsubsection{Using \emph{dvipdfmx}}
 
 A DVI file which is output by \pTeX\ can be converted directly to a PDF file
 using dvipdfmx.
 % [TODO] Mention kanji-config-updmap for font setup
 
-{\em Note for casual \LaTeX\ users} ---
+\emph{Note for casual \LaTeX\ users} ---
 when you choose to process the resulting DVI file with dvipdfmx
 after running \LaTeX\ (command |platex| or |uplatex|),
 you need to pass a proper driver option |[dvipdfmx]| for
@@ -284,7 +284,7 @@ as in the following example:
   \usepackage{color}
 \end{verbatim}
 
-\subsubsection{Using {\em dvips}}
+\subsubsection{Using \emph{dvips}}
 
 A DVI file which is output by \pTeX\ can be converted to a PostScript file
 using dvips.
@@ -627,7 +627,7 @@ is as follows:
 \subsection{Difference from \pdfTeX\ in DVI mode}\label{dvi-pdftex}
 
 As stated above,
-\epTeX/\eupTeX\ are {\em not} upward compatible with DVI mode of \pdfTeX.
+\epTeX/\eupTeX\ are \emph{not} upward compatible with DVI mode of \pdfTeX.
 
 %%% pdfTeX の DVI モードにあって e-(u)pTeX にないプリミティブ
 %%% その他ムニャムニャ
@@ -675,6 +675,9 @@ format is used. It is a modified version of \TeX\ TFM.
 %%% 欧文とは別個
 %%% \nullfont しても全部消えない
 
+%%% 「和文 \nullfont」は和文フォントが一回もグローバルに
+%%% 設定されていないとき =  iniTeX 時しかない
+
 \section{Other strange beasts}
 
 %%% 縦組は諦めよう
@@ -705,7 +708,7 @@ where
     C_2=\{\hex{40},\dots,\hex{7e}\}\cup\{\hex{80},\dots,\hex{fc}\} & (\mathtt{sjis}).
   \end{cases}
 \]
-Therefore, the overall range of <character code> is {\em not} continuous.
+Therefore, the overall range of <character code> is \emph{not} continuous.
 
 \newpage
 
