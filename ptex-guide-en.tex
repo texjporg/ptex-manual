@@ -554,8 +554,10 @@ a control sequence is considered to have a category code 0.
 
 \subsection{Case study}
 
-Based on the above knowledge, we provide some code examples
+Here we provide some code examples
 which may be useful for package developers.
+% [TODO] 本当は Based on the above knowledge としたいところだが
+% 説明が圧倒的に不足しているので天下り的なコード解説…
 
 %%% pTeX かどうかの判定
 \subsubsection{Detecting \pTeX}
@@ -594,7 +596,7 @@ The first difference can be detected by checking if
 
 The second difference can be detected by checking if
 the character \code{0x2121} (fullwidth space in JIS encoding)
-is stored as \hex{3030} internally.
+is stored as \hex{3000} internally.
 \begin{verbatim}
   \ifx\kanjiskip\undefined
   \else
@@ -612,6 +614,7 @@ the format-build setting of \verb+-kanji-internal=(sjis|euc)+ with
 which means that only JIS~X~0208 character set is supported.
 
 %%% pTeX のバージョン判定
+% [TODO] 何が有用？
 
 %%% 大きな定数を定義する話
 \subsubsection{Defining large integer constants}
@@ -659,6 +662,43 @@ is as follows:
  \item (optional) 256--2147483647: \.{chardef} (only for \upTeX/\eupTeX)
    % "7FFFFFFF = 2147483647 (+1 => ! Number too big.)
 \end{itemize}
+
+%%% 指定のコードの和文トークンを得る方法
+\subsubsection{Creating a Japanese character token with a specified code}
+
+To create a character token with a specified code value between 0--255,
+the ``\.{lowercase} trick'' can be used; for example,
+\begin{verbatim}
+  \begingroup
+  \lccode`\?=\mycount
+  \lowercase{\endgroup \def\X{?}}
+\end{verbatim}
+defines |\X| which expands to a character number |\mycount|
+while the \.{catcode} of |?| (\the\catcode`\?) is preserved.
+However, the trick cannot be applied to Japanese characters,
+since \pTeX\ family does not support \.{lccode} outside 0--255.
+Instead, the ``\.{kansuji} trick'' can be used.
+
+\.{kansuji} is an expandable primitive like \.{number} or \.{romannumeral},
+and it converts an integer into its corresponding kanji notation
+called ``kansuji'' (漢数字). The important point here is that
+the number-kanji mapping can be altered by \.{kansujichar}.
+
+Example 1: equivalent to |\def\X{あ}| (JIS code \code{0x2422} is ``あ''):
+\begin{verbatim}
+  \begingroup
+    \kansujichar1=\jis"2422 \xdef\X{\kansuji1}
+  \endgroup
+\end{verbatim}
+
+Example 2: equivalent to |\def\日本{Japan}|.
+\begin{verbatim}
+  \begingroup
+    \kansujichar5=\jis"467C\relax
+    \kansujichar6=\jis"4B5C\relax
+    \expandafter\gdef\csname\kansuji56\endcsname{Japan}
+  \endgroup
+\end{verbatim}
 
 %%% pdfTeX と違うところ
 \subsection{Difference from \pdfTeX\ in DVI mode}\label{dvi-pdftex}
