@@ -505,7 +505,7 @@ delimiter codeについても同様である．
  \csitem [\.{pdfstrcmp} <general text> <general text>]
   2つの引数を文字列化したものを先頭バイトから比較し，
   結果を$-1$（第1引数の方が先），0（等しい），1（第2引数の方が先）として文字列で返す．
-  
+
   比較する文字列中に和文文字がある場合には，（\epTeX の内部漢字コードにかかわらず）
   UTF-8で符号化して比較する．
   そのため，例えば
@@ -529,7 +529,7 @@ delimiter codeについても同様である．
   後で述べる\.{pdflastxpos}, \.{pdflastypos}による出力位置の取得
   の際の原点位置を設定するためだけに使われ，初期値は0である．
 
-  \csitem[\.{readpapersizespecial} (integer)]
+ \csitem[\.{readpapersizespecial} (integer)]
   \pTeX 系列では，
   用紙サイズの指定には伝統的にpapersize specialが利用されてきた．それを考慮して，
   本内部整数\.{readpapersizespecial}（既定値は1）が正の場合は
@@ -545,7 +545,7 @@ delimiter codeについても同様である．
 \def\<#1>{\langle\mbox{#1}\rangle}
 \begin{align*}
   \<special> &\longrightarrow \texttt{papersize=}\<length>\texttt{,}\<length>\\
-  \<length>  &\longrightarrow \<decimal> 
+  \<length>  &\longrightarrow \<decimal>
     \<optional~\texttt{true}>\<physical unit>\\
   \<decimal> &\longrightarrow \texttt{.} \mid \<digit>\<decimal> \mid
     \<decimal>\<digit>
@@ -554,10 +554,10 @@ delimiter codeについても同様である．
   注目してほしい．また，\texttt{zw},~\texttt{zh},~\texttt{em},~\texttt{ex}という
   現在のフォントに依存する単位も使用不可能である．
   }．
-  
+
   このプリミティブは\epTeX~180901で追加された．それより前のバージョンでは
   前段落で述べた機能は常に有効であった．
-  
+
  \csitem[\.{pdflastxpos}, \.{pdflastypos} (read-only integer)]
   \.{pdfsavepos}\indcs{pdfsavepos}が置かれた場所の，dviにおける出力位置を返す内部整数．
   原点はページの（物理的な意味の）左下隅であり，$y$軸は（物理的な）上方向に向かって増加する．
@@ -574,7 +574,7 @@ delimiter codeについても同様である．
     移動したところになる
     \footnote{これは\hologo{pdfTeX}のdviモードや\hologo{XeTeX}と同じ挙動である．}．
  \end{itemize}
-  
+
  \csitem[\.{pdfcreationdate}]
   エンジン起動時の時刻を，\texttt{\pdfcreationdate}の形式で表した文字列に展開する．
   末尾に|+09'00'|などと表示されるのはローカルのタイムゾーンであるが，
@@ -593,24 +593,24 @@ delimiter codeについても同様である．
   それぞれ<filename>の更新時刻（\.{pdfcreationdate}と同じ形式）と
   ファイルサイズを表す文字列に展開する．
   これらも\Pkg{standalone}パッケージのために\epTeX に実装されたプリミティブである．
-  
+
  \csitem[\.{pdffiledump} \textrm{[}\texttt{offset} <offset>\textrm{]}%
   \ \texttt{length} <length> <filename>]
   <filename>で与えられたファイル名の<offset>バイト目（先頭は0）から<length>バイトを読み込み，
   16進表記（大文字）したものに展開される．
-  
+
   本プリミティブはHeiko Oberdiek氏による\Pkg{bmpsize}パッケージを\epTeX でも使うために
   角藤さんが実装したものである(2014/05/06)．
-  
+
  \csitem[\.{pdfshellescape} (read-only integer)]
   \.{write18}によるshell-escapeが利用可能になっているかを示す内部整数．
   0ならば不許可，1ならば許可，2ならばrestricted shell-escape%
   \footnote{あらかじめ「安全」と認められたプログラム（\texttt{texmf.cnf}中で指定する）
     のみ実行を許可する仕組み．}%
   である．
-  
+
   本プリミティブは\TeX ユーザの集い2014でリクエストを受けて実装された(\cite{pdfse})．
-  
+
  \csitem[\.{pdfmdfivesum} {[\texttt{file}]} <general text>]
   引数<general text>のMD5ハッシュ値か，あるいは\texttt{file}が指定された場合は
   ファイル名が<general text>のファイルのMD5ハッシュ値を計算する．
@@ -620,7 +620,7 @@ delimiter codeについても同様である．
 
   このプリミティブは\cite{xe5}以降の議論を元に，角藤さんがリクエストしたもので，
   2015/07/04に\epTeX に実装されている．
-  
+
  \csitem[\.{pdfpritimive} <control sequence>, \.{ifpdfprimitive} <control sequence>]
   \.{pdfprimitive}は次に続く制御綴がプリミティブと同じ名称であった場合に，
   プリミティブ本来の意味で実行させるものである．例えば
@@ -643,7 +643,7 @@ delimiter codeについても同様である．
   乱数生成の種の値は，\.{pdfrandomseed}で取得できる．
   種の初期化にはシステムのマイクロ秒単位での現在時刻情報が使われる．また，種の値を
   設定するには\.{pdfsetrandomseed}に引数として渡せば良い．
-  
+
   \LaTeX3の\Pkg{l3fp}において，2016/11/12あたりから実装された乱数生成機能(\cite{random})を
   サポートするために\epTeX~161114から実装された．
 
@@ -723,7 +723,7 @@ min10フォントメトリックで「ちょっと」を組むと「ょっ」の
 \begin{cslist}
   \csitem[\.{lastnodechar} (read-only integer)]
   現在構築中のリストの「最後のノード」が文字由来であれば，そのコード番号（内部コード）を内部整数として返す．
-  
+
   上記「最後のノード」では，\pTeX によって自動挿入される
   \begin{itemize}
     \item JFMによって入るグルー
@@ -891,7 +891,7 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
   現在読み込んでいるファイルの文字コードを<encoding>に変更する．
   実際に変更されるのは「次の行」であり，また現在のファイルからさらに\.{input}等で
   読まれたファイルには効力を及ぼさない．
-  
+
   引数<encoding>の読み取りは，
   （\LaTeX で定義が上書きされていない，プリミティブの）\.{input}の引数（ファイル名）を
   取得するのと同じルーチンが用いられる．
@@ -901,10 +901,8 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 \end{verbatim}
   のように，<encoding>は|{}|で囲まないこと．
   <encoding>の末尾は，空白トークンや展開不能トークンによって区切られる．
-
-  % [TODO] これで合っていますか？ -- aminophen
-  %% scan_file_name で<encoding> を取得しているので，
-  %% \epTeXinputencoding "euc" \epTeXinputencoding ""e""u""c"" も OK.
+  % scan_file_name で<encoding> を取得しているので，
+  % \epTeXinputencoding "euc" \epTeXinputencoding ""e""u""c"" も OK.
 
   <encoding>の値は，基本的には\pTeX の\texttt{-kanji}オプションで指定できる値
   (\texttt{euc}, \texttt{sjis}, \texttt{jis}, \texttt{utf8})である．
@@ -980,37 +978,38 @@ $3$\,sp）だが，どこか気になるところである．
  \bibitem{h7k} 北川 弘典，「計算数学II　作業記録」，2008．\\
   \url{https://osdn.jp/projects/eptex/document/resume/ja/1/resume.pdf}ほか，
   本pdfと同じディレクトリにある\texttt{resume.pdf}がそれにあたる．
- \bibitem{yamamoto} 山本 和義，「数式famの制限とluatex」，掲示板「\TeX\
-  Q\ \&\ A」，2009/02/12．\\
+ \bibitem{yamamoto} 山本 和義，「数式famの制限とluatex」，
+  掲示板「\TeX\ Q\ \&\ A」，2009/02/12．\\
   \url{http://oku.edu.mie-u.ac.jp/~okumura/texfaq/qa/52744.html}
- \bibitem{yamamoto2} 山本 和義，「Re: 数式famの制限とluatex」，掲示板「\TeX\
-  Q\ \&\ A」，2009/02/16．
+ \bibitem{yamamoto2} 山本 和義，「Re: 数式famの制限とluatex」，
+  掲示板「\TeX\ Q\ \&\ A」，2009/02/16．
   \url{http://oku.edu.mie-u.ac.jp/~okumura/texfaq/qa/52767.html}
-\bibitem{yamamoto3} 山本 和義，「数式fam拡張マクロ for e-pTeX等」，掲示板「\TeX\
-  Q\ \&\ A」，2009/02/21．
+ \bibitem{yamamoto3} 山本 和義，「数式fam拡張マクロ for e-pTeX等」，
+  掲示板「\TeX\ Q\ \&\ A」，2009/02/21．
   \url{http://oku.edu.mie-u.ac.jp/~okumura/texfaq/qa/52799.html}
-\bibitem{expl31} 河原，「パッケージとディストリビューションについて」，掲示板「\TeX\
-  Q\ \&\ A」，2010/12/16．
+ \bibitem{expl31} 河原，「パッケージとディストリビューションについて」，
+  掲示板「\TeX\ Q\ \&\ A」，2010/12/16．
   \url{http://oku.edu.mie-u.ac.jp/~okumura/texfaq/qa/55464.html}
- \bibitem{expl32} 角藤 亮，「Re: パッケージとディストリビューションについて」，掲示板「\TeX\
-  Q\ \&\ A」，2010/12/19．
+ \bibitem{expl32} 角藤 亮，「Re: パッケージとディストリビューションについて」，
+  掲示板「\TeX\ Q\ \&\ A」，2010/12/19．
   \url{http://oku.edu.mie-u.ac.jp/~okumura/texfaq/qa/55478.html}
- \bibitem{expl33} zrbabbler，「LaTeX3 と expl3 パッケージ」，ブログ「マクロツイーター」内
-  ，2010/12/22．
+ \bibitem{expl33} zrbabbler，「LaTeX3 と expl3 パッケージ」，
+  ブログ「マクロツイーター」内，2010/12/22．
   \url{http://d.hatena.ne.jp/zrbabbler/20101222/1293050561}
- \bibitem{strcmp} 角藤 亮，「Re: e-pTeX 101231」，掲示板「\TeX\
-  Q\ \&\ A」，2011/01/01．\\
+ \bibitem{strcmp} 角藤 亮，「Re: e-pTeX 101231」，
+  掲示板「\TeX\ Q\ \&\ A」，2011/01/01．\\
   \url{http://oku.edu.mie-u.ac.jp/~okumura/texfaq/qa/55528.html}
  \bibitem{pdfse} Dora TeX，「Re: |\pdfshellescape|,
   |\lastnodechar| の実装」，\TeX~Forum，2014/11/19．
   \url{http://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=1435#p8053}
  \bibitem{lnc} 北川 弘典，「|\lastnodechar| プリミティブについて」，2014/12/15．\\
- \url{https://ja.osdn.net/projects/eptex/wiki/lastnodechar}
+  \url{https://ja.osdn.net/projects/eptex/wiki/lastnodechar}
  \bibitem{xe5} Joseph Wright, ``[XeTeX] |\(pdf)mdfivesum|'',
   2015/07/01,\\
   \url{http://tug.org/pipermail/xetex/2015-July/026044.html}
- \bibitem{15715} tat tsan，「[expl3 / e(u)ptex] 2015/07/15 版 expl3 パッケージが
-  、(u)platex で通らない」，\TeX~Forum，2015/07/26．\\
+ \bibitem{15715} tat tsan，
+  「[expl3 / e(u)ptex] 2015/07/15 版 expl3 パッケージが、(u)platex で通らない」，
+  \TeX~Forum，2015/07/26．\\
   \url{http://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=1632}
  \bibitem{random} Joseph Wright, ``[tex-live] Random number primitives'',
   2016/11/12,\\
@@ -1019,11 +1018,11 @@ $3$\,sp）だが，どこか気になるところである．
   \url{http://abenori.blogspot.jp/2016/02/e-ptexeptexinputencoding.html}．
  \bibitem{etexman} The \NTS\!\ Team. \textit{The \eTeX\ manual} (v2.0). \\
   |$TEXMFDIST/doc/etex/base/etex_man.pdf|
- \bibitem{omegaman} J.\ Plaice, Y.\ Haralambous. \textit{Draft
-  documentation for the $\it\Omega$ system}, 1999.\\
+ \bibitem{omegaman} J.\ Plaice, Y.\ Haralambous.
+  \textit{Draft documentation for the $\it\Omega$ system}, 1999.\\
   |$TEXMFDIST/doc/omega/base/doc-1.8.tex|
- \bibitem{pdftexman} H\`an Th\'{\^e} Th\`anh et al. \textit{The 
-  \hologo{pdfTeX}\ user manual}, 2015.\\
+ \bibitem{pdftexman} H\`an Th\'{\^e} Th\`anh et al.
+  \textit{The \hologo{pdfTeX}\ user manual}, 2015.\\
   |$TEXMFDIST/doc/pdftex/manual/pdftex-a.pdf|
  \bibitem{l2e26}
   The \LaTeX3 Project Team, \textit{\LaTeX\ News Issue 26}, 2017.\\
@@ -1035,7 +1034,7 @@ $3$\,sp）だが，どこか気になるところである．
  \bibitem{plt63} Dora TeX，
   「p 指定の tabular でのセル冒頭の |\relax\par|」，2018/02/19．\\
   \url{https://github.com/texjporg/platex/issues/63}．
- \bibitem{expanded1} Joseph Wright, 
+ \bibitem{expanded1} Joseph Wright,
   ``[tex-live] Primitive parity, |\expanded| and |\Ucharcat|'',
   2018/05/04,\\
   \url{http://tug.org/pipermail/tex-live/2018-May/041599.html}
@@ -1043,7 +1042,8 @@ $3$\,sp）だが，どこか気になるところである．
   Joseph Wright, ``A `new' primitive: |\expanded|'', 2018/12/06.\\
   \url{https://www.texdev.net/2018/12/06/a-new-primitive-expanded}
  \bibitem{latex95}
-  Volker-Weissmann, ``Feature Request: Better error messages for non-ASCII symbols in labels.'',
+  Volker-Weissmann, ``Feature Request: Better error messages for
+  non-ASCII symbols in labels.'',
   2018/12/03.\\
   \url{https://github.com/latex3/latex2e/issues/95}
 \ifnum\epTeXversion>190131 %%%%% TL2019-hack

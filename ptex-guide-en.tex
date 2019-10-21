@@ -171,7 +171,7 @@ related to the followings:
   \item Adjustment for mixing horizontal and vertical texts
 \end{itemize}
 %%% author レベルでは LaTeX とほぼ互換，ただし例外あり
-For authors, \pLaTeX/\upLaTeX\ is almost upward compatible with
+For authors, \pLaTeX/\upLaTeX\ are almost upward compatible with
 original \LaTeX, except for the followings:
 \begin{itemize}
   \item Order of float objects; in \pLaTeX/\upLaTeX,
@@ -565,14 +565,51 @@ the safer solution for detecting \pTeX\ is
 to test if a primitive |\kanjiskip| is defined.
 \begin{verbatim}
   \ifx\kanjiskip\undefined
-    % not pTeX, upTeX, e-pTeX and e-upTeX
   \else
-    % pTeX, upTeX, e-pTeX and e-upTeX
+    % pTeX / upTeX / e-pTeX / e-upTeX
   \fi
 \end{verbatim}
 
-% [TODO] upTeX 系列は \enablecjktoken か \ucs か？
-% [TODO] 内部コードが uptex かどうかの判定
+%%% upTeX かどうかの判定
+\subsubsection{Detecting \upTeX}
+
+\upTeX/\eupTeX\ are almost upward compatible
+with \pTeX/\epTeX\ respectively, however,
+there are two major differences:
+\begin{enumerate}
+  \item Improvements in the \.{kcatcode} business,
+    mainly for better handling of Latin-1 characters and CJK tokens.
+  \item Unicode as the default internal kanji encoding,
+    for direct use of its huge character set.
+\end{enumerate}
+
+The first difference can be detected by checking if
+\.{...cjktoken} primitive is defined.
+\begin{verbatim}
+  \ifx\enablecjktoken\undefined
+  \else
+    % upTeX/e-upTeX
+  \fi
+\end{verbatim}
+
+The second difference can be detected by checking if
+the character \code{0x2121} (fullwidth space in JIS encoding)
+is stored as \hex{3030} internally.
+\begin{verbatim}
+  \ifx\kanjiskip\undefined
+  \else
+    \ifnum\jis"2121="3000
+      % upTeX/e-upTeX with internal Unicode
+    \else
+      % pTeX/e-pTeX
+      % or, upTeX/e-upTeX with internal EUC-JP or Shift-JIS
+    \fi
+  \fi
+\end{verbatim}
+Please note that
+the format-build setting of \verb+-kanji-internal=(sjis|euc)+ with
+\upTeX\ makes it effectively \pTeX\ regarding the character set,
+which means that only JIS~X~0208 character set is supported.
 
 %%% pTeX のバージョン判定
 
