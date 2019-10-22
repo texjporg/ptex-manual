@@ -334,8 +334,26 @@ There is another \pTeX-derived engine named \pTeX-ng (or Asiatic \pTeX)
 \eTeX\ and \upTeX, but currently does not adopt \code{fam256.ch}
 so it has the same number of registers and mark classes as \eTeX.}
 
+%%% 数式ファミリの数
+\subsection{Number of math families}
+
+In \pTeX\ and \upTeX,
+the number of math fonts is restricted to 16, as with Knuthian \TeX.
+In \epTeX\ and \eupTeX, a change file \code{fam256.ch},
+which is derived from \OMEGA, extends the upper limit to 256.
+As a consequence, \epTeX\ and \eupTeX\ allows 256 math fonts,
+each of which can contain 256 characters.\footnote{\OMEGA\ allows
+256 math fonts, each of which can contain 65536 characters.}
+
+For \pLaTeX/\upLaTeX\ users to use more than 16 math fonts,
+it is necessary to use macros which exploit \OMEGA-derived primitives
+such as \.{omathchar}.
+A simple solution is to use a package \Pkg{mathfam256}\footnote{%
+\url{https://www.ctan.org/pkg/mathfam256}} written by H.~Yamashita,
+though it's still preliminary.
+
 %%% 拡張プリミティブ
-\subsection{Additional primitives}
+\subsection{Additional primitives and keywords}
 % tex -ini: 322 multiletter control sequences
 % ptex -ini: 366 multiletter control sequences
 % uptex -ini: 374 multiletter control sequences
