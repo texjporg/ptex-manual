@@ -338,7 +338,8 @@ so it has the same number of registers and mark classes as \eTeX.}
 \subsection{Number of math families}
 
 In \pTeX\ and \upTeX,
-the number of math fonts is restricted to 16, as with Knuthian \TeX.
+the number of math fonts is restricted to 16,
+each of which can contain 256 characters (same as Knuthian \TeX).
 In \epTeX\ and \eupTeX, a change file \code{fam256.ch},
 which is derived from \OMEGA, extends the upper limit to 256.
 As a consequence, \epTeX\ and \eupTeX\ allows 256 math fonts,
@@ -348,9 +349,15 @@ each of which can contain 256 characters.\footnote{\OMEGA\ allows
 For \pLaTeX/\upLaTeX\ users to use more than 16 math fonts,
 it is necessary to use macros which exploit \OMEGA-derived primitives
 such as \.{omathchar}.
-A simple solution is to use a package \Pkg{mathfam256}\footnote{%
-\url{https://www.ctan.org/pkg/mathfam256}} written by H.~Yamashita,
-though it's still preliminary.
+Recent (u)\pLaTeX\ (since 2016/11/29) partially supports this,
+and the maximum number of math alphabets that can be defined by
+|\DeclareMathAlphabet| is extended to 256 (|\e@mathgroup@top|)
+without needing any extension package.
+However, symbol fonts are restricted to 16 as
+|\DeclareMathSymbol| etc still use the standard \.{mathchar} etc.
+A simple solution to use more symbol fonts as well as math alphabets
+is to load a package \Pkg{mathfam256}\footnote{%
+\url{https://www.ctan.org/pkg/mathfam256}} though it's still preliminary.
 
 %%% 拡張プリミティブ
 \subsection{Additional primitives and keywords}
