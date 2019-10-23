@@ -62,7 +62,7 @@
 \frenchspacing
 \begin{document}
 \catcode`\<=13
-\title{\emph{Guide to \pTeX\ for developers unfamiliar with Japanese}}
+\title{\textsf{\textbf{Guide to \pTeX\ for developers unfamiliar with Japanese}}}
 \author{Japanese \TeX\ Development Community\null
 \thanks{\url{https://texjp.org},\ e-mail: \texttt{issue(at)texjp.org}}}
 \date{version p\the\ptexversion.\the\ptexminorversion\ptexrevision, \today}
@@ -510,7 +510,7 @@ One is enc\TeX\ extension, such as |\mubyte|.
 The ML\TeX\ extension, such as |\charsubdef|, is included but not well-tested.
 %%% コマンドラインオプションの話
 
-% [TODO] ptex.man1.pdf も参照
+% [TODO] Please also refer to ptex.man1.pdf
 
 \subsection{Behavior of Western \TeX\ primitives}
 
@@ -771,14 +771,41 @@ between characters.
 %%% 和文フォント
 \subsection{Japanese fonts}
 
-For typesetting Japanese characters, a JFM (Japanese \TeX\ font metric)
-format is used. It is a modified version of \TeX\ TFM.
-
 %%% 欧文とは別個
-%%% \nullfont しても全部消えない
+\pTeX\ family can have 3 different ``current'' fonts at the same time;
+a Latin font, a Japanese font for horizontal writing (``yoko-gumi''),
+and a Japanese font for vertical writing (``tate-gumi'').
+The first one is the same as in the Knuthian \TeX,
+which is defined in a standard TFM format.
+The latter two are specific to \pTeX\ family, which are defined
+in a JFM (Japanese \TeX\ font metric) format.\footnote{%
+A JFM is a modified version of the standard TFM.
+It can be created by (u)pPLtoTF, and decoded by (u)pTFtoPL.
+Please also refer to the man pages of these programs
+(\code{ppltotf.man1.pdf} and \code{ptftopl.man1.pdf}).}
 
+While typesetting, \pTeX\ family automatically switches between
+these 3 fonts, depending on the character code and the writing direction:
+\begin{itemize}
+  \item For typesetting Latin characters,
+    the current Latin font shown by |\the\font| is selected.
+  \item For typesetting Japanese characters,
+    the current Japanese font suitable for the current writing direction
+    is selected. It is shown by |\the\jfont| for horizontal writing
+    and |\the\tfont| for vertical writing.
+\end{itemize}
+
+%%% \nullfont しても全部消えない
 %%% 「和文 \nullfont」は和文フォントが一回もグローバルに
-%%% 設定されていないとき =  iniTeX 時しかない
+%%% 設定されていないとき = iniTeX 時しかない
+In Knuthian \TeX, the primitive \.{nullfont} refers to an ``empty font''
+in which all characters are undefined.
+However in \pTeX\ family, this is regarded as a Latin font
+and there is no equivalent to ``Japanese \.{nullfont}'' by design.
+To elaborate, it is possible \emph{only} when no Japanese font is
+set globally, i.e. in ini\TeX\ mode.
+Once a valid Japanese font is selected, there is no way of
+selecting ``Japanese \.{nullfont}'' to discard all characters.
 
 \section{Other strange beasts}
 
