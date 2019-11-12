@@ -11,38 +11,43 @@ DVITARGET = $(addsuffix .dvi,$(DOCTARGET))
 KANJI = -kanji=utf8
 FONTMAP = -f ipaex.map -f ptex-ipaex.map
 TEXMF = $(shell kpsewhich -var-value=TEXMFHOME)
+ifdef PLATEX
+	PLATEX=${foo}
+else
+	PLATEX=platex
+endif
 
 default: $(DVITARGET)
 all: $(PDFTARGET)
 
 ptex-manual.dvi: ptex-manual.tex
-	platex $(KANJI) ptex-manual.tex
-	platex $(KANJI) ptex-manual.tex
+	$(PLATEX) $(KANJI) ptex-manual.tex
+	$(PLATEX) $(KANJI) ptex-manual.tex
 #	makeindex -s gind.ist -o ptex-manual.ind ptex-manual.idx
 	mendex -U -s gind.ist -o ptex-manual.ind ptex-manual.idx
-	platex $(KANJI) ptex-manual.tex
+	$(PLATEX) $(KANJI) ptex-manual.tex
 	rm -f *.aux *.log *.toc *.idx *.ind *.ilg *.out
 
 ptex-guide-en.dvi: ptex-guide-en.tex
-	platex $(KANJI) ptex-guide-en.tex
-	platex $(KANJI) ptex-guide-en.tex
+	$(PLATEX) $(KANJI) ptex-guide-en.tex
+	$(PLATEX) $(KANJI) ptex-guide-en.tex
 #	makeindex -s gind.ist -o ptex-guide-en.ind ptex-guide-en.idx
 	mendex -U -s gind.ist -o ptex-guide-en.ind ptex-guide-en.idx
-	platex $(KANJI) ptex-guide-en.tex
+	$(PLATEX) $(KANJI) ptex-guide-en.tex
 	rm -f *.aux *.log *.toc *.idx *.ind *.ilg *.out
 
 eptexdoc.dvi: eptexdoc.tex fam256p.tex fam256d.tex
-	platex $(KANJI) eptexdoc.tex
-	platex $(KANJI) eptexdoc.tex
+	$(PLATEX) $(KANJI) eptexdoc.tex
+	$(PLATEX) $(KANJI) eptexdoc.tex
 	mendex -U -s gind.ist eptexdoc.idx
-	platex $(KANJI) eptexdoc.tex
+	$(PLATEX) $(KANJI) eptexdoc.tex
 	rm -f *.aux *.log *.toc *.idx *.ind *.ilg *.out
 
 .SUFFIXES: .tex .dvi .pdf
 .tex.dvi:
-	platex $(KANJI) $<
-	platex $(KANJI) $<
-	platex $(KANJI) $<
+	$(PLATEX) $(KANJI) $<
+	$(PLATEX) $(KANJI) $<
+	$(PLATEX) $(KANJI) $<
 	rm -f *.aux *.log *.toc
 .dvi.pdf:
 	dvipdfmx $(FONTMAP) $<
