@@ -28,7 +28,7 @@
 %%%%%%%%%%%%%%%%
 
 % logos
-\newcommand{\OMEGA}{$\Omega$}
+\newcommand{\OMEGA}{\texorpdfstring{$\Omega$}{Ω}}
 \protected\def\epTeX{$\varepsilon$\nobreakdash-\pTeX}
 \protected\def\eupTeX{$\varepsilon$\nobreakdash-\upTeX}
 \protected\def\eTeX{$\varepsilon$\nobreakdash-\TeX}
@@ -357,8 +357,8 @@ extended modeの時に限り有効になる．
 \paragraph{数式フォント制限の緩和}
 \OMEGA の大きな特徴としては，\TeX 内部のデータ構造を改変し
 \footnote{詳しくは\texttt{texk/web2c/texmfmem.h}中の共用体%
-\texttt{memoryword}の定義を参照．大雑把に言うと，1つの「メモリ要素」に2つの32\,bit整
-数を同時に格納できるようになっている．
+\texttt{memoryword}の定義を参照．大雑把に言うと，
+1つの「メモリ要素」に2つの32\,bit整数を同時に格納できるようになっている．
 なお，少なくともtetex3以降では\texttt{memoryword}は8バイトであるが，
 \TeX 82では1つの「メモリ要素」を2つの32\,bit整数として使うことはしていない．
 %  [TODO] 正確には "big TeX" からだが，
@@ -394,20 +394,20 @@ extended modeの時に限り有効になる．
 すなわち，以下のプリミティブが追加されている\footnote{\OMEGA では\bits{8}のところが\bits{16}に
 なっている．}．
 \begin{cslist}[itemsep=\dimexpr-\baselineskip+\medskipamount]
-\csitem[\.{omathcode} \bits{8}\texttt{=}\bits{27}]\ 
-\csitem[\.{omathcode} \bits{8}]\ 
-\csitem[\.{omathchar} \bits{27}]\ 
-\csitem[\.{omathaccent} \bits{27}]\ 
-\csitem[\.{omathchardef} <control sequence>\texttt{=}\bits{27}]\ 
-\csitem[\.{odelcode} \bits{8}\texttt{=}\bits{27}\ \bits{24}]\ 
-\csitem[\.{odelimiter} \bits{27}\ \bits{24}]\ 
-\csitem[\.{oradical} \bits{27}\ \bits{24}]\ 
+ \csitem[\.{omathcode} \bits{8}\texttt{=}\bits{27}]\ 
+ \csitem[\.{omathcode} \bits{8}]\ 
+ \csitem[\.{omathchar} \bits{27}]\ 
+ \csitem[\.{omathaccent} \bits{27}]\ 
+ \csitem[\.{omathchardef} <control sequence>\texttt{=}\bits{27}]\ 
+ \csitem[\.{odelcode} \bits{8}\texttt{=}\bits{27}\ \bits{24}]\ 
+ \csitem[\.{odelimiter} \bits{27}\ \bits{24}]\ 
+ \csitem[\.{oradical} \bits{27}\ \bits{24}]\ 
 \end{cslist}
 \vspace{-\baselineskip}
 ここで，27\,bitとか24\,bitの自然数の意味については，上の表の
 \OMEGA の行を参照して欲しい．上に書いた内部のデータ構造から推測できる通り，
-\.{omathchar}等のcharacter codeの指定に使われる16\,bitの数値のうち実際に使われるのは下位
-8\,bitであり，上位8\,bitは無視される．
+\.{omathchar}等のcharacter codeの指定に使われる16\,bitの数値のうち
+実際に使われるのは下位8\,bitであり，上位8\,bitは無視される．
 例えば，|\omathchar"4012345|と|\omathchar"4010045|は同義である．
 
 なお，|\mathcode|~\bits 8としてmath code値を取得できる文字はファミリ番号が16未満のもの
@@ -415,7 +415,6 @@ extended modeの時に限り有効になる．
 delimiter codeについても同様である．
 さらに，|\odelcode|~\bits 8として51\,bitの形式のdelimiter codeを取得することはできない
 （$-1$が返る）．
-
 
 \medskip
 \LaTeX において数式フォントを同時に16個以上使うには，|\omathchar|%
@@ -669,6 +668,7 @@ delimiter codeについても同様である．
 \fi %%%%% TL2019
 \end{cslist}
 
+
 \section{バージョン番号}
 \pTeX~p3.8.0に\.{ptexversion}が実装されたのと同時に，\epTeX でもバージョン番号を
 取得する\.{epTeXversion}プリミティブが\epTeX~180121から追加された．
@@ -682,8 +682,6 @@ This is e-pTeX, Version 3.14159265-%
 p\number\ptexversion.\number\ptexminorversion\ptexrevision-%
 \number\epTeXversion-\number\eTeXversion\eTeXrevision ...
 \end{verbatim}
-
-
 \end{cslist}
 
 
@@ -721,8 +719,9 @@ min10フォントメトリックで「ちょっと」を組むと「ょっ」の
 改善する助けになることを目指して実装された．
 
 \begin{cslist}
-  \csitem[\.{lastnodechar} (read-only integer)]
-  現在構築中のリストの「最後のノード」が文字由来であれば，そのコード番号（内部コード）を内部整数として返す．
+ \csitem[\.{lastnodechar} (read-only integer)]
+  現在構築中のリストの「最後のノード」が文字由来であれば，
+  そのコード番号（内部コード）を内部整数として返す．
 
   上記「最後のノード」では，\pTeX によって自動挿入される
   \begin{itemize}
@@ -730,8 +729,10 @@ min10フォントメトリックで「ちょっと」を組むと「ょっ」の
     \item 行末禁則処理のために挿入されるペナルティ
     \item 欧文文字のベースライン補正用のノード
   \end{itemize}
-  は無視される．また，「最後のノード」が欧文文字のリガチャであった場合は，リガチャそれ自身のコード番号ではなく，
-  最後の構成要素の文字のコード番号を返す．「最後のノード」が文字を表すものでなかった場合は，$-1$が返る．
+  は無視される．また，「最後のノード」が欧文文字のリガチャであった場合は，
+  リガチャそれ自身のコード番号ではなく，
+  最後の構成要素の文字のコード番号を返す．
+  「最後のノード」が文字を表すものでなかった場合は，$-1$が返る．
 \end{cslist}
 
 例えば，\.{lastnodechar}を使って
@@ -748,7 +749,6 @@ min10フォントメトリックで「ちょっと」を組むと「ょっ」の
   $\texttt{"8143} = 33091$となる．
 }が得られる．これによって，\.{textmc}等の命令の直前の文字を知ることができるので，
 あとは\TeX マクロ側でなんとかできるだろう，という目論見である．
-
 
 また，上記の説明にあるとおり，
 \begin{verbatim}
@@ -799,8 +799,8 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 
 \begin{cslist}
  \csitem[\.{lastnodesubtype} (read-only integer)]
- 現在構築中のリストの「最後のノード」（\.{lastnodechar}プリミティブと同様）の
- subtype値を内部整数として返す．
+  現在構築中のリストの「最後のノード」（\.{lastnodechar}プリミティブと同様）の
+  subtype値を内部整数として返す．
 \begin{itemize}
  \item 「最後のノード」が文字ノードのときは0が返る．
  \item 現在構築中のリストが空のときは$-1$が返る．
@@ -887,7 +887,7 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 \cite{eptexinputenc}を参照してほしいが，おおまかに述べると以下のようになるだろう．
 
 \begin{cslist}
-  \csitem[\.{epTeXinputencoding} <encoding>]
+ \csitem[\.{epTeXinputencoding} <encoding>]
   現在読み込んでいるファイルの文字コードを<encoding>に変更する．
   実際に変更されるのは「次の行」であり，また現在のファイルからさらに\.{input}等で
   読まれたファイルには効力を及ぼさない．
@@ -920,17 +920,25 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 山下さんによって実装された(\cite{tjb94})．
 
 \begin{cslist}
-  \csitem[\.{currentspacingmode} (read-only integer)]
-  \leavevmode\<「標準で\.{kanjiskip}を挿入する」機能が有効(\.{autospacing})ならば1，
+ \csitem[\.{currentspacingmode} (read-only integer)]
+  \pTeX の「標準で\.{kanjiskip}を挿入する」機能が有効(\.{autospacing})ならば1，
   無効(\.{noautospacing})ならば0を返す．
-  \csitem[\.{currentxspacingmode} (read-only integer)]
-  \leavevmode\<「標準で\.{xkanjiskip}を挿入する」機能が有効(\.{autoxspacing})ならば1，
+ \csitem[\.{currentxspacingmode} (read-only integer)]
+  \pTeX の「標準で\.{xkanjiskip}を挿入する」機能が有効(\.{autoxspacing})ならば1，
   無効(\.{noautoxspacing})ならば0を返す．
 \end{cslist}
 
-\begin{dangerous}
-  \eupTeX では，同様に\.{currentcjktoken}...
-\end{dangerous}
+同様に，\eupTeX でも\.{currentcjktoken}プリミティブが2019/10/28に実装された．
+% e-pTeX の追加プリミティブではないが，ドキュメント化の都合上ここに書いた．
+
+\begin{cslist}
+ \csitem[\.{currentcjktoken} (read-only integer)]
+  \upTeX の「和文(CJK)文字と欧文文字を区別する」機能について，
+  \.{enablecjktoken}の状態ならば0，
+  \.{disablecjktoken}の状態ならば1，
+  \.{forcecjktoken}の状態ならば2を返す．
+\end{cslist}
+
 
 \section{\.{Uchar}, \.{Ucharcat}プリミティブ}
 \hologo{XeTeX}, \hologo{LuaTeX}には，引数<character code>を文字コードとする
@@ -946,10 +954,10 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 \epTeX~191112で前段落で述べた\.{Uchar}, \.{Ucharcat}プリミティブを追加することにした．
 
 \begin{cslist}
-  \csitem[\.{Uchar} <character code>]
+ \csitem[\.{Uchar} <character code>]
   文字コードが<character code>の文字トークンに展開される．
   指定した値と得られる文字トークンの対応表は次の通り．
-  
+
   \begin{center}
 	\small\medskip
 	\begin{tabular}{llrr}
@@ -966,7 +974,7 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
   \footnotetext{もし\.{kcatcode}の値が15だったときは，得られる和文文字トークンの
 	\.{kcatcode}は18となる．}
 
-  \csitem[\.{Ucharcat} <character code> <category code>]
+ \csitem[\.{Ucharcat} <character code> <category code>]
   文字コード・カテゴリーコードがそれぞれ<character code>, <category code>の文字トークンに展開される．
 
   \epTeX では和文文字トークンにはカテゴリーコードの情報は保存されないため，
@@ -1127,7 +1135,7 @@ $3$\,sp）だが，どこか気になるところである．
   2018/12/03.\\
   \url{https://github.com/latex3/latex2e/issues/95}
 \ifnum\epTeXversion>190131 %%%%% TL2019-hack
- \bibitem{tjb83} 北川 弘典，「バイト列と和文文字トークンの区別」，2019/06/08．\\
+ \bibitem{tjb81} 北川 弘典，「バイト列と和文文字トークンの区別」，2019/06/08．\\
   \url{https://github.com/texjporg/tex-jp-build/issues/81}．
  \bibitem{tjb83} aminophen，「[e-pTeX] |\ifincsname|」，2019/07/09．\\
   \url{https://github.com/texjporg/tex-jp-build/issues/83}．
