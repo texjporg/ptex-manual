@@ -458,6 +458,8 @@ Knuthian \TeX; however, it is enabled in \pTeX\ family.
 %%% その他の独自拡張
 \subsubsection{\epTeX\ additions (available in \epTeX, \eupTeX)}
 \begin{simplelist}
+ \csitem[\.{currentspacingmode} \New{191112 (\TL2020)}]
+ \csitem[\.{currentxspacingmode} \New{191112 (\TL2020)}]
  \csitem[\.{epTeXinputencoding} \New{160201 (\TL2016)}]
  \csitem[\.{epTeXversion} \New{180121 (\TL2018)}]
  \csitem[\.{expanded} \New{180518 (\TL2019)}]
@@ -494,8 +496,16 @@ Knuthian \TeX; however, it is enabled in \pTeX\ family.
  \csitem[\.{pdfstrcmp}]
  \csitem[\.{pdfuniformdeviate} \New{161114 (\TL2017)}]
  \csitem[\.{readpapersizespecial} \New{180901 (\TL2019)}]
+ \csitem[\.{Uchar} \New{191112 (\TL2020)}]
+ \csitem[\.{Ucharcat} \New{191112 (\TL2020)}]
  \csitem[\.{vfi}]
  \csitem[\texttt{fi}\index{fi=\texttt{fi}}]
+\end{simplelist}
+
+%%% e-upTeX の独自拡張
+\subsubsection{\eupTeX\ additions (available in \eupTeX)}
+\begin{simplelist}
+ \csitem[\.{currentcjktoken} \New{191112 (\TL2020)}]
 \end{simplelist}
 
 % [TODO] 引数は何で返り値は何か，expandable?
@@ -691,8 +701,21 @@ is as follows:
 %%% 指定のコードの和文トークンを得る方法
 \subsubsection{Creating a Japanese character token with a specified code}
 
-To create a character token with a specified code value between 0--255,
-the ``\.{lowercase} trick'' can be used; for example,
+Short version:
+\begin{itemize}
+ \item With \epTeX~191112 or later (\TL2020),
+   you can use expandable primitives \.{Uchar} and \.{Ucharcat}
+ \item Otherwise, use the ``\.{kansuji} trick''.
+\end{itemize}
+
+\paragraph{The ``\.{kansuji} trick''}
+This is a modified version of the ``\.{lowercase} trick''
+available in \pTeX\ family.
+
+\begin{dangerous}
+Short note on the ``\.{lowercase} trick'':
+to create a character token with a specified code value between 0--255
+with Knuthian \TeX, the ``\.{lowercase} trick'' can be used; for example,
 \begin{verbatim}
   \begingroup
   \lccode`\?=\mycount
@@ -702,7 +725,7 @@ defines |\X| which expands to a character number |\mycount|
 while the \.{catcode} of |?| (\the\catcode`\?) is preserved.
 However, the trick cannot be applied to Japanese characters,
 since \pTeX\ family does not support \.{lccode} outside 0--255.
-Instead, the ``\.{kansuji} trick'' can be used.
+\end{dangerous}
 
 \.{kansuji} is an expandable primitive like \.{number} or \.{romannumeral},
 and it converts an integer into its corresponding kanji notation
@@ -724,6 +747,57 @@ Example 2: equivalent to |\def\日本{Japan}|.
     \expandafter\gdef\csname\kansuji56\endcsname{Japan}
   \endgroup
 \end{verbatim}
+
+Since \.{kansujichar} accepts only Japanese character code,
+the ``\.{kansuji} trick'' and the ``\.{lowercase} trick'' should be
+used complementarily.
+
+\paragraph{\.{Uchar}, \.{Ucharcat}}
+The ``\.{kansuji} trick'' above include an assignment of \.{kansujichar}
+which is unexpandable.
+\epTeX~191112 or later (\TL2020) provides expandable primitives
+\.{Uchar} and \.{Ucharcat}, which are derived from \hologo{XeTeX}.
+
+\begin{simplelist}
+ \csitem[\.{Uchar} <character code>]
+  Expands to a character token with specified slot <character code>.
+  \begin{itemize}
+   \item When an 8-bit number (0--255) is given,
+     it expands to a Latin character token with category code 12,
+     except for a space character (32) which has category code 10.
+   \item When a Japanese character code greater than 255 is given,
+     it expands to a Japanese character token with its current category code;
+     16--18 for \epTeX, 16--19 for \eupTeX.
+  \end{itemize}
+
+ \csitem[\.{Ucharcat} <character code> <category code>]
+  Expands to a character token with slot <character code> and
+  <category code> specified.
+  \begin{itemize}
+   \item With \epTeX:
+     \begin{itemize}
+      \item Only 8-bit number (0--255) are allowed for <character code>;
+        that is, only Latin characters can be generated.
+      \item The values allowed for <category code> are 1--4, 6--8, 10--13.
+     \end{itemize}
+   \item With \eupTeX:
+     \begin{itemize}
+      \item When <character code> is between 0--127,
+        only Latin characters can be generated.
+        Thus, the values allowed for <category code> are
+        1--4, 6--8, 10--13.
+      \item When <character code> is between 128--255,
+        both Latin and Japanese characters can be generated
+        depending on the specified <category code>;
+        1--4, 6--8, 10--13: Latin character,
+        16--19: Japanese character.
+      \item When <character code> is greater than 255,
+        only Japanese characters can be generated.
+        Thus, the values allowed for <category code> are
+        16--19.
+     \end{itemize}
+  \end{itemize}
+\end{simplelist}
 
 %%% pdfTeX と違うところ
 \subsection{Difference from \pdfTeX\ in DVI mode}\label{dvi-pdftex}
