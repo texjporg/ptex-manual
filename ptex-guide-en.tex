@@ -768,6 +768,8 @@ which is unexpandable.
    \item When a Japanese character code greater than 255 is given,
      it expands to a Japanese character token with its current category code;
      16--18 for \epTeX, 16--19 for \eupTeX.
+     % [TODO] 本当は pTeX では和文文字トークン自体は \kcatcode を
+     % 持たないが，簡単のためまあいっか．
   \end{itemize}
 
  \csitem[\.{Ucharcat} <character code> <category code>]

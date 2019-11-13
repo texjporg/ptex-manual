@@ -960,14 +960,14 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 
   \begin{center}
 	\small\medskip
-	\begin{tabular}{llrr}
+	\begin{tabular}{lccc}
 	  \toprule
 	  <character code>&和文・欧文&\multicolumn{2}{c}{category code}\\\cmidrule(lr){3-4}
 	  &&\epTeX&\eupTeX\\
 	  \midrule
 	  0--31, 33--255&欧文文字トークン&12&12\\
 	  32            &欧文文字トークン&10&10\\
-	  256以上の<kanji code>&和文文字トークン&---&その時の\.{kcatcode}\footnotemark\\
+	  256以上の<kanji code>&和文文字トークン&---（都度取得）&その時の\.{kcatcode}\footnotemark\\
 	  \bottomrule
 	\end{tabular}
   \end{center}
