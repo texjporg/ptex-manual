@@ -941,14 +941,17 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 文字トークンを作るプリミティブが存在する\footnote{\hologo{LuaTeX}ではLuaによる代替物がある．}．
 
 % pTeX の「抜け道」の具体的なコード？
-……\epTeX~191030で前段落で述べた\.{Uchar}, \.{Ucharcat}プリミティブを追加した．
+\pTeX で「和文版\.{Uchar}」に相当することは\TeX~Live 2019以前の\pTeX ではマクロで実現することが可能だが，
+将来の\pTeX の改修で不可能になる恐れ(\cite{tjb81,tjb95})があるので，
+\epTeX~191112で前段落で述べた\.{Uchar}, \.{Ucharcat}プリミティブを追加することにした．
 
 \begin{cslist}
   \csitem[\.{Uchar} <character code>]
   文字コードが<character code>の文字トークンに展開される．
   指定した値と得られる文字トークンの対応表は次の通り．
+  
   \begin{center}
-	\small
+	\small\medskip
 	\begin{tabular}{llrr}
 	  \toprule
 	  <character code>&和文・欧文&\multicolumn{2}{c}{category code}\\\cmidrule(lr){3-4}
@@ -1124,11 +1127,15 @@ $3$\,sp）だが，どこか気になるところである．
   2018/12/03.\\
   \url{https://github.com/latex3/latex2e/issues/95}
 \ifnum\epTeXversion>190131 %%%%% TL2019-hack
+ \bibitem{tjb83} 北川 弘典，「バイト列と和文文字トークンの区別」，2019/06/08．\\
+  \url{https://github.com/texjporg/tex-jp-build/issues/81}．
  \bibitem{tjb83} aminophen，「[e-pTeX] |\ifincsname|」，2019/07/09．\\
   \url{https://github.com/texjporg/tex-jp-build/issues/83}．
  \bibitem{tjb94} aminophen，「e(u)ptex: add |\current(x)spacingmode|, |\currentcjktoken|」，%
   2019/10/28．\\
   \url{https://github.com/texjporg/tex-jp-build/pull/94}．
+ \bibitem{tjb95} 北川 弘典，「[eptex] |\Uchar| and |\Ucharcat|」，2019/10/30．\\
+  \url{https://github.com/texjporg/tex-jp-build/issues/95}．
 \fi %%%%% TL2019
 \end{thebibliography}
 
