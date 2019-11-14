@@ -997,6 +997,21 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 	<category code>の指定可能値は16--19．
   \end{itemize}
 \end{dangerous}
+\begin{dangerous}
+  \.{Uchar}で和文文字トークンを生成するには，その和文文字コードを
+  与える必要があるが，その値は内部漢字コードに依るので，
+  |\jis|や|\euc|等の文字コード変換プリミティブを使うのが便利である
+  （例えば|\Uchar\jis"3441|で「\Uchar\jis"3441」を得る）．
+
+  ただし，\eupTeX の\.{Ucharcat}では<character code>と<category code>を
+  空白トークンで区切る必要があり，注意を要する．
+  例えば，カテゴリーコード17の「漢」を得ようとして，
+  単に|\Ucharcat\jis"3441 17|と書くとエラー\footnote{%
+    \.{jis}の展開時に後ろの空白トークンが食われてしまい，\.{Uchar}には
+    文字コード2845017（$\text{漢}=\text{U+6F22}\rightarrow 28450$と17が
+    繋がった結果）が渡ってしまう．
+  }．|\Ucharcat\jis"3441\noexpand\space17|と書けば回避できる．
+\end{dangerous}
 
 
 
