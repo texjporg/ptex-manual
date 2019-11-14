@@ -883,6 +883,12 @@ set globally, i.e. in ini\TeX\ mode.
 Once a valid Japanese font is selected, there is no way of
 selecting ``Japanese \.{nullfont}'' to discard all characters.
 
+Moreover, \pTeX\ and friends assume that each Japanese font
+(except ``Japanese \.{nullfont} in ini\TeX\ mode)
+contains all valid Japanese character code.
+In other words, all Japanese fonts share the same character set
+corresponding to the whole valid Japanese character code range.\label{jfont}
+
 \section{Other strange beasts}
 
 %%% 縦組は諦めよう
@@ -914,6 +920,20 @@ where
   \end{cases}
 \]
 Therefore, the overall range of <character code> is \emph{not} continuous.
+
+To check whether an integer is a valid Japanese character code or not,
+you can use \.{iffontchar} with \epTeX~190709 or later (\TL2020).
+Suppose a count register |\mycount| stores an integer, you can do it as follows:
+\begin{verbatim}
+  \iffontchar\jfont\mycount
+    % \mycount is a valid Japanese character code
+  \fi
+\end{verbatim}
+Here the primitive \.{jfont} is used merely as
+a representative non-empty\footnote{This assumption is always safe after
+one of the standard \pTeX\ formats (e.g. plain \pTeX, \pLaTeX) is loaded.}
+Japanese font containing all valid Japanese character code (see \ref{jfont}).
+
 
 \newpage
 
