@@ -932,7 +932,7 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 % e-pTeX の追加プリミティブではないが，ドキュメント化の都合上ここに書いた．
 
 \begin{cslist}
- \csitem[\.{currentcjktoken} (read-only integer)]
+ \csitem[\.{currentcjktoken}（read-only integer，\emph{\eupTeX のみ}）]
   \upTeX の「和文(CJK)文字と欧文文字を区別する」機能について，
   \.{enablecjktoken}の状態ならば0，
   \.{disablecjktoken}の状態ならば1，
@@ -1006,11 +1006,18 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
   ただし，\eupTeX の\.{Ucharcat}では<character code>と<category code>を
   空白トークンで区切る必要があり，注意を要する．
   例えば，カテゴリーコード17の「漢」を得ようとして，
-  単に|\Ucharcat\jis"3441 17|と書くとエラー\footnote{%
+  単に
+  \begin{quote}
+	\verb+\Ucharcat\jis"3441 17 % エラー+
+  \end{quote}
+  と書くとエラー\footnote{%
     \.{jis}の展開時に後ろの空白トークンが食われてしまい，\.{Uchar}には
     文字コード2845017（$\text{漢}=\text{U+6F22}\rightarrow 28450$と17が
     繋がった結果）が渡ってしまう．
-  }．|\Ucharcat\jis"3441\noexpand\space17|と書けば回避できる．
+  }が発生する．次のように書けばエラーが回避できるようである．
+  \begin{quote}
+	\verb+\Ucharcat\jis"3441\noexpand\space17 % エラー回避+
+  \end{quote}
 \end{dangerous}
 
 
@@ -1080,7 +1087,7 @@ $3$\,sp）だが，どこか気になるところである．
 \begin{thebibliography}{99}
  \bibitem{h7k} 北川 弘典，「計算数学II　作業記録」，2008．\\
   \url{https://osdn.jp/projects/eptex/document/resume/ja/1/resume.pdf}ほか，
-  本pdfと同じディレクトリにある\texttt{resume.pdf}がそれにあたる．
+  本pdfと同じディレクトリにある\texttt{eptex\_resume.pdf}がそれにあたる．
  \bibitem{yamamoto} 山本 和義，「数式famの制限とluatex」，
   掲示板「\TeX\ Q\ \&\ A」，2009/02/12．\\
   \url{http://oku.edu.mie-u.ac.jp/~okumura/texfaq/qa/52744.html}
