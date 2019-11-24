@@ -1018,6 +1018,10 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
   \begin{quote}
 	\verb+\Ucharcat\jis"3441\noexpand\space17 % エラー回避+
   \end{quote}
+  あるいは：
+  \begin{quote}
+	\verb+\Ucharcat\numexpr\jis"3441\relax 17 % エラー回避+
+  \end{quote}
 \end{dangerous}
 
 
