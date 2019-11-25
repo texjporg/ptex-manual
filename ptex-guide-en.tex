@@ -16,6 +16,7 @@
 \usepackage[dvipdfmx,hyperfootnotes=false]{hyperref}
 \usepackage{pxjahyper}
 \usepackage{hologo}
+\usepackage{xspace}
 \usepackage{makeidx}\makeindex
 
 % common
@@ -55,7 +56,7 @@
 \def\pLaTeX{p\LaTeX}\def\upLaTeX{u\pLaTeX}
 \def\pdfTeX{pdf\TeX}
 \def\OMEGA{$\Omega$}
-\def\TL{\TeX\ Live\ }
+\def\TL{\TeX\ Live\xspace}
 
 \def\_{\leavevmode\vrule width .45em height -.2ex depth .3ex\relax}
 
@@ -211,20 +212,83 @@ summarized as follows:
 \section{Output format --- DVI}
 
 %%% DVI だけ
-The output of \pTeX/\upTeX\ is always a DVI file.
+The output of \pTeX\ family is always a DVI file.
+This is in contrast to the mainstream of \pdfTeX\ in the Western \TeX\ world.
+
+In case you are not familiar with DVI output processing,
+first we give some general notice on how to get a ``correct'' output
+using \LaTeX\ in DVI mode.
+
+\begin{itemize}
+  \item The DVI format is, as its name suggests, inherently driver-independent.
+    However, some \LaTeX\ packages (\Pkg{graphicx}, \Pkg{color}, \Pkg{hyperref} etc.)
+    embed some \.{special} commands into the DVI, which can be interpreted later
+    by some specific DVI driver.
+    Such a DVI is no longer driver-independent, thus those are called
+    driver-dependent packages.
+  \item In almost all major \TeX\ distributions (of course including \TL),
+    the default DVI driver is set to |dvips|.
+    When you choose to process the resulting DVI file with a driver
+    other than dvips (e.g. dvipdfmx) after running \LaTeX,
+    you need to pass a proper driver option (e.g. |[dvipdfmx]|) to
+    all driver-dependent packages.
+\end{itemize}
+
+%%% 日本の DVI ドライバの状況
+Now, let's move on to the situation in Japan,
+which is slightly complicated due to historical reasons
+but may also apply to other countries:
+\begin{itemize}
+  \item There are two major conventions to pass a proper driver option
+    to all driver-dependent packages:
+    \begin{enumerate}
+      \item To give a driver option to each driver-dependent package:
+\begin{verbatim}
+\documentclass{article}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage[dvipdfmx]{color}
+\end{verbatim}
+      \item To have a driver option as global:
+\begin{verbatim}
+\documentclass[dvipdfmx]{article}
+\usepackage{graphicx}
+\usepackage{color}
+\end{verbatim}
+    \end{enumerate}
+    The former convention has been used for many years since 1990s
+    when the number of driver-dependent packages was limited.
+    But in recent years (around 2010--), there are much more
+    driver-dependent packages available. Thus
+    we (Japanese \TeX\ experts) advise a global driver option
+    rather than individual package options for simplicity,
+    but not yet fully widespread.\footnote{The fact that
+    there had been a mismatch in option names
+    (\code{[dvipdfm]} vs. \code{[dvipdfmx]})
+    between packages may also have been part of it;
+    \Pkg{geometry} did not understand \code{[dvipdfmx]} option until 2018!}
+  \item Many people still see driver options as ``optional'';
+    they do without driver options unless really needed.
+    For example, the convention of having a global driver option
+    does no harm even when no driver-dependent package is used, but
+    some users choose to omit a driver option to avoid a warning:
+\begin{verbatim}
+LaTeX Warning: Unused global option(s):
+    [dvipdfmx].
+\end{verbatim}
+\end{itemize}
+
+\subsection{Extensions of DVI format in \pTeX\ family}
+
 %%% pTeX の DVI は欧文の横組みだけなら普通。和文が入ると特殊，縦組ならIDも変化
-Its DVI format is completely compatible with Knuthian \TeX,
-as long as the following conditions are met:
+The DVI format output by \pTeX\ family is fully compatible with
+Knuthian \TeX, as long as the following conditions are met:
 \begin{itemize}
   \item No Japanese characters are typeset.
   \item There is no portion of vertical text alignment.
 \end{itemize}
 
-\subsection{Extensions of DVI format}
-
-In \pTeX/\upTeX,
-some additional DVI commands, which are defined in the
-standard \cite{dvistd0} but never used in \TeX82, are used.
+However, some additional DVI commands, which are defined in the
+standard \cite{dvistd0} but never used in \TeX82, can come out.
 \begin{itemize}
   \item |set2| (129), |put2| (134):
     Appears in both \pTeX\ and \upTeX\ DVI.
@@ -254,7 +318,6 @@ Normally it is set to 2, as with \TeX82; however,
 when |dir| (255) appears at least once in a single \pTeX/\upTeX\ DVI,
 the |post_post| table of postamble contains $\mathrm{ID} = 3$.
 
-%%% 日本の DVI ドライバの状況
 \subsection{DVI drivers with Japanese support}
 
 There are some DVI drivers with Japanese support.
@@ -262,27 +325,14 @@ The most eminent drivers are \emph{dvips} and \emph{dvipdfmx}.
 Nowadays most of casual Japanese users are using \emph{dvipdfmx} as a DVI driver.
 On the other hand, users of \emph{dvips} are unignorable, especially those
 working in publishing industry.
+In recent years, most of major driver-dependent packages support
+both two drivers.
 
 \subsubsection{Using \emph{dvipdfmx}}
 
 A DVI file which is output by \pTeX\ can be converted directly to a PDF file
 using dvipdfmx.
 % [TODO] Mention kanji-config-updmap for font setup
-
-\emph{Note for casual \LaTeX\ users} ---
-when you choose to process the resulting DVI file with dvipdfmx
-after running \LaTeX\ (command |platex| or |uplatex|),
-you need to pass a proper driver option |[dvipdfmx]| for
-all driver-dependent packages, such as |graphicx| and |color|.
-This is because the default for such packages is set to |dvips| mode
-as with the original \LaTeX\ in DVI mode (command |latex|).
-For simplicity, we recommend a global driver option |[dvipdfmx]|
-as in the following example:
-\begin{verbatim}
-  \documentclass[dvipdfmx,...]{article}
-  \usepackage{graphicx}
-  \usepackage{color}
-\end{verbatim}
 
 \subsubsection{Using \emph{dvips}}
 
