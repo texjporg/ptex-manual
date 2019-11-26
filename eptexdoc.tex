@@ -638,7 +638,7 @@ delimiter codeについても同様である．
   \.{pdfuniformdeviate}は，0以上<number>未満の一様分布に従う乱数（整数値）を生成する．
   \.{pdfnormaldeviate}は，平均値0，標準偏差65536の正規分布に従う乱数（整数値）を生成する．
 
-  \csitem[\.{pdfrandomseed} (read-only integer), \.{pdfsetrandomseed} <number>]
+ \csitem[\.{pdfrandomseed} (read-only integer), \.{pdfsetrandomseed} <number>]
   乱数生成の種の値は，\.{pdfrandomseed}で取得できる．
   種の初期化にはシステムのマイクロ秒単位での現在時刻情報が使われる．また，種の値を
   設定するには\.{pdfsetrandomseed}に引数として渡せば良い．
@@ -661,7 +661,7 @@ delimiter codeについても同様である．
   \epTeX~180518以降で利用可能である．
 
 \ifnum\epTeXversion>190131 %%%%% TL2019-hack
-  \csitem[\.{ifincsname}]
+ \csitem[\.{ifincsname}]
   \texttt{\.{csname}~...~\.{endcsname}}内で評価されたちょうどその時に真となる．
   \LaTeX~2019-10-01で行われる変更(\cite{latex95,tjb83})で必要になったために
   \epTeX~190709で導入された．
@@ -801,10 +801,10 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
  \csitem[\.{lastnodesubtype} (read-only integer)]
   現在構築中のリストの「最後のノード」（\.{lastnodechar}プリミティブと同様）の
   subtype値を内部整数として返す．
-\begin{itemize}
- \item 「最後のノード」が文字ノードのときは0が返る．
- \item 現在構築中のリストが空のときは$-1$が返る．
-\end{itemize}
+  \begin{itemize}
+    \item 「最後のノード」が文字ノードのときは0が返る．
+    \item 現在構築中のリストが空のときは$-1$が返る．
+  \end{itemize}
 \end{cslist}
 
 実際に有用なのは，以下の場合であろう：
@@ -912,6 +912,7 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
   % （\uccode, \lccode は参照しない）
 \end{cslist}
 
+\ifnum\epTeXversion>190131 %%%%% TL2019-hack
 \section{\.{current[x]spacingmode}プリミティブ}
 もともと\pTeX 系列では，\.{kanjiskip},~\.{xkanjiskip}の挿入が有効になっているか
 直接的に知る方法が\.{showmode}プリミティブしかなかった．
@@ -938,8 +939,9 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
   \.{disablecjktoken}の状態ならば1，
   \.{forcecjktoken}の状態ならば2を返す．
 \end{cslist}
+\fi %%%%% TL2019
 
-
+\ifnum\epTeXversion>190131 %%%%% TL2019-hack
 \section{\.{Uchar}, \.{Ucharcat}プリミティブ}
 \hologo{XeTeX}, \hologo{LuaTeX}には，引数<character code>を文字コードとする
 \emph{文字トークン}に展開される「\.{Uchar} <character code>」というプリミティブが存在する
@@ -1023,6 +1025,7 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 	\verb+\Ucharcat\numexpr\jis"3441\relax 17 % エラー回避+
   \end{quote}
 \end{dangerous}
+\fi %%%%% TL2019
 
 
 
