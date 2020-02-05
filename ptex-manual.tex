@@ -1044,11 +1044,23 @@ JFMファイルもTFMファイルと同様の情報を持つが，
 \end{dangerous}
 
 \begin{cslist}
-\csitem[\.{ifjfont} <font>, \.{iftfont} <font>]
+\csitem[\.{ifjfont} <\,font>, \.{iftfont} <\,font>]
   |\ifjfont|は<font>が和文の横組用フォントかどうか，
   |\iftfont|は和文の縦組用フォントかどうかを判定する．
   2020-02-05のコミット(r53681)で追加され，
-  \TeX~Live 2020の\pTeX~(p3.8.3)で利用可能である。
+  \TeX~Live 2020の\pTeX~(p3.8.3)で利用可能である．
+
+  これにより，例えば\.{HOGE}が和文フォントか否かは
+\begin{verbatim}
+\ifjfont\HOGE
+  （和文の横組用フォント）
+\else\iftfont\HOGE
+  （和文の縦組用フォント）
+\else
+  （欧文フォント）
+\fi
+\end{verbatim}
+  として判定できる．
 \end{cslist}
 
 \begin{dangerous}
@@ -1058,6 +1070,15 @@ JFMファイルもTFMファイルと同様の情報を持つが，
   バージョンp3.8.2までの\pTeX には存在しなかった．
   % https://github.com/texjporg/tex-jp-build/pull/97
 \end{dangerous}
+
+\begin{dangerous}
+  ちなみに，\epTeX, \eupTeX には\.{iffontchar}プリミティブが存在する．
+  しかし，<\,font>が和文フォントか否かを判定するために
+  \texttt{\.{iffontchar}~<\,font>~256}などと第二引数に256以上の値を指定することはできない．
+  なぜなら，欧文フォントに対し第二引数に0--255以外の値を指定すると
+  「\verb+! Bad character code (...).+」エラーが発生するからである．
+\end{dangerous}
+
 
 \begin{cslist}
 \csitem[\.{jfam}=<number>]
