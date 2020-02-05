@@ -1016,8 +1016,9 @@ JFMファイルもTFMファイルと同様の情報を持つが，
   用いる命令である．
 \begin{itemize}
  \item フォントを定義する際は，欧文フォント・和文の横組用フォント・
-       和文の縦組用のフォントのいずれも
-       |\font|, |\jfont|, |\tfont|のどれを用いても定義できる．
+       和文の縦組用フォントのいずれも
+       |\font|, |\jfont|, |\tfont|のどれを用いても定義できる
+       （要求された実際のTFM/JFMに応じて，自動的にアサインされる）．
  \item |\the|等で「現在のフォント」を取得する際には，
        |\jfont|で「和文の横組用フォント」を，
        |\tfont|で「和文の縦組用フォント」を返す．
@@ -1040,6 +1041,22 @@ JFMファイルもTFMファイルと同様の情報を持つが，
   % https://tex.stackexchange.com/questions/18602/
   % https://twitter.com/doraTeX/status/1098584763277824000
   % https://twitter.com/zr_tex8r/status/1098594165573722112
+\end{dangerous}
+
+\begin{cslist}
+\csitem[\.{ifjfont} <font>, \.{iftfont} <font>]
+  |\ifjfont|は<font>が和文の横組用フォントかどうか，
+  |\iftfont|は和文の縦組用フォントかどうかを判定する．
+  2020-02-05のコミット(r53681)で追加され，
+  \TeX~Live 2020の\pTeX~(p3.8.3)で利用可能である。
+\end{cslist}
+
+\begin{dangerous}
+  上述のとおり，欧文フォント・和文の横組用フォント・
+  和文の縦組用フォントのいずれも|\font|一つで定義可能だが，
+  定義したフォントが実際にどの種類だったかを知る手段は
+  バージョンp3.8.2までの\pTeX には存在しなかった．
+  % https://github.com/texjporg/tex-jp-build/pull/97
 \end{dangerous}
 
 \begin{cslist}
