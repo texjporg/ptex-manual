@@ -242,7 +242,6 @@ tracing機能や条件判断文の強化などあるが，そこら辺はパッ�
   \end{multilist}}
 
  \csitem[\.{currentiftype} (read-only integer)]
-\ifnum\epTeXversion>190131 %%%%% TL2019-hack
   条件判断文とそれを表す数字との対応は以下のようになっている
   （\epTeX~190709以降）．
   21,~22は\hologo{pdfTeX}由来の条件判断文（後述），
@@ -261,27 +260,7 @@ tracing機能や条件判断文の強化などあるが，そこら辺はパッ�
   \item \bf 28&\.{ifybox}\cr\item \bf 29&\.{ifdbox}\cr\item \bf 30&\.{ifmbox}\cr
   \item \bf 31&\.{ifjfont}\cr\item \bf 32&\.{iftfont}\cr
   \end{multilist}}
-\else %%%%% TL2019-hack
-  条件判断文とそれを表す数字との対応は以下のようになっている
-  （\epTeX~190131まで；\epTeX~190709以降は\.{ifincsname}プリミティブ追加により変化するので注意）．
-  21--28が，\pTeX 拡張で追加された条件判断文に対応する．
-  29の\.{ifpdfprimitive}は\hologo{pdfTeX}由来のプリミティブ（後述）である．\\
-  \parbox{.9\linewidth}{%
-  \begin{multilist}{3}{\hfil\hskip1.5zw#:&\quad#\qquad\hfil}
-  \item 1&\.{if}\cr\item 2&\.{ifcat}\cr\item 3&\.{ifnum}\cr\item 4&\.{ifdim}\cr
-  \item 5&\.{ifodd}\cr\item 6&\.{ifvmode}\cr\item 7&\.{ifhmode}\cr
-  \item 8&\.{ifmmode}\cr\item 9&\.{ifinner}\cr\item 10&\.{ifvoid}\cr
-  \item 11&\.{ifhbox}\cr\item 12&\.{ifvbox}\cr\item 13&\.{ifx}\cr
-  \item 14&\.{ifeof}\cr\item 15&\.{iftrue}\cr\item 16&\.{iffalse}\cr
-  \item 17&\.{ifcase}\cr\item 18&\.{ifdefined}\cr\item 19&\.{ifcsname}\cr
-  \item 20&\.{iffontchar}\cr\item \bf 21&\.{iftdir}\cr\item \bf 22&\.{ifydir}\cr
-  \item \bf 23&\.{ifddir}\cr\item \bf 24&\.{ifmdir}\cr\item \bf 25&\.{iftbox}\cr
-  \item \bf 26&\.{ifybox}\cr\item \bf 27&\.{ifdbox}\cr\item \bf 28&\.{ifmbox}\cr
-  \item \bf 29&\.{ifpdfprimtive}\cr
-  \end{multilist}}
-\fi %%%%% TL2019-hack
 
-\ifnum\epTeXversion>190131 %%%%% TL2019-hack
  \csitem[\.{fontcharwd}, \.{fontcharht}, \.{fontchardp}, \.{fontcharic}]
   欧文フォントと和文フォントを判別し，それに応じて処理が分かれる．
   それに伴い，許容される引数範囲と意味が異なることに注意
@@ -324,10 +303,8 @@ tracing機能や条件判断文の強化などあるが，そこら辺はパッ�
       \verb+! Bad character code (256).+
       のようにエラーが出る．
   \end{itemize}
-\fi %%%%% TL2019-hack
 \end{cslist}
 
-\ifnum\epTeXversion>190131 %%%%% TL2019-hack
 \begin{dangerous}
   上記で「和文文字コードとして有効かどうか」は，関数|is_char_kanji|を参照．
   この関数は内部コードによって異なるため，マクロで実装するのは面倒であるが，
@@ -335,7 +312,6 @@ tracing機能や条件判断文の強化などあるが，そこら辺はパッ�
   なお，\upTeX では任意の非負の値が和文文字コードとして有効なため，
   |is_char_kanji|は非負かどうかの判定になっている．
 \end{dangerous}
-\fi %%%%% TL2019-hack
 
 \section{\OMEGA 由来の機能（旧名称：\texttt{FAM256}パッチ）}
 \epTeX には，掲示板\TeX\ Q\ \&\ Aの山本氏の書き込み
@@ -661,12 +637,10 @@ delimiter codeについても同様である．
   \hologo{pdfTeX}, \epTeX, \hologo{XeTeX}で一斉に実装された．
   \epTeX~180518以降で利用可能である．
 
-\ifnum\epTeXversion>190131 %%%%% TL2019-hack
  \csitem[\.{ifincsname}]
   \texttt{\.{csname}~...~\.{endcsname}}内で評価されたちょうどその時に真となる．
   \LaTeX~2019-10-01で行われる変更(\cite{latex95,tjb83})で必要になったために
   \epTeX~190709で導入された．
-\fi %%%%% TL2019
 \end{cslist}
 
 
@@ -913,7 +887,6 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
   % （\uccode, \lccode は参照しない）
 \end{cslist}
 
-\ifnum\epTeXversion>190131 %%%%% TL2019-hack
 \section{\.{current[x]spacingmode}プリミティブ}
 もともと\pTeX 系列では，\.{kanjiskip},~\.{xkanjiskip}の挿入が有効になっているか
 直接的に知る方法が\.{showmode}プリミティブしかなかった．
@@ -940,9 +913,8 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
   \.{disablecjktoken}の状態ならば1，
   \.{forcecjktoken}の状態ならば2を返す．
 \end{cslist}
-\fi %%%%% TL2019
 
-\ifnum\epTeXversion>190131 %%%%% TL2019-hack
+
 \section{\.{Uchar}, \.{Ucharcat}プリミティブ}
 \hologo{XeTeX}, \hologo{LuaTeX}には，引数<character code>を文字コードとする
 \emph{文字トークン}に展開される「\.{Uchar} <character code>」というプリミティブが存在する
@@ -1026,7 +998,6 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 	\verb+\Ucharcat\numexpr\jis"3441\relax 17 % エラー回避+
   \end{quote}
 \end{dangerous}
-\fi %%%%% TL2019
 
 
 
@@ -1164,7 +1135,6 @@ $3$\,sp）だが，どこか気になるところである．
   non-ASCII symbols in labels.'',
   2018/12/03.\\
   \url{https://github.com/latex3/latex2e/issues/95}
-\ifnum\epTeXversion>190131 %%%%% TL2019-hack
  \bibitem{tjb81} 北川 弘典，「バイト列と和文文字トークンの区別」，2019/06/08．\\
   \url{https://github.com/texjporg/tex-jp-build/issues/81}．
  \bibitem{tjb83} aminophen，「[e-pTeX] |\ifincsname|」，2019/07/09．\\
@@ -1174,7 +1144,6 @@ $3$\,sp）だが，どこか気になるところである．
   \url{https://github.com/texjporg/tex-jp-build/pull/94}．
  \bibitem{tjb95} 北川 弘典，「[eptex] |\Uchar| and |\Ucharcat|」，2019/10/30．\\
   \url{https://github.com/texjporg/tex-jp-build/issues/95}．
-\fi %%%%% TL2019
 \end{thebibliography}
 
 \newpage
