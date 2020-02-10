@@ -64,14 +64,25 @@
 \date{version p\the\ptexversion.\the\ptexminorversion\ptexrevision，\today}
 \maketitle
 
-本ドキュメントは，日本語\TeX 開発コミュニティ版の\pTeX%
-~p\the\ptexversion.\the\ptexminorversion\ptexrevision
-についてまとめたものである．
-オリジナルのASCII~\pTeX\footnote{最新版はp3.1.11 (2009/08/17)．
-  \url{https://asciidwango.github.io/ptex/}}とは
-動作が異なる点もあるので注意されたい．
+本ドキュメントは，日本語\TeX 開発コミュニティ版の
+\pTeX~p\the\ptexversion.\the\ptexminorversion\ptexrevision
+（以下，「コミュニティ版\pTeX 」）についてまとめたものである．
 
-\emph{\large 本ドキュメントはまだまだ未完成です．}
+\pTeX はもともとアスキー株式会社によって開発された\footnote{最新版は
+p3.1.11 (2009/08/17)．\url{https://asciidwango.github.io/ptex/}}ので，
+しばしば「ASCII \pTeX 」と呼ばれる．
+コミュニティ版\pTeX は，ASCII \pTeX に幾つかの改良を加えた
+「ptexenc版\pTeX\footnote{2004年から2011年まで開発されていた，
+UNIX向け日本語\TeX ディストリビューションptetexや後継のptexliveの
+一部であった．なお，バージョン番号はASCII~\pTeX と同じとされた．}」を
+基にしている．そのため，オリジナルのASCII~\pTeX とは
+動作が異なる点もあるので注意されたい．
+\begin{itemize}
+  \item コミュニティ版\pTeX の開発元：\\
+    \url{https://github.com/texjporg/tex-jp-build/}
+  \item 本ドキュメントの開発元：\\
+    \url{https://github.com/texjporg/ptex-manual/}
+\end{itemize}
 
 \tableofcontents
 
@@ -86,85 +97,47 @@
 \section{\pTeX で利用可能な文字}
 \label{sec:ptexchar}
 
-\TeX82で扱える文字コードの範囲は0--255であった．
-\pTeX ではこれに加えてJIS X 0208の文字も利用可能であり，
-以上の文字集合が欧文文字と和文文字に区別されて扱われる．
-
-[TODO] 欧文文字とは何か，和文文字とは何か
-
-% https://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=460#p2422
-% あたりによると，以下のようになるが，今も正しいのか？
-%
-% \pTeX への入力は，「7ビットASCII文字集合」に「ISO-2022-JP (jis)，EUC-JP (euc)，
-% Shift-JIS (sjis)またはUTF-8 (utf8)のいずれかでエンコードされた
-% JIS X 0208の文字集合」を加えたものとして解釈される．
-
-\pTeX は，入力をEUC-JPまたはShift-JISのいずれか（後述）の
-内部コードに変換して取り扱う．和文文字の内部コードとして
-許される整数は$256c_1+c_2$，但し$c_i\in C_i$であり，ここで
-\begin{description}
- \item[内部コードがEUC-JPのとき]
-    $C_1=C_2=\{\hex{a1},\dots,\hex{fe}\}$.
- \item[内部コードがShift-JISのとき]
-    $C_1=\{\hex{81},\dots,\hex{9f}\}\cup\{\hex{e0},\dots,\hex{fc}\}$,\\
-    $C_2=\{\hex{40},\dots,\hex{7e}\}\cup\{\hex{80},\dots,\hex{fc}\}$.
-\end{description}
-である．この内部コードのパターンに合えば和文文字として扱われ，
-合わなければ欧文文字として扱われる．
-% 参考：kanji.c の |is_char_kanji| の実装
-
-入力ファイルの文字コードがUTF-8の場合，JIS X 0208にない文字は
-UTF-8のバイト列として読み込まれる．
-
 % このマニュアルを英語化する際は以下も参照．
 % http://tutimura.ath.cx/ptexlive/?ptexenc%2FDetails
 % http://ajt.ktug.org/assets/2008/5/1/0201tsuchimura_kuroki.pdf
 % https://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=460
 
-\pTeX の入力ファイルの文字コードは，起動時のオプション|-kanji|によって
-変更できる（可能な値は|utf8|，|euc|，|sjis|，|jis|）．
-同様に，内部コードは|-kanji-internal|オプションによって変更できる
+\TeX82で扱える文字コードの範囲は0--255であった．
+\pTeX ではこれに加えてJIS~X~0208の文字も利用可能になっている．
+
+\pTeX への入力は\emph{「7ビットASCII文字集合」に
+「ISO-2022-JP (jis)，EUC-JP (euc)，Shift-JIS (sjis)または
+UTF-8 (utf8)のいずれかでエンコードされたJIS~X~0208の文字集合」を
+加えたもの}として解釈される．
+なお，入出力ファイルの文字コードは，起動時のオプション|-kanji=|<encoding>に
+よって指定できる（可能な<encoding>の値は|utf8|，|euc|，|sjis|，|jis|）．
+
+そして，以下の規則により欧文文字と和文文字に区別して取り扱われる．
+なお，内部コードは|-kanji-internal=|<encoding>によって変更できる
 （可能な値は|euc|，|sjis|）が，こちらはini modeでのフォーマット作成時
 に限られ，virtual modeでは不可である（フォーマットの内部コードと実際の
 処理の整合性をとるため，\pTeX\ p3.8.2以降の仕様）．
-
-\pTeX の入力ファイルの文字コードと内部コードは起動時のバナーから分かる．
-例えば
-\begin{verbatim}
-This is pTeX, Version 3.14159265-p3.8.0 (utf8.euc) (TeX Live 2018)
-(preloaded format=ptex)
-\end{verbatim}
-というバナーの場合は，|(utf8.euc)| から
 \begin{itemize}
- \item 入力ファイルの（既定）文字コードはUTF-8（但し，JIS X 0208の範囲内）
- \item \pTeX の内部コードはEUC-JP
+ \item 7ビットASCII文字集合は欧文文字として扱われる．
+ \item 最上位ビットが1の場合，\pTeX はそのバイトで始まる列について
+    EUC-JPまたはShift-JISのいずれかの内部コードへの変換を試みる．
+    和文文字の内部コードとして許される整数は
+    $256c_1+c_2$，但し$c_i\in C_i$であり，ここで
+  \begin{description}
+   \item[内部コードがEUC-JPのとき]
+    $C_1=C_2=\{\hex{a1},\dots,\hex{fe}\}$.
+   \item[内部コードがShift-JISのとき]
+    $C_1=\{\hex{81},\dots,\hex{9f}\}\cup\{\hex{e0},\dots,\hex{fc}\}$,\\
+    $C_2=\{\hex{40},\dots,\hex{7e}\}\cup\{\hex{80},\dots,\hex{fc}\}$.
+  \end{description}
+    である．この内部コードのパターンに合えば和文文字として扱われ，
+    合わなければ8ビット欧文文字のバイト列として扱われる．\footnote{例えば，
+    入力ファイルの文字コードがUTF-8の場合，JIS~X~0208にない文字は
+    UTF-8のバイト列として読み込まれる．}
 \end{itemize}
-という情報が見て取れる．入力ファイルの文字コードと内部コードが同じ場合は，
-\begin{verbatim}
-This is pTeX, Version 3.14159265-p3.8.0 (sjis) (TeX Live 2018)
-(preloaded format=ptex)
-\end{verbatim}
-のように表示される（この例は，入力ファイルの文字コードと内部コードが
-ともにShift-JISの場合）．
+% 参考：kanji.c の |is_char_kanji| の実装
 
-\begin{dangerous}
-上にはこのように書いたが，
-極めて細かい話をすれば，起動時のバナーは時にウソをつくので注意．
-ログファイルには記録されるバナーは常に正しい．これは以下の事情による．
-
-virtual modeでは，起動直後にバナーを表示してから，フォーマットファイル
-読込が行われる．この時点で初めて，起動時の内部コードとフォーマットの
-内部コードの整合性が確認される．ここでもし合致しなかった場合は，\pTeX は
-警告を表示してフォーマットに合った内部コードを選択し，以降の処理を行う．
-ログファイルはこの後にオープンされるため，そこには正しい内部コード
-（フォーマットと同じ内部コード）が書き込まれる\cite{build55}．
-
-このようなウソは，\pTeX に限らず|(preloaded format=***)|でも見られる．
-\end{dangerous}
-
-[TODO] \pTeX の内部コードはEUC-JPかShift-JISのいずれかであるが，
-DVIファイル内の和文文字コードとしてはJISコードを出力する．
-ただし，|\special|命令の文字列は内部コードで符号化されたバイト列として書き出される．
+% [TODO] 8ビット欧文文字の ^^ab 形式への変換について
 
 \begin{dangerous}
  以上で述べた「内部コードの範囲」はJIS~X~0213の漢字集合1面（Shift-JISの場合は2面も）を
@@ -186,6 +159,43 @@ DVIファイル内の和文文字コードとしてはJISコードを出力す�
  また，DVIに文字として出力されたからといって，それをPostScriptやPDFに変換したときに
  意図通りに出力されるかは全くの別問題である．
 \end{dangerous}
+
+\pTeX の入出力ファイルの文字コードと内部コードは起動時のバナーから分かる．
+例えば
+\begin{verbatim}
+This is pTeX, Version 3.14159265-p3.8.0 (utf8.euc) (TeX Live 2018)
+(preloaded format=ptex)
+\end{verbatim}
+というバナーの場合は，|(utf8.euc)| から
+\begin{itemize}
+ \item 入出力ファイルの（既定）文字コードはUTF-8（但し，JIS~X~0208の範囲内）
+ \item \pTeX の内部コードはEUC-JP
+\end{itemize}
+という情報が見て取れる．入出力ファイルの文字コードと内部コードが同じ場合は，
+\begin{verbatim}
+This is pTeX, Version 3.14159265-p3.8.0 (sjis) (TeX Live 2018)
+(preloaded format=ptex)
+\end{verbatim}
+のように表示される（この例は，入出力ファイルの文字コードと内部コードが
+ともにShift-JISの場合）．
+
+\begin{dangerous}
+上にはこのように書いたが，
+極めて細かい話をすれば，起動時のバナーは時にウソをつくので注意．
+ログファイルには記録されるバナーは常に正しい．これは以下の事情による．
+
+virtual modeでは，起動直後にバナーを表示してから，フォーマットファイル
+読込が行われる．この時点で初めて，起動時の内部コードとフォーマットの
+内部コードの整合性が確認される．ここでもし合致しなかった場合は，\pTeX は
+警告を表示してフォーマットに合った内部コードを選択し，以降の処理を行う．
+ログファイルはこの後にオープンされるため，そこには正しい内部コード
+（フォーマットと同じ内部コード）が書き込まれる\cite{build55}．
+
+このようなウソは，\pTeX に限らず|(preloaded format=***)|でも見られる．
+\end{dangerous}
+
+なお，\pTeX はDVIファイル内の和文文字コードとしてはJISコードを出力する．
+ただし，|\special|命令の文字列は内部コードで符号化されたバイト列として書き出される．
 
 \section{文字コードの取得と指定}
 
@@ -1125,7 +1135,7 @@ p3.1.2で復活したという経緯がある．}．
 
 \begin{dangerous}
  \ref{sec:ptexchar}節でも述べたように，
- \emph{\pTeX はJIS X 0213には対応せず，JIS X 0208の範囲のみ扱える}．
+ \emph{\pTeX はJIS~X~0213には対応せず，JIS~X~0208の範囲のみ扱える}．
 
  [TODO] \.{kuten}, \.{jis}, \.{sjis}, \.{euc}が$-1$とならない範囲はどこ？
 \end{dangerous}

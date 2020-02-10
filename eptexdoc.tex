@@ -449,6 +449,11 @@ delimiter codeについても同様である．
 \]
       となっている．内部では\texttt{fi}レベルが1，\texttt{fil}レベルが2，……として
       処理している．
+      % なお，LuaTeX にも無限のレベル fi が存在するが，
+      % \gluestretchorder, \glueshrinkorder は e-(p)TeX と異なり
+      % 有限-fi-fil-fill-filll で 0-1-2-3-4 である．
+      % e-TeX 互換の \eTeXgluestretchorder, \eTeXglueshrinkorder が
+      % r52360 で追加され，そちらは 有限-fil-fill-fill で 0-1-2-3 とし，fi は -1 である．
 \end{itemize}
 
 \paragraph{レジスタについて}
