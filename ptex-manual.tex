@@ -1161,15 +1161,26 @@ p3.1.2で復活したという経緯がある．}．
   （ちょうど|\romannumeral|にゼロまたは負の値を与えた場合と同様）．
 
   |\kansujichar|で指定できるのは「和文文字の内部コードとして有効な値」であり，
-  無効な値（例えば\pTeX では，|`A|は欧文文字コードであり，和文文字コードではない）
-  を指定すると
+  例えば\pTeX で|\kansujichar1=`A|のように無効な値（\pTeX において|`A|は
+  欧文文字コードであり，和文文字コードではない）を指定すると
 \begin{verbatim}
-! Invalid KANSUJI char ("41)
+! Invalid KANSUJI char ("41).
 \end{verbatim}
   というエラーが発生する\footnote{\upTeX では0--127も含め，
   Unicodeの文字コードすべてが和文文字コードとして有効であり
   （|\kchar|で任意の文字コードを和文文字ノードに変換して出力できる），
   基本的にこのエラーは発生しない．}．
+  また，|\kansujichar|の引数に許される値は0--9に限られ，
+  例えば|\kansujichar10=`拾|とすると
+\begin{verbatim}
+! Invalid KANSUJI number (10).
+\end{verbatim}
+  というエラーが発生する．
+  % エラーからのリカバリで，他の TeX82 プリミティブが
+  %   I changed this one to zero.
+  % とするのに対し，\kansujichar では
+  %   I'm skipping this control sequences.
+  % とスキップされ，値の代入は行われない．
 \end{cslist}
 
 \begin{dangerous}
@@ -1179,6 +1190,10 @@ p3.1.2で復活したという経緯がある．}．
   \pTeX~p3.8.3で取得もできるように修正された(\cite{build93})が，
   以前の\pTeX も考慮すると，値の取得は以下のようにするのが安全である：
   |\count255=\expandafter`\kansuji1|
+  % \count123=\kansujichar45 のように \kansujichar の引数が不正な場合は，
+  % ! Invalid KANSUJI number (45).
+  % のエラーを出し，リカバリは \kansujichar を無視した \count123=45 と同義になる．
+  % これは \kansujichar の代入時の挙動に合わせたものである．
 \end{dangerous}
 
 % luatexja.dtx より pTeX 用に移植
