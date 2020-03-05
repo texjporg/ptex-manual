@@ -16,6 +16,7 @@
 
 % logos
 \def\pTeX{p\kern-.10em\TeX}\def\upTeX{u\pTeX}
+\def\OMEGA{$\Omega$}
 
 \title{\emph{JFMファイルフォーマット}}
 \author{ASCII Corporation \& Japanese \TeX\ Development Community}
@@ -36,7 +37,10 @@ JFMフォーマットの仕様は全く同じであり，ただ
 JISコードを用いる（\pTeX の場合）か，
 UCS-4の下位3バイトを用いる（\upTeX の場合）かだけが異なる．
 
-\section{JFMファイルの構成}
+\tableofcontents
+\clearpage
+
+\section{JFMファイルの構成}\label{jfm-format}
 
 JFMファイルのフォーマットは，
 基本的にはTFMファイルのフォーマットに準拠しており，
@@ -238,6 +242,17 @@ JFMでは$\size{bc}$は必ずゼロ\footnote{前節にある通り，文字コ�
 % 上下位置補正に \fontdimen5 の値が用いられるらしい．他には？
 \end{dangerous}
 
+
+\section{JPLファイル}
+
+TFMはバイナリ形式であるが，これをプロパティ（特性）という概念を使って
+テキスト形式で視覚化したものがPL (Property List)ファイルである．
+同様に，JFMをテキスト形式で視覚化したものが
+\emph{JPL (Japanese Property List)}ファイルである．
+JPLファイルでもPLファイルと同じく，拡張子は\code{.pl}が用いられる．
+
+
+% -- tables begin
 \DeleteShortVerb{|}
 \begin{table}[tbp]\small
 \caption{JFMファイルの構成\label{構成}}
@@ -307,15 +322,8 @@ $\size{ng}$ & $\size{np}$ \\ \hline
 \end{minipage}
 \end{table}
 \MakeShortVerb*{|}
-
-
-\section{JPLファイル}
-
-TFMはバイナリ形式であるが，これをプロパティ（特性）という概念を使って
-テキスト形式で視覚化したものがPL (Property List)ファイルである．
-同様に，JFMをテキスト形式で視覚化したものが
-\emph{JPL (Japanese Property List)}ファイルである．
-JPLファイルでもPLファイルと同じく，拡張子は\code{.pl}が用いられる．
+% -- tables end
+\clearpage
 
 
 \section{JFMを扱うプログラム}
@@ -324,14 +332,132 @@ JPLファイルでもPLファイルと同じく，拡張子は\code{.pl}が用�
 JFMを扱うのは当然であるが，ここではJFMおよび関連するフォントフォーマットを
 扱うことに特化したプログラムの主なものを挙げる．
 
-%\subsection{pPLtoTF, upPLtoTF}
+\subsection{pPLtoTF, upPLtoTF}
 
-%\subsection{pTFtoPL, upTFtoPL}
+テキスト形式のJPLファイルをバイナリ形式のJFMファイルに変換する．いずれも
+欧文\TeX 用の\code{pltotf}の上位互換であり，入力ファイルが欧文用のPLファイルで
+あれば欧文用のTFMを生成し，和文用のJPLファイルであれば和文用のJFMを生成する．
 
-%\subsection{chkdvifont}
+\code{ppltotf}と\code{uppltotf}の違いは，エンコーディングである．
+\begin{itemize}
+  \item \code{ppltotf}: 常に\textbf{JIS}コードでエンコードされたJFMを生成するため，
+    \pTeX 用のJFM生成には多くの場合\code{ppltotf}コマンドが用いられる．
+  \item \code{uppltotf}: デフォルトでは\textbf{Unicode}（UCS-4の下位3バイト）で
+    エンコードされたJFMを生成するため，主に\upTeX 用のJFM生成に用いられる．
+\end{itemize}
 
-%\subsection{jfmutil}
+\code{ppltotf}においては，\code{-kanji}オプションで
+入力JPLファイルの文字コードを指定できる
+（有効な値は\code{euc}, \code{jis}, \code{sjis}, \code{utf8}）．
+\code{uppltotf}でも\code{-kanji}オプションが同じく使えるが，
+同時にJFMのエンコードもJISになる（従って\code{ppltotf}と同じ挙動を示す）ことに注意
+\footnote{\code{uppltotf}における規定値は\code{uptex}であり，
+この場合はJFMがUnicodeでエンコードされる．}．
 
-%\subsection{makejvf}
+\subsection{pTFtoPL, upTFtoPL}
+
+バイナリ形式のJFMファイルをテキスト形式のJPLファイルに変換する．いずれも
+欧文\TeX 用の\code{tftopl}の上位互換であり，入力ファイルが欧文用のTFMであれば
+欧文用のPLファイルを生成し，和文用のJFMであれば和文用のJPLファイルを生成する．
+
+\code{ptftopl}と\code{uptftopl}の違いは，やはりエンコーディングである．
+\begin{itemize}
+  \item \code{ptftopl}: 入力JFMファイルを常に\textbf{JIS}コードで解釈するため，
+    \pTeX 用のJFMデコードには多くの場合\code{ptftopl}コマンドが用いられる．
+  \item \code{uptftopl}: 入力JFMファイルをデフォルトでは\textbf{Unicode}で解釈するため，
+    主に\upTeX 用のJFMデコードに用いられる．
+\end{itemize}
+
+\code{ptftopl}においては，\code{-kanji}オプションで
+出力JPLファイルの文字コードを指定できる
+（有効な値は\code{euc}, \code{jis}, \code{sjis}, \code{utf8}）．
+\code{uptftopl}でも\code{-kanji}オプションが同じく使えるが，
+同時にJFMもJISコードで解釈される（従って\code{ptftopl}と同じ挙動を示す）ことに注意
+\footnote{\code{uptftopl}における規定値は\code{uptex}であり，
+この場合はJFMがUnicodeで解釈される．}．
+
+\subsection{chkdvifont}
+
+\TeX\ Live 2019で追加された比較的新しいコマンドであり，
+TFM/JFMファイルの簡単な情報を表示する機能を持つ（\OMEGA 用のOFMファイルにも対応）．
+
+実行例を示す（注意：ファイル名の拡張子は省略不可。また，ファイルが
+現在のディレクトリにない場合は，フルパスの指定が必要）。
+
+\paragraph{欧文TFMの場合}
+\begin{verbatim}
+$ chkdvifont cmr10.tfm
+    "cmr10" is a tfm file :  0  -> 127
+    checksum        = 4BF16079
+    design size     = 10485760 2^{-20} points = 10 points
+\end{verbatim}
+一行目の表示から，
+欧文TFMであることと$\size{bc}=0$，$\size{ec}=127$であることが読み取れる．
+
+\paragraph{和文横組用JFMの場合}
+\begin{verbatim}
+$ chkdvifont jis.tfm
+    "jis" is a jfm file :  0  ->   5
+    checksum        = 00000000
+    design size     = 10485760 2^{-20} points = 10 points
+\end{verbatim}
+和文（横組用）JFMであることと$\size{bc}=0$，$\size{ec}=5$であることが読み取れる．
+
+\paragraph{和文縦組用JFMの場合}
+\begin{verbatim}
+$ chkdvifont upjisr-v.tfm
+    "upjisr-v" is a jfm(tate) file :  0  ->   5
+    checksum        = 00000000
+    design size     = 10485760 2^{-20} points = 10 points
+\end{verbatim}
+和文縦組用JFMであることと$\size{bc}=0$，$\size{ec}=5$であることが読み取れる
+\footnote{\code{upjisr-v.tfm}は\upTeX 用JFMであるが，
+原理的に\pTeX 用と\upTeX 用のJFMは区別できない．}．
+
+\paragraph{和文JFMの拡張機能が使われている場合}
+第\ref{jfm-format}節で述べたとおり，日本語\TeX 開発コミュニティによって
+下記の3点につきJFMフォーマットの仕様が拡張されている．
+\begin{enumerate}
+  \item \node{char\_type}テーブルへの3バイトの文字コード格納
+  \item \node{glue\_kern}テーブルでのスキップ(SKIP)コマンド使用
+  \item \node{glue\_kern}テーブルでの再配置(rearrangement)
+\end{enumerate}
+和文JFMでこれらの拡張機能が使われている場合は\pTeX~p3.8.0以上が必要であるが，
+この情報も表示される（下の例は再配置あり）：
+\begin{verbatim}
+$ chkdvifont upphiraminw3-h.tfm
+    "upphiraminw3-h" is a jfm file :  0  -> 146
+        New features in pTeX p3.8.0 / JFM 2.0:
+        + rearrangement in glue_kern
+    checksum        = 00000000
+    design size     = 10485760 2^{-20} points = 10 points
+\end{verbatim}
+
+\subsection{jfmutil}
+
+ZR氏によって開発されたPerlスクリプトである．
+
+[TODO] 簡単な説明を追加
+
+\subsection{makejvf}
+
+JFMファイルを基にして，VF (virtual font)を生成するプログラムである．
+\code{makejvf}が生成する和文VFの目的は以下のとおりである：
+\begin{itemize}
+  \item \pTeX や\upTeX で使われる多くのJFMでは，約物類（かっこ，句読点など）の文字幅を
+    半角幅として定義し，見た目の空白をグルーやカーンの挿入によって実現している．
+    例えば``（''のような左に空きがある括弧類は，左半分は文字の一部として扱わず，
+    「グルーによる半角分の右シフト」と「半角幅の\inhibitglue （」として扱っている．
+  \item 一方，DVIからPostScriptやPDFへ変換時に使われる実際のフォントでは，
+    これらの約物類も全角幅でデザインされている．そのため，DVIに配置された
+    ``（``を実際のフォントの``（``に安直に置き換えると，想定よりも右にずれた
+    位置に出力されてしまう．
+  \item この位置ずれを補正するため，欧文フォントの合成や置換に実用されている
+    VF（仮想フォント）という仕組みを和文フォントにも応用する．
+    例えばVF中に「``（''は左に半角分ずらして置き換える」という記述を追加することで，
+    DVIドライバがそれを解釈して位置補正できるようにする．
+\end{itemize}
+
+[TODO] 説明を追加（makejvf.1 参照）
 
 \end{document}
