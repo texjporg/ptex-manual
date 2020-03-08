@@ -1,9 +1,23 @@
 %#!make eptexdoc.pdf
 \documentclass[a4paper,11pt,nomag]{jsarticle}
+\AtBeginDvi{%
+  \special{pdf:mapline hgothb-h        H       HaranoAjiGothic-Medium.otf}
+  \special{pdf:mapline hgothb-v        V       HaranoAjiGothic-Medium.otf}
+  \special{pdf:mapline otf-cjgb-h      Identity-H      HaranoAjiGothic-Medium.otf}
+  \special{pdf:mapline otf-cjgb-v      Identity-V      HaranoAjiGothic-Medium.otf}
+  \special{pdf:mapline otf-ujgb-h      UniJIS-UTF16-H  HaranoAjiGothic-Medium.otf}
+  \special{pdf:mapline otf-ujgb-v      UniJIS-UTF16-V  HaranoAjiGothic-Medium.otf}
+  \special{pdf:mapline hgothr-h        H       HaranoAjiGothic-Medium.otf}
+  \special{pdf:mapline hgothr-v        V       HaranoAjiGothic-Medium.otf}
+  \special{pdf:mapline otf-cjgr-h      Identity-H      HaranoAjiGothic-Medium.otf}
+  \special{pdf:mapline otf-cjgr-v      Identity-V      HaranoAjiGothic-Medium.otf}
+  \special{pdf:mapline otf-ujgr-h      UniJIS-UTF16-H  HaranoAjiGothic-Medium.otf}
+  \special{pdf:mapline otf-ujgr-v      UniJIS-UTF16-V  HaranoAjiGothic-Medium.otf}
+}
 \usepackage[bold,deluxe]{otf}
+
 \input fam256p.tex
 \usepackage[textwidth=42zw,lines=40,truedimen,centering]{geometry}
-
 %%%%%%%%%%%%%%%%
 % additional packages
 \usepackage{amsmath}
@@ -476,7 +490,12 @@ delimiter codeについても同様である．
 が必要となっており，もはや純粋な\eTeX ですら
 \LaTeX 3を利用することはできない状況である (\cite{expl31,expl32,expl33})．
 その他にも，\hologo{pdfTeX}由来のいくつかのプリミティブ(\cite{pdftexman})の実装が
-日本の\TeX ユーザからあり，
+日本の\TeX ユーザ，および\LaTeX3~team%
+\footnote{%
+  現在ではさらに状況が動き，
+  2021年以降は，\LaTeXe 自体が本節で述べた（\.{readpapersizespecial}以外の）プリミティブを
+  要求する予定である(\cite{l2e31})．
+}などからあり，
 ほとんど\hologo{pdfTeX}における実装をそのまま真似する形で実装している．
 
 現在の\epTeX で利用できる\hologo{pdfTeX}由来のプリミティブの一覧を以下に示す．
@@ -510,7 +529,7 @@ delimiter codeについても同様である．
   後で述べる\.{pdflastxpos}, \.{pdflastypos}による出力位置の取得
   の際の原点位置を設定するためだけに使われ，初期値は0である．
 
- \csitem[\.{readpapersizespecial} (integer)]
+ \csitem[\.{readpapersizespecial}（integer，\emph{\epTeX 独自拡張で，\hologo{pdfTeX}にはない}）]
   \pTeX 系列では，
   用紙サイズの指定には伝統的にpapersize specialが利用されてきた．それを考慮して，
   本内部整数\.{readpapersizespecial}（既定値は1）が正の場合は
@@ -557,7 +576,7 @@ delimiter codeについても同様である．
  \end{itemize}
 
  \csitem[\.{pdfcreationdate}]
-  エンジン起動時の時刻を，\texttt{\pdfcreationdate}の形式で表した文字列に展開する．
+  エンジン起動時の時刻を\texttt{\pdfcreationdate}の形式で表した文字列に展開される．
   末尾に|+09'00'|などと表示されるのはローカルのタイムゾーンであるが，
   例えば|SOURCE_DATE_EPOCH=1000000000|のように環境変数を設定すると
   |D:20010909014640Z|のようにタイムゾーンは|Z|と表示される．
@@ -572,13 +591,13 @@ delimiter codeについても同様である．
 
  \csitem[\.{pdffilemoddate} <filename>, \.{pdffilesize} <filename>]
   それぞれ<filename>の更新時刻（\.{pdfcreationdate}と同じ形式）と
-  ファイルサイズを表す文字列に展開する．
+  ファイルサイズを表す文字列に展開される．
   これらも\Pkg{standalone}パッケージのために\epTeX に実装されたプリミティブである．
 
  \csitem[\.{pdffiledump} \textrm{[}\texttt{offset} <offset>\textrm{]}%
   \ \texttt{length} <length> <filename>]
   <filename>で与えられたファイル名の<offset>バイト目（先頭は0）から<length>バイトを読み込み，
-  16進表記（大文字）したものに展開される．
+  16進表記（大文字）した文字列に展開される．
 
   本プリミティブはHeiko Oberdiek氏による\Pkg{bmpsize}パッケージを\epTeX でも使うために
   角藤さんが実装したものである(2014/05/06)．
@@ -593,11 +612,17 @@ delimiter codeについても同様である．
   本プリミティブは\TeX ユーザの集い2014でリクエストを受けて実装された(\cite{pdfse})．
 
  \csitem[\.{pdfmdfivesum} {[\texttt{file}]} <general text>]
-  引数<general text>のMD5ハッシュ値か，あるいは\texttt{file}が指定された場合は
-  ファイル名が<general text>のファイルのMD5ハッシュ値を計算する．
+  \texttt{file}が指定された場合は，ファイル名が<general text>のファイルのMD5ハッシュ値に展開される．
+  もしファイルが存在しなかった場合は何も返さない．
 
-  前者の「引数のMD5ハッシュ値を計算する」場合には，\.{pdfstrcmp}と同じように
-  和文文字をUTF-8で符号化してから計算する．
+  \texttt{file}が指定されなかった場合は，引数<general text>のMD5ハッシュ値に展開される．
+  その際，\.{pdfstrcmp}と同じように和文文字はUTF-8で符号化してから計算される．
+  例えば
+\begin{verbatim}
+\pdfmdfivesum{あ}
+\pdfmdfivesum{^^e3^^81^^82}
+\end{verbatim}
+  の結果はいずれも\texttt{\pdfmdfivesum{あ}}である．
 
   このプリミティブは\cite{xe5}以降の議論を元に，角藤さんがリクエストしたもので，
   2015/07/04に\epTeX に実装されている．
@@ -617,11 +642,18 @@ delimiter codeについても同様である．
   現在では\Pkg{expl3}パッケージではこれらのプリミティブは要求していない．
 
  \csitem[\.{pdfuniformdeviate} <number>, \.{pdfnormaldeviate}]
-  \.{pdfuniformdeviate}は，0以上<number>未満の一様分布に従う乱数（整数値）を生成する．
-  \.{pdfnormaldeviate}は，平均値0，標準偏差65536の正規分布に従う乱数（整数値）を生成する．
+  \.{pdfuniformdeviate}は，0以上<number>未満の一様分布に従う乱数
+  \footnote{%
+    乱数とはいっても，例えば\texttt{\.{pdfuniformdeviate}~536870912}は常に偶数を生成することが知られている
+    (\cite{xe4})．しかしもともとの\hologo{pdfTeX}の実装がそうなっており，他のエンジンでも直されていないため
+    \epTeX でもこの症状には独自対処はしない．
+  }（整数値）を生成し，
+  それを10進表記した文字列に展開される．
+  \.{pdfnormaldeviate}は，平均値0，標準偏差65536の正規分布に従う乱数（整数値）を生成し，
+  それを10進表記した文字列に展開される．
 
  \csitem[\.{pdfrandomseed} (read-only integer), \.{pdfsetrandomseed} <number>]
-  乱数生成の種の値は，\.{pdfrandomseed}で取得できる．
+  乱数生成の種の値は，内部整数\.{pdfrandomseed}で取得できる．
   種の初期化にはシステムのマイクロ秒単位での現在時刻情報が使われる．また，種の値を
   設定するには\.{pdfsetrandomseed}に引数として渡せば良い．
 
@@ -1108,7 +1140,10 @@ $3$\,sp）だが，どこか気になるところである．
  \bibitem{random} Joseph Wright, ``[tex-live] Random number primitives'',
   2016/11/12,\\
   \url{http://tug.org/pipermail/tex-live/2016-November/039436.html}
- \bibitem{eptexinputenc} 阿部 紀行，「2016年2月2日」，2016/02/02．\\
+ \bibitem{xe4} Bruno Le Floch, ``[XeTeX] Random number primitives'',
+  2016/12/06,\\
+  \url{http://tug.org/pipermail/pipermail/xetex/2016-December/026920.html}
+\bibitem{eptexinputenc} 阿部 紀行，「2016年2月2日」，2016/02/02．\\
   \url{http://abenori.blogspot.jp/2016/02/e-ptexeptexinputencoding.html}．
  \bibitem{etexman} The \NTS\!\ Team. \textit{The \eTeX\ manual} (v2.0). \\
   |$TEXMFDIST/doc/etex/base/etex_man.pdf|
@@ -1149,6 +1184,10 @@ $3$\,sp）だが，どこか気になるところである．
   \url{https://github.com/texjporg/tex-jp-build/pull/94}．
  \bibitem{tjb95} 北川 弘典，「[eptex] |\Uchar| and |\Ucharcat|」，2019/10/30．\\
   \url{https://github.com/texjporg/tex-jp-build/issues/95}．
+ \bibitem{l2e31}
+  The \LaTeX3 Project Team, \textit{\LaTeX\ News Issue 31}, 2020.\\
+  |$TEXMFDIST/source/latex/base/ltnews31.tex|, \\
+  \url{https://www.latex-project.org/news/latex2e-news/ltnews31.pdf}.
 \end{thebibliography}
 
 \newpage
