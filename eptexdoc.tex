@@ -7,12 +7,6 @@
   \special{pdf:mapline otf-cjgb-v      Identity-V      HaranoAjiGothic-Medium.otf}
   \special{pdf:mapline otf-ujgb-h      UniJIS-UTF16-H  HaranoAjiGothic-Medium.otf}
   \special{pdf:mapline otf-ujgb-v      UniJIS-UTF16-V  HaranoAjiGothic-Medium.otf}
-  \special{pdf:mapline hgothr-h        H       HaranoAjiGothic-Medium.otf}
-  \special{pdf:mapline hgothr-v        V       HaranoAjiGothic-Medium.otf}
-  \special{pdf:mapline otf-cjgr-h      Identity-H      HaranoAjiGothic-Medium.otf}
-  \special{pdf:mapline otf-cjgr-v      Identity-V      HaranoAjiGothic-Medium.otf}
-  \special{pdf:mapline otf-ujgr-h      UniJIS-UTF16-H  HaranoAjiGothic-Medium.otf}
-  \special{pdf:mapline otf-ujgr-v      UniJIS-UTF16-V  HaranoAjiGothic-Medium.otf}
 }
 \usepackage[bold,deluxe]{otf}
 
@@ -23,9 +17,9 @@
 \usepackage{amsmath}
 \usepackage{mathtools,amssymb,comment}
 \usepackage[dvipdfmx]{graphicx}
+\usepackage{lmodern}
 \usepackage[T1]{fontenc}
 \usepackage{booktabs,enumitem,multicol}
-\usepackage{lmodern}
 \usepackage[dvipdfmx,hyperfootnotes=false]{hyperref}
 \usepackage{pxjahyper}
 \usepackage{hologo}
@@ -275,24 +269,25 @@ tracing機能や条件判断文の強化などあるが，そこら辺はパッ�
   \item \bf 31&\.{ifjfont}\cr\item \bf 32&\.{iftfont}\cr
   \end{multilist}}
 
- \csitem[\.{fontcharwd}, \.{fontcharht}, \.{fontchardp}, \.{fontcharic}]
+ \csitem[\.{fontcharwd}, \.{fontcharht}, \.{fontchardp}, \.{fontcharic} (dimension)]
+  基本的にフォント内の文字の寸法を内部長さとして返す命令であるが，
   欧文フォントと和文フォントを判別し，それに応じて処理が分かれる．
   それに伴い，許容される引数範囲と意味が異なることに注意
   （\epTeX~190709以降）．
   以下，|??|は|wd|, |ht|, |dp|, |ic|のいずれかを表す．
   \begin{itemize}
-    \item 和文フォントの場合： \.{fontchar??} <Japanese font> <number>\\
+    \item 和文フォントの場合：\.{fontchar??} <Japanese font> <number>\\
       <Japanese font>を$f$，<number>を$c$とおくと，
       \begin{itemize}
         \item $c \geq 0$の場合は，$c$を\emph{文字コード}とみなす．
           $c$が和文文字コードとして有効であれば，
           和文フォント$f$における文字コード$c$の和文文字の寸法値を返す．
-          和文文字コードとして無効であれば|0pt|を返す．
+          和文文字コードとして無効であれば0\,ptを返す．
         \item $c < 0$の場合は，$-(c+1)$を\emph{文字タイプ}とみなす．
           和文フォント$f$に文字タイプ$-(c+1)$が定義されていればその寸法値を返し，
-          未定義であれば|0pt|を返す．
+          未定義であれば0\,ptを返す．
       \end{itemize}
-    \item 欧文フォントの場合： \.{fontchar??} <font> <8-bit number>\\
+    \item 欧文フォントの場合：\.{fontchar??} <font> <8-bit number>\\
       オリジナルの\eTeX と同じ挙動である．すなわち，
       引数に$c \geq 256$や$c < 0$を与えると
       \verb+! Bad character code (256).+
@@ -527,7 +522,7 @@ delimiter codeについても同様である．
 
   この2つの内部長さを設定するだけではdviに何の影響も与えない．
   後で述べる\.{pdflastxpos}, \.{pdflastypos}による出力位置の取得
-  の際の原点位置を設定するためだけに使われ，初期値は0である．
+  の際の原点位置を設定するためだけに使われ，初期値は0\,ptである．
 
  \csitem[\.{readpapersizespecial}（integer，\emph{\epTeX 独自拡張で，\hologo{pdfTeX}にはない}）]
   \pTeX 系列では，
@@ -563,7 +558,7 @@ delimiter codeについても同様である．
   原点はページの（物理的な意味の）左下隅であり，$y$軸は（物理的な）上方向に向かって増加する．
  \begin{itemize}
   \item ページの物理的な幅と高さはすぐ上の\.{pdfpagewidth}, \.{pdfpageheight}で設定する．
-    これらの内部長さが0であった場合は，\.{shipout}されたボックスの寸法と
+    これらの内部長さが0\,ptであった場合は，\.{shipout}されたボックスの寸法と
     \.{hoffset}（または\.{voffset}）の値から自動的に計算される．
   \item \pTeX では横組・縦組と組方向が複数あるので，\.{pdflastxpos}, \.{pdflastypos}の値の座標系を
     「物理的な」向きとすべきか，それとも「組方向に応じた」向きとすべきかは悩みどころである．
