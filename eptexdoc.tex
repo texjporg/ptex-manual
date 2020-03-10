@@ -1,13 +1,5 @@
 %#!make eptexdoc.pdf
 \documentclass[a4paper,11pt,nomag]{jsarticle}
-\AtBeginDvi{%
-  \special{pdf:mapline hgothb-h        H       HaranoAjiGothic-Medium.otf}
-  \special{pdf:mapline hgothb-v        V       HaranoAjiGothic-Medium.otf}
-  \special{pdf:mapline otf-cjgb-h      Identity-H      HaranoAjiGothic-Medium.otf}
-  \special{pdf:mapline otf-cjgb-v      Identity-V      HaranoAjiGothic-Medium.otf}
-  \special{pdf:mapline otf-ujgb-h      UniJIS-UTF16-H  HaranoAjiGothic-Medium.otf}
-  \special{pdf:mapline otf-ujgb-v      UniJIS-UTF16-V  HaranoAjiGothic-Medium.otf}
-}
 \usepackage[bold,deluxe]{otf}
 
 \input fam256p.tex
@@ -1138,7 +1130,7 @@ $3$\,sp）だが，どこか気になるところである．
  \bibitem{xe4} Bruno Le Floch, ``[XeTeX] Random number primitives'',
   2016/12/06,\\
   \url{http://tug.org/pipermail/pipermail/xetex/2016-December/026920.html}
-\bibitem{eptexinputenc} 阿部 紀行，「2016年2月2日」，2016/02/02．\\
+ \bibitem{eptexinputenc} 阿部 紀行，「2016年2月2日」，2016/02/02．\\
   \url{http://abenori.blogspot.jp/2016/02/e-ptexeptexinputencoding.html}．
  \bibitem{etexman} The \NTS\!\ Team. \textit{The \eTeX\ manual} (v2.0). \\
   |$TEXMFDIST/doc/etex/base/etex_man.pdf|

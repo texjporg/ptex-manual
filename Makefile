@@ -10,7 +10,7 @@ PDFTARGET = $(addsuffix .pdf,$(DOCTARGET))
 DVITARGET = $(addsuffix .dvi,$(DOCTARGET))
 KANJI = -kanji=utf8
 #FONTMAP = -f ipaex.map -f ptex-ipaex.map
-FONTMAP = -f ptex-haranoaji.map -f otf-haranoaji.map
+FONTMAP = -f haranoaji.map -f ptex-haranoaji.map -f otf-haranoaji.map
 TEXMF = $(shell kpsewhich -var-value=TEXMFHOME)
 ifdef PLATEX
 	PLATEX=${foo}
