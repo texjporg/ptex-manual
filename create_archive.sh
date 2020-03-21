@@ -15,6 +15,7 @@ git archive --format=tar --prefix=$PROJECT/ HEAD | (cd $TMP && tar xf -)
 rm $TMP/$PROJECT/.gitignore
 rm $TMP/$PROJECT/create_archive.sh
 rm $TMP/$PROJECT/Makefile
+rm $TMP/$PROJECT/haranoaji.map
 perl -pi.bak -e "s/\\\$RELEASEDATE/$RELEASEDATE/g" $TMP/$PROJECT/README.md
 rm -f $TMP/$PROJECT/README.md.bak
 
