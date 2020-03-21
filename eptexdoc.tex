@@ -449,12 +449,15 @@ delimiter codeについても同様である．
 \end{cases}
 \]
       となっている．内部では\texttt{fi}レベルが1，\texttt{fil}レベルが2，……として
-      処理している．
-      % なお，LuaTeX にも無限のレベル fi が存在するが，
-      % \gluestretchorder, \glueshrinkorder は e-(p)TeX と異なり
-      % 有限-fi-fil-fill-filll で 0-1-2-3-4 である．
-      % e-TeX 互換の \eTeXgluestretchorder, \eTeXglueshrinkorder が
-      % r52360 で追加され，そちらは 有限-fil-fill-fill で 0-1-2-3 とし，fi は -1 である．
+      処理している\footnote{%
+      \hologo{LuaTeX}にも無限のレベル\texttt{fi}が存在するが，
+      |\gluestretchorder|, |\glueshrinkorder|は\eTeX や\epTeX と異なり，
+      有限/\texttt{fi}/\texttt{fil}/\texttt{fill}/\texttt{filll}で0/1/2/3/4である．
+      また，r52360で\eTeX 互換を意図した
+      |\eTeXgluestretchorder|, |\eTeXglueshrinkorder|も追加されており，
+      そちらは有限/\texttt{fil}/\texttt{fill}/\texttt{filll}で0/1/2/3とし，
+      \texttt{fi}は$-1$である．
+      }．
 \end{itemize}
 
 \paragraph{レジスタについて}
@@ -514,7 +517,8 @@ delimiter codeについても同様である．
 
   この2つの内部長さを設定するだけではdviに何の影響も与えない．
   後で述べる\.{pdflastxpos}, \.{pdflastypos}による出力位置の取得
-  の際の原点位置を設定するためだけに使われ，初期値は0\,ptである．
+  の際の原点位置を設定するためだけに使われ，初期値は0\,ptである
+  （\hologo{pdfTeX}のdviモードと同じ挙動）．
 
  \csitem[\.{readpapersizespecial}（integer，\emph{\epTeX 独自拡張で，\hologo{pdfTeX}にはない}）]
   \pTeX 系列では，
