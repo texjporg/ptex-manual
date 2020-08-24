@@ -1419,6 +1419,38 @@ has been |\let| equal to a non-active character token.
 「原理的に文字コードが取り得ない値」に変更した(\cite{build68})．
 \end{dangerous}
 
+\newpage
+
+%%%%%
+\part{\pTeX の出力するDVIフォーマット}
+
+\pTeX が出力するDVIファイルは，欧文の横組のみを行っていれば
+オリジナルの\TeX が出力するDVIファイルと全く同様に解釈できる．
+一方，\pTeX で和文文字を出力する場合，および組方向変更を行う場合は
+以下のDVI命令が使用される．
+|set2|，|set3|は\cite{dvistd0}で定義されているが，
+オリジナルの\TeX では使われていない．
+|dir|は\cite{dvistd0}で定義されておらず，\pTeX の独自拡張である．
+\begin{itemize}
+  \item |set2| (129)\quad $\mathit{c}[2]$\\
+    コード番号が$c$ ($\mathtt{0x100} \le c < \mathtt{0x10000}$)の
+    文字を印字し，参照点を移動する．
+    \pTeX ではJISコード，\upTeX ではUCS-2が用いられる．
+  \item |set3| (130)\quad $\mathit{c}[3]$\\
+    コード番号が$c$ ($\mathtt{0x10000} \le c < \mathtt{0x1000000}$)の
+    文字を印字し，参照点を移動する．
+    \upTeX ではUCS-4の下位3バイトが用いられる（\pTeX では現れない）．
+  \item |dir| (255)\quad $\mathit{d}[1]$\\
+    組方向を変更する．$\mathit{d}[1]=0$が横組，
+    $\mathit{d}[1]=1$が縦組，$\mathit{d}[1]=3$がDtoU組を示す．
+\end{itemize}
+
+\pTeX が出力するDVIファイルのプリアンブル部のフォーマットIDは，
+オリジナルの\TeX と同じく常に2である．
+一方，ポストアンブル部の|post_post|命令に続くフォーマットIDは
+\pTeX でも通常2であるが，\pTeX の拡張DVI命令である|dir|が
+使用されている場合のみ3にセットされる．
+
 \begin{thebibliography}{99}
  \bibitem{topic} Victor Eijkhout, \textit{\TeX\ by Topic, A \TeX nician's Reference},
   Addison-Wesley, 1992.\\
@@ -1458,6 +1490,9 @@ has been |\let| equal to a non-active character token.
  \bibitem{build68} aminophen, 「upTeX の |\if| と |\ifcat|」，
   2019/01/17,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/68}
+ \bibitem{dvistd0} TUG DVI Standards Working Group,
+  \textit{The DVI Driver Standard, Level 0}.\\
+  \url{https://ctan.org/pkg/dvistd}
 \end{thebibliography}
 
 \newpage
