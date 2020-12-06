@@ -1,19 +1,19 @@
 %#!make ptex-guide-en.pdf
-\documentclass[a4paper,11pt]{article}
+\documentclass[a4paper,11pt,dvipdfmx]{article}
 \usepackage[textwidth=42zw,lines=40,truedimen,centering]{geometry}
 
 %%%%%%%%%%%%%%%%
 % additional packages
 \usepackage{amsmath}
-\usepackage{array}\usepackage[all]{xy}
+\usepackage{array}
+\usepackage[all]{xy}
 \SelectTips{cm}{}
-%\usepackage[dvipdfmx]{graphicx}
 \usepackage[T1]{fontenc}
 \usepackage{booktabs,enumitem,multicol}
 \usepackage[defaultsups]{newpxtext}
 \usepackage[zerostyle=c,straightquotes]{newtxtt}
 \usepackage{newpxmath}
-\usepackage[dvipdfmx,hyperfootnotes=false]{hyperref}
+\usepackage[hyperfootnotes=false]{hyperref}
 \usepackage{pxjahyper}
 \usepackage{hologo}
 \usepackage{xspace}
@@ -32,6 +32,7 @@
 }
 \makeatother
 
+\def\file#1{\textsf{#1}}
 \def\code#1{\texttt{#1}}
 
 %%%%%%%%%%%%%%%%
@@ -49,10 +50,15 @@
 \MakeShortVerb*{|}
 %%%%%%%%%%%%%%%%
 
+% foreign text -> italic
+\def\Foreign#1{\textit{#1}}
+
 % logos
-\def\epTeX{$\varepsilon$-\pTeX}\def\eTeX{$\varepsilon$-\TeX}
-\def\eupTeX{$\varepsilon$-\upTeX}\def\upTeX{u\pTeX}
-\def\pTeX{p\kern-.10em\TeX}
+\def\eTeXpre{$\varepsilon$-}
+\def\eTeX{\leavevmode\hbox{\eTeXpre\TeX}}
+\def\epTeX{\leavevmode\hbox{\eTeXpre\pTeX}}
+\def\eupTeX{\leavevmode\hbox{\eTeXpre\upTeX}}
+\def\pTeX{p\kern-.10em\TeX}\def\upTeX{u\pTeX}
 \def\pLaTeX{p\LaTeX}\def\upLaTeX{u\pLaTeX}
 \def\pdfTeX{pdf\TeX}
 \def\OMEGA{$\Omega$}
@@ -94,16 +100,15 @@ We hope that this document helps authors of packages or classes
 to proceed with supporting \pTeX\ family smoothly.
 
 \begin{quotation}
-Note: This English edition (\jobname.pdf) is \emph{not} meant
-to be a complete translation of Japanese edition (ptex-manual.pdf).
-For example, this document does not cover the following aspects of \pTeX:
-\begin{itemize}
-  \item Typesetting conventions of Japanese characters
-  \item Details of vertical writing
-\end{itemize}
-For beginners of writing Japanese texts,
-please refer to the Japanese edition.
+Note: This English guide (\file{\jobname.pdf}) is \emph{not} meant
+to be a complete translation of Japanese manual (\file{ptex-manual.pdf}).
+For example, this document does not cover issues regarding Japanese typesettings.
+If you are interested in typesetting conventions of Japanese text, please also
+refer to \file{japanese.pdf} distributed with \Pkg{babel-japanese}.
 \end{quotation}
+
+This document is maintained at:
+\url{https://github.com/texjporg/ptex-manual/}
 
 \tableofcontents
 
@@ -117,25 +122,54 @@ please refer to the Japanese edition.
 %%% pTeX とその仲間
 \section{\pTeX\ and its variants}
 
-% [TODO] \pTeX, \upTeX, \epTeX, \eupTeX を簡単に紹介
+The figure below shows the relationship between engines.
+\[
+\xymatrix@ur{
+ \text{\TeX}   \ar[r]\ar[d] & \text{\eTeX}  \ar[r]\ar[d]
+   & \text{\fbox{\pdfTeX}} \\
+ \text{\pTeX}  \ar[r]\ar[d] & \text{\fbox{\epTeX}} \ar[d] &\\
+ \text{\upTeX} \ar[r]       & \text{\fbox{\eupTeX}}       &
+}
+\]
 
-%%% e-(u)pTeX の話がメイン
-There is no advantage to choose \pTeX/\upTeX\ over \epTeX/\eupTeX,
-so we focus mainly on \epTeX/\eupTeX.
+\pTeX\ is an old Japanese-specific extension of \TeX82,
+which aims to support proper typesetting of Japanese text
+but only supports a limited character set, JIS~X~0208 (6879 characters).
 
-% [TODO] pLaTeX/upLaTeX も e- で走っていて，これで十分であると付け加える
-% [TODO] 既に pTeX/upTeX が暗に e-pTeX/e-upTeX を指す文献もあることに言及
+\upTeX\ is developed as an extension of \pTeX\ to support full Unicode
+characters. It also includes extensions to overcome the difficulties of
+\pTeX\ in processing 8-bit Latin characters due to conflicts with
+legacy multibyte Japanese encodings.
+
+\epTeX\ and \eupTeX\ are \eTeX\ extensions of \pTeX\ and \upTeX\ respectively.
+In the current release, some extensions derived from \pdfTeX\ and \OMEGA\ are
+also available.
+
+%%% 際立った pTeX 系列の特徴
+\section{Eminent characteristics of \pTeX\ family}
+
+The most important characteristics of \pTeX\ family can be
+summarized as follows:
+%%% 欧文と和文が別個に存在する・縦組がある
+\begin{itemize}
+  \item Japanese characters are interpreted and handled completely apart from
+    Western characters. If a pair of two or more 8-bit codes in the input
+    matches the pattern of Japanese character codes, it is regarded as one
+    Japanese character and given a different \.{catcode} (\.{kcatcode}) value.
+  \item There are two text directions; horizontal (\Foreign{yoko-gumi}; 横組)
+    and vertical (\Foreign{tate-gumi}; 縦組).
+    Two directions can be mixed even within a single document.
+\end{itemize}
 
 %%% 欧文 TeX との互換性
-\section{Compatibility with Western \TeX}
+\section{Compatibility with Western \TeX}\label{compat}
 
 %%% pTeX/upTeX は Knuthian TeX に対してほぼ上位互換
 \pTeX/\upTeX\ are almost upward compatible with Knuthian \TeX,
 however, they do not pass the TRIP test.
 %%% 入力の8bitの扱いが異なる。フォントの8bitはそのまま
-In \pTeX/\upTeX, input handling is different from Knuthian \TeX;
-if a pair of two or more 8-bit codes matches Japanese character code,
-it is regarded as one Japanese character.
+The most important difference lies in the handling of 8-bit code inputs;
+some 8-bit Latin characters may be subject to the encoding conversion.
 There is no difference in handling 8-bit TFM font.
 
 %%% e-pTeX/e-upTeX は e-TeX に対してほぼ上位互換
@@ -144,12 +178,17 @@ however, input handling is similar to \pTeX/\upTeX.
 It does not pass the e-TRIP test.
 %%% だけど e-TeX はもうなく，pdfTeX の DVI モードがあるだけ
 That said, please note that ``raw \eTeX'' is unavailable anymore
-in \TeX\ Live and derived distributions;
+in \TL and derived distributions;
 they provide a command |etex| only as ``DVI mode of \pdfTeX.''
 %%% e-pTeX/e-upTeX は pdfTeX の DVI モードに対して上位互換ではない
-We should note that
+You should note that
 \epTeX/\eupTeX\ are \emph{not} upward compatible with DVI mode of \pdfTeX,
-which will be discussed later in section \ref{dvi-pdftex}.
+which will be discussed later in Section \ref{dvi-pdftex}.
+
+%%% e-(u)pTeX の話がメイン
+There is no advantage to choose \pTeX/\upTeX\ over \epTeX/\eupTeX,
+so we focus mainly on \epTeX/\eupTeX.
+% [TODO] 既に pTeX/upTeX が暗に e-pTeX/e-upTeX を指す場合もある
 
 %%% LaTeX ムニャムニャ
 \section{\LaTeX\ on \pTeX/\upTeX\ --- \pLaTeX/\upLaTeX}
@@ -157,7 +196,7 @@ which will be discussed later in section \ref{dvi-pdftex}.
 %%% pLaTeX と upLaTeX ムニャムニャ
 Formats based on \LaTeX\ is called \pLaTeX\ when running on \pTeX/\epTeX,
 and called \upLaTeX\ when running on \upTeX/\eupTeX.
-In recent versions (around 2011) of \TeX\ Live and its derivatives,
+In recent versions (around 2011) of \TL and its derivatives,
 the default engines of \pLaTeX\ and \upLaTeX\ are \epTeX\ and \eupTeX.
 That is, the command |platex| starts \epTeX\ (not \pTeX) with
 preloaded format |platex.fmt|.
@@ -167,9 +206,9 @@ In the kernel level (|platex.ltx| and |uplatex.ltx|),
 \pLaTeX\ and \upLaTeX\ adds some additional commands
 related to the followings:
 \begin{itemize}
-  \item Selection of Japanese fonts
-  \item Crop marks (called ``tombow'') for printings
-  \item Adjustment for mixing horizontal and vertical texts
+  \item Selection of Japanese fonts,
+  \item Crop marks (called \Foreign{tombow}; トンボ) for printings,
+  \item Adjustment for mixing horizontal and vertical texts.
 \end{itemize}
 %%% author レベルでは LaTeX とほぼ互換，ただし例外あり
 For authors, \pLaTeX/\upLaTeX\ are almost upward compatible with
@@ -184,22 +223,7 @@ original \LaTeX, except for the followings:
 \end{itemize}
 %%% developer レベルでは pdfTeX 拡張や pLaTeX カーネルでムニャムニャ
 For developers, additional care may be needed,
-for changes in the kernel macros and/or absence of \pdfTeX\ features.
-
-%%% 際立った pTeX 系列の特徴
-\section{Eminent characteristics of \pTeX/\upTeX}
-
-The most important characteristics of \pTeX/\upTeX\ can be
-summarized as follows:
-%%% 欧文と和文が別個に存在する・縦組がある
-\begin{itemize}
-  \item Japanese characters are interpreted and handled completely apart from
-    Western characters.
-  \item Texts can be aligned vertically, called ``tate-gumi'' (縦組).
-    The horizontal alignment of texts is called ``yoko-gumi'' (横組),
-    and both ``tate-gumi'' and ``yoko-gumi'' can be mixed
-    even within a single document.
-\end{itemize}
+for changes in the kernel macros and/or the absence of \pdfTeX\ features.
 
 
 \newpage
@@ -293,12 +317,12 @@ Knuthian \TeX, as long as the following conditions are met:
 However, some additional DVI commands, which are defined in the
 standard \cite{dvistd0} but never used in \TeX82, can come out.
 \begin{itemize}
-  \item |set2| (129), |put2| (134):
-    Appears in both \pTeX\ and \upTeX\ DVI.
-    Used to typeset a Japanese character with 2-byte code.
-  \item |set3| (130), |put3| (135):
-    Appears in only \upTeX\ DVI.
-    Used to typeset a Japanese character with 3-byte code.
+  \item |set2| (129): % |put2| (134) seems to be unused
+    Used to typeset a Japanese character with 2-byte code
+    (both \pTeX\ and \upTeX).
+  \item |set3| (130): % |put3| (135) seems to be unused
+    Used to typeset a Japanese character with 3-byte code
+    (\upTeX\ only).
 \end{itemize}
 When \pTeX\ is going to typeset a Japanese character into DVI,
 it is encoded in JIS, which is always a 2-byte code.
@@ -790,7 +814,7 @@ since \pTeX\ family does not support \.{lccode} outside 0--255.
 
 \.{kansuji} is an expandable primitive like \.{number} or \.{romannumeral},
 and it converts an integer into its corresponding kanji notation
-called ``kansuji'' (漢数字). The important point here is that
+called \Foreign{kansuji} (漢数字). The important point here is that
 the number-kanji mapping can be altered by \.{kansujichar}.
 
 Example 1: equivalent to |\def\X{あ}| (JIS code \code{0x2422} is ``あ''):
@@ -870,10 +894,28 @@ These primitives in \epTeX\ and \eupTeX\ take a valid character code
 %%% pdfTeX と違うところ
 \subsection{Difference from \pdfTeX\ in DVI mode}\label{dvi-pdftex}
 
-As stated above,
-\epTeX/\eupTeX\ are \emph{not} upward compatible with DVI mode of \pdfTeX.
+As stated in Section \ref{compat}, \epTeX/\eupTeX\ are
+\emph{not} upward compatible with DVI mode of \pdfTeX,
+which is available as the |etex| command in \TL.
+Here we list some important differences:
 
 %%% pdfTeX の DVI モードにあって e-(u)pTeX にないプリミティブ
+First, some \pdfTeX-specific primitives are absent. Examples:
+\begin{itemize}
+ \item All primitives specific to PDF output:
+   \.{pdfoutput}, \.{pdfinfo}, \.{pdfobj} etc.\footnote{%
+    \epTeX/\eupTeX\ has primitives \.{pdfpagewidth} and \.{pdfpageheight};
+    this is just because they were convenient for implementing \.{pdfsavepos},
+    and their behavior is somewhat different from that of \pdfTeX.
+    Also note that \epTeX/\eupTeX\ does not have \.{pdfhorigin}
+    and \.{pdfvorigin}.}
+ \item All primitives related to micro-typography:
+   \.{pdffontexpand}, \.{pdfprotrudechars}, etc.
+ \item Some primitives related to handling of strings:
+   \.{pdfescapestring}, \.{pdfescapehex} etc.
+\end{itemize}
+
+
 %%% その他ムニャムニャ
 
 %%% ファイルの文字コードはどうするか
@@ -915,8 +957,8 @@ between characters.
 
 %%% 欧文とは別個
 \pTeX\ family can have 3 different ``current'' fonts at the same time;
-a Latin font, a Japanese font for horizontal writing (``yoko-gumi''),
-and a Japanese font for vertical writing (``tate-gumi'').
+a Latin font, a Japanese font for horizontal writing (\Foreign{yoko-gumi}),
+and a Japanese font for vertical writing (\Foreign{tate-gumi}).
 The first one is the same as in the Knuthian \TeX,
 which is defined in a standard TFM format.
 The latter two are specific to \pTeX\ family, which are defined
