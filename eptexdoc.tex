@@ -1,5 +1,5 @@
 %#!make eptexdoc.pdf
-\documentclass[a4paper,11pt,nomag]{jsarticle}
+\documentclass[a4paper,11pt,nomag,dvipdfmx]{jsarticle}
 \usepackage[bold,deluxe]{otf}
 
 \input fam256p.tex
@@ -12,7 +12,7 @@
 \usepackage{lmodern}
 \usepackage[T1]{fontenc}
 \usepackage{booktabs,enumitem,multicol}
-\usepackage[dvipdfmx,hyperfootnotes=false]{hyperref}
+\usepackage[hyperfootnotes=false]{hyperref}
 \usepackage{pxjahyper}
 \usepackage{hologo}
 \usepackage{makeidx}\makeindex
@@ -902,7 +902,10 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 \begin{verbatim}
 \epTeXinputencoding sjis
 \end{verbatim}
-  のように，<encoding>は|{}|で囲まないこと．
+  のように，<encoding>は|{}|で囲まないこと\footnote{\TeX\ Live 2020以降，
+  \.{input}プリミティブでブレースで囲まれたファイル名指定が可能に
+  なった(r53729)ことに付随して，\.{epTeXinputencoding}でもブレースで
+  囲んだ<encoding>の指定が可能となった．}．
   <encoding>の末尾は，空白トークンや展開不能トークンによって区切られる．
   % scan_file_name で<encoding> を取得しているので，
   % \epTeXinputencoding "euc" \epTeXinputencoding ""e""u""c"" も OK.

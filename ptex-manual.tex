@@ -1,5 +1,5 @@
 %#!make ptex-manual.pdf
-\documentclass[a4paper,11pt,nomag]{jsarticle}
+\documentclass[a4paper,11pt,nomag,dvipdfmx]{jsarticle}
 \usepackage[textwidth=42zw,lines=40,truedimen,centering]{geometry}
 
 %%%%%%%%%%%%%%%%
@@ -13,7 +13,7 @@
 \usepackage[defaultsups]{newpxtext}
 \usepackage[zerostyle=c,straightquotes]{newtxtt}
 \usepackage{newpxmath}
-\usepackage[dvipdfmx,hyperfootnotes=false]{hyperref}
+\usepackage[hyperfootnotes=false]{hyperref}
 \usepackage{pxjahyper}
 \usepackage{hologo}
 \usepackage{makeidx}\makeindex
@@ -1045,9 +1045,12 @@ JFMファイルもTFMファイルと同様の情報を持つが，
 \end{cslist}
 
 \begin{dangerous}
-  細かい話をすれば，\pTeX のフォーマット作成時に和文フォントを
+  細かい話をすれば，\pTeX のini modeでのフォーマット作成時に和文フォントを
   何も選択しなければ，|\fontname\jfont|が|\nullfont|となり，
-  また和文文字を入力してもノードは作られないので，
+  また和文文字を入力してもノードは作られない\footnote{ただし，
+  $\.{tracinglostchars}>0$でも
+  \code{Missing character: There is no あ in font nullfont!}のような
+  警告は出ない．}ので，
   「和文版|\nullfont|が選択されている」と言えなくもない．
   ただ，いったん実際の和文フォントを選択した後に
   「和文版|\nullfont|を選択する」という制御綴は作れないと思われる．
