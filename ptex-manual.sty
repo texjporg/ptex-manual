@@ -25,14 +25,18 @@
 
 \def\Pkg#1{\textsf{#1}}
 \let\@lessthan <
+\begingroup
 \catcode`\<=13
+\gdef<{\ifmmode\@lessthan\else\expandafter\@@meta\fi}
+\gdef\@@meta#1>{\ensuremath{\langle\hbox{\normalfont\textit{#1}}\rangle}}
+\gdef\hex#1{\ifmmode\mbox\fi{\texttt{"#1}}}%"
+\endgroup
+\AtBeginDocument{\catcode`\<=13\relax}
+
 \xspcode`\\=3
 \xspcode`\*=3
 \xspcode`\-=3
 \xspcode23=3 % \textcompwordmark
-\def<{\ifmmode\@lessthan\else\expandafter\@@meta\fi}
-\def\@@meta#1>{\ensuremath{\langle\hbox{\normalfont\textit{#1}}\rangle}}
-\def\hex#1{\ifmmode\mbox\fi{\texttt{"#1}}}%"
 
 \normalsize
 \bigskipamount=\baselineskip
