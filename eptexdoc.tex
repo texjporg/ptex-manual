@@ -864,8 +864,11 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 \epTeX 内部で使用しているsubtypeの値をそのまま返すだけであるので，
 具体的な数値は将来変わる恐れがある．そのため，
 \begin{verbatim}
-\ifdefined\ucs\jfont\tenmin=upjisr-h at 9.62216pt
-\else\jfont\tenmin=min10\fi
+\ifnum\jis"2121="3000 %% upTeX check
+  \jfont\tenmin=upjisr-h at 9.62216pt
+\else
+  \jfont\tenmin=min10
+\fi
 \tenmin\char\jis"214B\null\setbox0\lastbox%"
 \global\chardef\pltx@gluetype\lastnodetype
 \global\chardef\pltx@jfmgluesubtype\lastnodesubtype

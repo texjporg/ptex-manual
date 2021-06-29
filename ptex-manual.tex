@@ -1139,13 +1139,65 @@ p3.1.2で復活したという経緯がある．}．
   それぞれJISコード，EUCコード，Shift-JISコードから内部コードへの変換を行う．
   たとえば，|\char\jis"346E|，|\char\euc"B0A5|，|\char\sjis"8A79|は，
   それぞれ「\char\jis"346E」，「\char\euc"B0A5」，「\char\sjis"8A79」である．
+
+%%% [TODO] \ucs, \toucs => pTeX version p3.10.0
+\ifx\toucs\undefined\else
+%
+\csitem[\.{ucs} <number>]
+  Unicodeから内部コードへの変換を行う．
+  もともと\upTeX で実装されていたが，\pTeX~3.10.0で取り入れた．
+
+\csitem[\.{toucs} <number>]
+  内部コードからUnicodeへの変換を行う．\pTeX~3.10.0で追加した．
+%
+\fi
+%%%
 \end{cslist}
 
 \begin{dangerous}
- \ref{sec:ptexchar}節でも述べたように，
- \emph{\pTeX はJIS~X~0213には対応せず，JIS~X~0208の範囲のみ扱える}．
-
- [TODO] \.{kuten}, \.{jis}, \.{sjis}, \.{euc}が$-1$とならない範囲はどこ？
+  \ref{sec:ptexchar}節でも述べたように，
+  \emph{\pTeX はJIS~X~0213には対応せず，JIS~X~0208の範囲のみ扱える}．
+  なお，\pTeX~3.9.1以前では，不正な文字コードを与えたときの挙動が
+  不統一で，特に以下の値を返すケースもあった：
+  \begin{itemize}
+    \item 区点コード表のJIS~X~0208における最初の未定義位置
+          (JIS 0x222F, EUC 0xA2AF, SJIS 0x81AD)…
+          和文文字コードとして有効で，JIS~X~0213では定義されている．
+          % 発生状況：従来のUCS2toJIS(0)
+    \item 区点コード表の1区0点
+          (JIS 0x2120, EUC 0xA1A0, SJIS 0x813F)…
+          文字コードとして無効．
+          % 発生状況: JIStoSJIS(不正)
+    \item $-1$…文字コードとして無効．
+          % 発生状況：KUTENtoJIS(不正)→JIStoEUC(-1)
+  \end{itemize}
+  \pTeX~3.10.0では\.{ucs}と\.{toucs}を追加し，さらに不正な文字コードを
+  容易に判別できるように以下の仕様にした：
+  \begin{itemize}
+    \item 文字コード変換が\emph{不要}なケース\footnote{内部eucにおける\.{euc}，
+        内部sjisにおける\.{sjis}，および\upTeX で内部uptexにおける\.{ucs}と
+        \.{toucs}がこれに該当する．}…恒等変換となる．
+        不正な文字コードを与えてもそのまま通る．（これは従来どおりの挙動）
+    \item 文字コード変換が\emph{必要}なケース…
+        不正な文字コードを与えると$-1$を返す．（返り値を統一）
+  \end{itemize}
+%%%
+%
+% pTeX-3.10.0 での実装メモ (2021-06-29 @aminophen)
+% https://github.com/texjporg/tex-jp-build/pull/121
+%
+%  * ptexenc (ptexenc.c, kanjicnv.c, unicode.c) の関数
+%    => 文字コード変換が不要な場合は恒等変換．
+%                       必要な場合で不正な文字コードなら 0 を返す．
+%  * ptex-base.ch の実装
+%    => ptexenc に従う．ただし \jis, \sjis, \euc, \kuten, \ucs, \toucs の
+%       返り値が 0 の場合は -1 を表示．
+%  * uptex-m.ch の実装
+%    => ptexenc 及び ptex-base.ch に従う．ただし，内部コード uptex の時の
+%       \ucs0 と \toucs0 は（ptex-base.ch が無条件に -1 を表示しようとするが，
+%       ここは無変換とすべきなので）0 を表示．
+%
+%%%
 \end{dangerous}
 
 \begin{cslist}
