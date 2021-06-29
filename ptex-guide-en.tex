@@ -463,6 +463,7 @@ The features of each primitive can be found in Japanese edition.
 % [TODO] 追加されたバージョン情報は正しいか？
 
 \def\New#1{--- New primitive since #1}
+\def\NewMoved#1#2{--- Imported from #1, since #2}
 
 \subsubsection{Sync\TeX\ additions (available in \pTeX, \upTeX, \epTeX, \eupTeX)}
 In the standard build of \TL, Sync\TeX\ extension is unavailable in
@@ -515,6 +516,8 @@ Knuthian \TeX; however, it is enabled in \pTeX\ family.
  \csitem[\.{tbaselineshift}]
  \csitem[\.{textbaselineshiftfactor} \New{p3.7 (\TL2016)}]
  \csitem[\.{tfont}]
+ \csitem[\.{toucs} \New{p3.10.0 (\TL2022)}]
+ \csitem[\.{ucs} \NewMoved{\upTeX}{p3.10.0 (\TL2022)}]
  \csitem[\.{xkanjiskip}]
  \csitem[\.{xspcode}]
  \csitem[\.{ybaselineshift}]
@@ -533,7 +536,7 @@ Knuthian \TeX; however, it is enabled in \pTeX\ family.
  \csitem[\.{forcecjktoken}]
  \csitem[\.{kchar}]
  \csitem[\.{kchardef}]
- \csitem[\.{ucs}]
+ %\csitem[\.{ucs}] % moved to pTeX 3.10.0
  \csitem[\.{uptexrevision} \New{u1.23 (\TL2018)}]
  \csitem[\.{uptexversion} \New{u1.23 (\TL2018)}]
 \end{simplelist}
