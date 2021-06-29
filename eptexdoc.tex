@@ -807,6 +807,8 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
   \begin{itemize}
     \item 「最後のノード」が文字ノードのときは0が返る．
     \item 現在構築中のリストが空のときは$-1$が返る．
+    \item \epTeX~210701以降では，数式内のノードについてはsubtype値そのままではほとんど意味がないので，
+    次ページの表の値を返す．
   \end{itemize}
 \end{cslist}
 
@@ -886,6 +888,35 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
     \fi\fi}
 \end{verbatim}
 として定義している．
+
+\paragraph{\epTeX~210701以降の注意}
+上でも述べたように，数式内のノードについてはsubtype値はほとんど意味を持たないので，
+これらに対する\.{lastnodesubtype}ではsubtype値でなく以下の値を返すようにした：
+\begin{description}
+  \item[最後のノードが数式内のノード($\.{lastnodetype}=15$)]
+  \begin{multilist}{3}{\hfil\hskip1.5em#:&\quad#\hfil}
+    \item 0&明示的なスタイル指定\footnotemark\cr
+    \item 1&\.{mathchoice}\cr
+    \item 2&\.{mathord}\cr
+    \item 3&\.{mathop}${}+{}$\.{displaylimits}\cr
+    \item 4&\.{mathop}${}+{}$\.{limits}\cr
+    \item 5&\.{mathop}${}+{}$\.{nolimits}\cr
+    \item 6&\.{mathbin}\cr
+    \item 7&\.{mathrel}\cr
+    \item 8&\.{mathopen}\cr
+    \item 9&\.{mathclose}\cr
+    \item 10&\.{mathpunct}\cr
+    \item 11&\.{mathinner}\cr
+    \item 12&\.{radical}\cr
+    %\item 13&分数（\cs{over}など）\cr
+    \item 14&\.{underline}\cr
+    \item 15&\.{overline}\cr
+    \item 16&\.{mathaccent}\cr
+    \item 17&\.{vcenter}\cr
+  \end{multilist}
+  \footnotetext{\.{displaystyle}, \.{textstyle}, \.{scriptstyle}, \.{scriptscriptstyle}.}
+\end{description}
+
 
 \section{\.{epTeXinputencoding}プリミティブ}
 現在読み込んでいるファイルの文字コードを切り替えるプリミティブであり，
