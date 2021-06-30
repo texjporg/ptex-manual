@@ -669,6 +669,9 @@ delimiter codeについても同様である．
   \texttt{\.{csname}~...~\.{endcsname}}内で評価されたちょうどその時に真となる．
   \LaTeX~2019-10-01で行われる変更(\cite{latex95,tjb83})で必要になったために
   \epTeX~190709で導入された．
+
+ \csitem[\.{vadjust} pre <vertical mode material>]
+   ...
 \end{cslist}
 
 
@@ -913,8 +916,13 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
     \item 15&\.{overline}\cr
     \item 16&\.{mathaccent}\cr
     \item 17&\.{vcenter}\cr
+    \item 18&\.{left}\cr
+    \item 19&\.{middle}\cr
   \end{multilist}
   \footnotetext{\.{displaystyle}, \.{textstyle}, \.{scriptstyle}, \.{scriptscriptstyle}.}
+  なお，\verb+\left...[\middle]...\right+の直後で\.{lastnodesubtype}を使用しても，
+  \verb+\left...[\middle]...\right+全体が一つの内部数式(\.{mathinner})となるので，
+  \.{right}に「対応する」\.{lastnodesubtype}の値は取得できない．\.{over}プリミティブなどによる分数についても類似の事情がある．
 \end{description}
 
 
