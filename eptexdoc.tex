@@ -671,7 +671,15 @@ delimiter codeについても同様である．
   \epTeX~190709で導入された．
 
  \csitem[\.{vadjust} pre <vertical mode material>]
-   ...
+  \.{vadjust}自体は\TeX82に存在し，それが現れた行の
+  \emph{直後}に<vertical mode material>を配置するものである．
+  \hologo{pdfTeX}では，\.{vadjust}にキーワード|pre|を付けると，それが現れた行の
+  \emph{直前}に<vertical mode material>を配置できるように拡張されており，
+  同じ機能が\hologo{LuaTeX}と\hologo{XeTeX}にも存在するので，
+  \epTeX~210701でこれをサポートした．
+
+  発端は，2021年2月にPandocで「ハイパーリンクのターゲットを行の下端ではなく
+  上端にする」という目的で|\vadjust pre|が使われたことである\cite{tjb115}．
 \end{cslist}
 
 
@@ -1224,6 +1232,8 @@ $3$\,sp）だが，どこか気になるところである．
   The \LaTeX3 Project Team, \textit{\LaTeX\ News Issue 31}, 2020.\\
   |$TEXMFDIST/source/latex/base/ltnews31.tex|, \\
   \url{https://www.latex-project.org/news/latex2e-news/ltnews31.pdf}.
+ \bibitem{tjb115} aminophen，「e(u)ptex: Add |\vadjust pre|」，2021/05/22．\\
+  \url{https://github.com/texjporg/tex-jp-build/pull/115}
 \end{thebibliography}
 
 \newpage
