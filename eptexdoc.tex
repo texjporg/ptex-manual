@@ -670,7 +670,9 @@ delimiter codeについても同様である．
   \LaTeX~2019-10-01で行われる変更(\cite{latex95,tjb83})で必要になったために
   \epTeX~190709で導入された．
 
- \csitem[\.{vadjust} pre <vertical mode material>]
+%%%
+\ifnum\epTeXversion>210629
+ \csitem[\.{vadjust} \texttt{pre} <vertical mode material>]
   \.{vadjust}自体は\TeX82に存在し，それが現れた行の
   \emph{直後}に<vertical mode material>を配置するものである．
   \hologo{pdfTeX}では，\.{vadjust}にキーワード|pre|を付けると，それが現れた行の
@@ -680,6 +682,8 @@ delimiter codeについても同様である．
 
   発端は，2021年2月にPandocで「ハイパーリンクのターゲットを行の下端ではなく
   上端にする」という目的で|\vadjust pre|が使われたことである\cite{tjb115}．
+\fi
+%%%
 \end{cslist}
 
 
@@ -900,6 +904,8 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 \end{verbatim}
 として定義している．
 
+%%%
+\ifnum\epTeXversion>210629
 \paragraph{\epTeX~210701以降の注意}
 上でも述べたように，数式内のノードについてはsubtype値はほとんど意味を持たないので，
 これらに対する\.{lastnodesubtype}ではsubtype値でなく以下の値を返すようにした：
@@ -932,6 +938,8 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
   \verb+\left...[\middle]...\right+全体が一つの内部数式(\.{mathinner})となるので，
   \.{right}に「対応する」\.{lastnodesubtype}の値は取得できない．\.{over}プリミティブなどによる分数についても類似の事情がある．
 \end{description}
+\fi
+%%%
 
 
 \section{\.{epTeXinputencoding}プリミティブ}
