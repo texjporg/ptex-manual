@@ -439,7 +439,7 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
   \item 当該の欧文文字の直前が和文文字（後方に禁則ペナルティを伴っても構わない）の
     場合に限り，その欧文文字に設定された|\prebreakpenalty|を挿入する．
 \end{itemize}
-\iffalse %%%%% TL2019-hack
+\iffalse %%%%% [TODO]
 \begin{dangerous}
 上記の「欧文文字に設定された禁則ペナルティが挿入される状況」は
 欧文文字と和文文字の境界であり，
@@ -452,7 +452,7 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
   \item 和文→欧文文字間： |penalty_node| (\.{prebreakpenalty}) → |disp_node| の順
 \end{itemize}
 \end{dangerous}
-\fi %%%%% TL2019-hack
+\fi %%%%%
 
 \begin{dangerous}
 禁則ペナルティはリスト構築中に自動的に挿入されるので，\.{showlists}で
@@ -542,7 +542,7 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
  \item 禁則ペナルティ（\.{prebreakpenalty}や\.{postbreakpenalty}）と
   が同じ箇所に発行される場合は
   「禁則ペナルティ→JFM由来空白」の順に発行される．
-\iffalse %%%%% TL2019-hack
+\iffalse %%%%% [TODO]
  \item より一般に，禁則ペナルティ，JFM由来空白，ベースライン補正，
   欧文TFM由来カーンが同じ箇所に発行される場合は
   次の順になる（\ref{sec:kinsoku}節の注意の一般化）．% tex-jp-build/f6f500d or 9e7e21aa
@@ -553,7 +553,7 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
    \footnote{[TODO] \TeX~Live~2019の\pTeX~3.8.2では，欧文TFM由来カーンは欧文→和文の
    切替時には挿入されない．}% tex-jp-build/78c8605 で解決
   \end{itemize}
-\fi %%%%% TL2019-hack
+\fi %%%%%
  \item もし水平ボックス(\.{hbox})や\.{noindent}で開始された段落がJFM由来グルーで始まった
    場合は，そのグルーは取り除かれる（カーンは除かれない）．
    また水平ボックスがJFM由来グルーで終了した場合は，そのグルーは自然長・伸び量・縮み量の
@@ -1285,7 +1285,8 @@ p3.1.2で復活したという経緯がある．}．
   「整数値をその符号値をもつ和文文字トークンに変換する」という目的に
   用いることもでき\footnote{ただし，\upTeX で
   0--127の文字コードを|\kansujichar|で指定した場合のみ，
-  |\kansuji|で生成されるトークンは欧文文字トークンになる\cite{build36}．}，
+  |\kansuji|で生成されるトークンはカテゴリーコード12の
+  欧文文字トークンになる\cite{build36}．}，
   これは時に“|\kansuji|トリック”と呼ばれる．例えば
 \begin{verbatim}
   \kansujichar1=\jis"2422 \edef\X{\kansuji1}
