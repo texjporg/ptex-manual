@@ -334,7 +334,18 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
 
   \pTeX においては，|\kcatcode|を上記の初期状態から変更することは想定されていない．
   また，変更したとしても，（先に述べた通り）和文文字トークンにカテゴリーコードの情報は
-  保存されず，和文文字が処理対象となるたびにその度に値が取得される．
+  保存されず，和文文字が処理対象となるたびにカテゴリーコードの値が再取得される．
+  ただし，|\let\CS=あ| などとして和文文字トークンを|\let|すると，|\CS|には
+  その時のカテゴリーコード(|\kcatcode|)が保存される\footnote{コミュニティ版\pTeX では，
+  一時的に「和文文字トークンを|\let|した|\CS|においても，それが処理対象となるたびに
+  カテゴリーコードの値を再取得する」という挙動に変更しようとした(r51021)．
+  しかし，この変更が不完全で「|\ifcat|では再取得するが，|\ifx|では再取得しない」という
+  不統一な状態となってしまったため，r59699で従来の挙動に戻した（アスキー版と同じ）．
+  結果的に，\TeX\ Live 2019--2021では「ただし，…」が当てはまらない(\cite{man4})．}．
+  % 不統一な挙動になっているのは以下のバージョン．
+  %   * TeX Live 2019 rebuild 2019-05-30 (p3.8.2)
+  %   * TeX Live 2020 (p3.8.3)
+  %   * TeX Live 2021 (p3.9.0)
 
   なお，\upTeX においては，|\kcatcode|は大きく仕様変更されている．
 \end{cslist}
@@ -1546,6 +1557,9 @@ has been |\let| equal to a non-active character token.
  \bibitem{build68} aminophen, 「upTeX の |\if| と |\ifcat|」，
   2019/01/17,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/68}
+ \bibitem{man4} aminophen, 「pTeX の和文文字トークンのカテゴリーコード」，
+  2019/04/22,\\
+  \url{https://github.com/texjporg/ptex-manual/issues/4}
  \bibitem{dvistd0} TUG DVI Standards Working Group,
   \textit{The DVI Driver Standard, Level 0}.\\
   \url{https://ctan.org/pkg/dvistd}
