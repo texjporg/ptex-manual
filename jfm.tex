@@ -13,6 +13,7 @@
 
 \def\size#1{\mathit{#1}}
 \def\code#1{\texttt{#1}}
+\def\codechar#1{\ensuremath{\langle\mbox{\null\code{#1}\null}\rangle}}
 
 % logos
 \def\pTeX{p\kern-.10em\TeX}\def\upTeX{u\pTeX}
@@ -465,7 +466,7 @@ $ chkdvifont upphiraminw3-h.tfm
     design size     = 10485760 2^{-20} points = 10 points
 \end{verbatim}
 
-\subsection{makejvf}
+\subsection{makejvf}\label{makejvf}
 
 JFMファイルを基にして，VF (virtual font)を生成するプログラムである．
 \code{makejvf}が生成する和文VFの目的は以下のとおりである：
@@ -500,5 +501,152 @@ JFMおよび和文VFを操作する種々の機能を提供するPerlスクリ�
     VF中に記録された参照先のJFM名も適切に変更される．多書体化などに有用．
 \end{itemize}
 詳細は公式ドキュメントを参照してほしい．
+
+
+\section{付録：利用可能なJFMについて}\label{jfm-dist}
+
+\pTeX/\upTeX と一緒に標準で配布しているJFMについて，簡単に説明する．
+
+\subsection{ptex-fonts}
+
+コミュニティによる配布場所は |https://github.com/texjporg/ptex-fonts| であり，
+内容物は以下のとおり．なお，\pTeX および\pLaTeX のフォーマットでは，既定で
+横組用に |min*.tfm| と |goth*.tfm| を，
+縦組用に |tmin*.tfm| と |tgoth*.tfm| を使用している．
+\begin{itemize}
+  \item 株式会社アスキーによるもの
+    \begin{itemize}
+      \item |min*.tfm|，|goth*.tfm|，|nmin*.tfm|，|ngoth*.tfm|（以上，横組用）
+      \item |tmin*.tfm|，|tgoth*.tfm|（以上，縦組用）
+    \end{itemize}
+  \item 東京書籍印刷，現リーブルテックの小林肇氏によるもの
+    \begin{itemize}
+      \item |jis*.tfm|（JISフォントメトリック）
+    \end{itemize}
+\end{itemize}
+
+\paragraph{株式会社アスキーによるJFM}
+
+しばしば「|min10|系」と呼ばれる．
+歴史が非常に古く，開発当時のドキュメントは残念ながらほとんど残っていない．
+以下は，株式会社アスキーによる「日本語\TeX version j1.7」\cite{jtex1.7}に
+付属していたドキュメント|README.KANJI|からの抜粋である．
+
+\begin{quotation}
+\paragraph{漢字フォント}
+
+ディレクトリ |jfms| 内の漢字フォント用 JFM（TFM）ファイルは、以下に
+示すサイズ（ドット数）のフォントを想定して作成されています（日本
+語 version j0.3 の配布時のものと若干異なります。注意して下さい）。
+尚、（株）アスキーより販売されている「日本語 Micro TeX」において
+も、これと全く同じものを使用しています。
+
+\begin{verbatim}
+    TeX での呼び名  実寸（pt） 300dpi  480dpi  240dpi 118dpi
+    5pt             4.58222      19     30      15     7
+    6pt             5.49866      23     36      18     9
+    7pt             6.4151       27     42      21     10
+    8pt             7.33154      30     49      24     12
+    9pt             8.24799      34     55      27     13
+    10pt            9.16443      38     61      30     15
+    10pt * 1.2^1/2  10.0391      42     67      33     16
+    10pt * 1.2^1    10.9973      46     73      36     18
+    10pt * 1.2^2    13.1968      55     88      44     22
+    10pt * 1.2^3    15.8361      66     105     52     26
+    10pt * 1.2^4    19.0034      79     126     63     31
+    10pt * 1.3^5    22.804       95     151     75     37
+\end{verbatim}
+
+このサイズ以外のフォントを使用する場合は、プリンタドライバで疑似的に
+これらのサイズに合わせるか、そのフォントに合わせたJFM（TFM）ファイル
+を作成するかのどちらかになります。互換性を考慮する場合は、前者の方法
+を取るべきです。しかし、それではどうしても気にくわないというのであれ
+ば、|jtex/TeXware| に JFM 用の |tftopl| および |pltotf| がありますから、これ
+を使用して新しい JFMファイルを作成して下さい。これらのユーティリティ
+のドキュメントは、株式会社アスキー発行の「日本語 TeX テクニカルブック
+I」を参照して下さい。（中略）
+
+|jfms| 内には、|min*.tfm|、|goth*.tfm| の他に |nmin*.tfm| と |ngoth*.tfm| が含
+まれています。前者は、句読点、ピリオド、カンマといくつかの仮名文字と
+の間でカーニング処理を行うようになっていますが、後者ではこの処理を行っ
+ていません。両者間では、これ以外の違いはありません。ただしマクロ中で
+は、前者のみが定義されており、後者を使用する場合は自分で定義する必要
+があります。
+\end{quotation}
+
+通常の和文フォントは正方形の仮想ボディに収まるようにデザインされるが，
+例えば公称10ポイントの|min10|は「幅9.62216pt，高さ7.77588pt，深さ1.38855pt」の
+扁平な矩形でデザインされている（$\mathrm{zw}=9.62216\,\mathrm{pt}$と
+$\mathrm{zh}=9.16443\,\mathrm{pt}$が一致しない）．
+また，例えば|ちょっと|が「ちょっと」ではなく
+「{\jfont\minten=min10 \minten ちょっと}」と詰まるなどの
+不自然な挙動も知られている\cite{min10otobe}．
+ただし，\emph{互換性維持のため，コミュニティが修正を行う予定はない}．
+
+\paragraph{JISフォントメトリック}
+
+|jis*.tfm|は，JIS~X~4051-1995「日本語文書の行組版方法」になるべく即した
+メトリックとして開発された\cite{jistfm}．
+|min10|系を「そのまま置き換えて使ってもらう」ことを
+意図しており，そのため，|min10|系の字詰まりの不具合等は直しつつ，
+zw，zhの値を仮定した既存スタイルに影響を与えないように
+|min10|のzw・zhの寸法は温存した設計になっている．
+なお，|jsclasses|は横組用の|jis.tfm|と|jisg.tfm|を標準で使用している．
+
+% JIS メトリックの説明（英語版）
+% https://okumuralab.org/~okumura/texfaq/japanese/ptex.html
+% http://ajt.ktug.org/2008/0201okumura.pdf
+
+なお，|jis.tfm|（n無し）と|jisn.tfm|（n有り）の違いは
+\begin{quote}
+中黒\codechar{・}，コロン\codechar{：}，セミコロン\codechar{；}の組み方を
+「半角幅＋前後グルー」とするか「全角幅」とするか
+\end{quote}
+だけである．
+
+\paragraph{対応するVFと実フォント}
+
+第\ref{makejvf}節で述べたとおり，\pTeX で使用するJFMと実際のフォントでは
+一部の字幅が異なり，その位置ずれを補正するためにVFを用いている．
+対応は以下のとおり（左が\pTeX 用JFM，右がDVIドライバ用JFMである
+\footnote{DVIドライバ用JFMは全ての文字を全角扱いとしており，グルー挿入などは
+一切定義していない．当然，\pTeX の組版時には使用すべきでない．}．
+実際のOpenType/TrueTypeフォントの割り当ては，mapファイルに依存する）．
+% [TODO] この割り当てを定義するのが ptex-fontmaps である，まで言及したい．
+% kanji-config-updmap のドキュメントまで導線を張るつもりだが，別の節にまとめる．
+\begin{itemize}
+  \item |min*.tfm| → |min*.vf| → |rml.tfm|（→明朝体フォント，横組）
+  \item |goth*.tfm| → |goth*.vf| → |gbm.tfm|（→ゴシック体フォント，横組）
+  \item |tmin*.tfm| → |tmin*.vf| → |rmlv.tfm|（→明朝体フォント，縦組）
+  \item |tgoth*.tfm| → |tgoth*.vf| → |gbmv.tfm|（→ゴシック体フォント，縦組）
+  \item |jis*.tfm| → |jis*.vf| → |rml.tfm|（→明朝体フォント，横組）
+  \item |jisg*.tfm| → |jisg*.vf| → |gbm.tfm|（→ゴシック体フォント，横組）
+  \item |jis*-v.tfm| → |jis*-v.vf| → |rmlv.tfm|（→明朝体フォント，縦組）
+  \item |jisg*-v.tfm| → |jisg*-v.vf| → |gbmv.tfm|（→ゴシック体フォント，縦組）
+\end{itemize}
+
+また，|tmin*.vf|及び|tgoth*.vf|では「縦書き時にソース中に
+クオート\codechar{’}\codechar{”}を入力すると，
+ミニュート\codechar{′}\codechar{″}を加工した文字に置き換える」と
+いう処置も加えてある（\code{makejvf}の |-m| オプションの機能による）．
+一方，|jis*-v.vf|及び|jisg*-v.vf|ではそのような処置を行わない．
+
+\subsection{uptex-fonts}
+
+[TODO] 執筆予定．
+
+% クオート記号
+% https://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=3153
+
+\begin{thebibliography}{99}
+ \bibitem{jtex1.7}
+   株式会社アスキー，「アスキー日本語\TeX 配布テープ 1992.02.24 (release~1.12)」
+ \bibitem{min10otobe}
+   乙部厳己，「min10フォントについて」，2000/12/12,\\
+   |http://argent.shinshu-u.ac.jp/~otobe/tex/files/min10.pdf|
+ \bibitem{jistfm}
+   奥村晴彦，「pLaTeX2e 新ドキュメントクラス」，2016/07/07,\\
+   |https://oku.edu.mie-u.ac.jp/~okumura/jsclasses/|
+\end{thebibliography}
 
 \end{document}
