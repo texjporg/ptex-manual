@@ -483,7 +483,7 @@ delimiter codeについても同様である．
 日本の\TeX ユーザ，および\LaTeX3~team%
 \footnote{%
   現在ではさらに状況が動き，
-  2021年以降は，\LaTeXe 自体が本節で述べた（\.{readpapersizespecial}以外の）プリミティブを
+  2021年以降は，\LaTeXe 自体が本節で述べたプリミティブを
   要求する予定である(\cite{l2e31})．
 }などからあり，
 ほとんど\hologo{pdfTeX}における実装をそのまま真似する形で実装している．
@@ -519,37 +519,10 @@ delimiter codeについても同様である．
   後で述べる\.{pdflastxpos}, \.{pdflastypos}による出力位置の取得
   の際の原点位置を設定するためだけに使われ，初期値は0\,ptである
   （\hologo{pdfTeX}のdviモードと同じ挙動）．
+  ただし，\epTeX では特定書式のpapersize specialを読み取って原点位置を設定する
+  機能を追加している（第\ref{readpss}節を参照）．
 
- \csitem[\.{readpapersizespecial}（integer，\emph{\epTeX 独自拡張で，\hologo{pdfTeX}にはない}）]
-  \pTeX 系列では，
-  用紙サイズの指定には伝統的にpapersize specialが利用されてきた．それを考慮して，
-  本内部整数\.{readpapersizespecial}（既定値は1）が正の場合は
-  papersize specialがdvi中に書き出される時，\epTeX にはその内容を解釈して
-  自動的に\.{pdfpagewidth}, \.{pdfpageheight}の値を設定する
-  \footnote{%
-  papersize specialで指定した長さは常に\texttt{true}付きで解釈するのが慣習と
-  なっているが，\epTeX~180901より前では\texttt{true}なしの寸法として解釈するという
-  バグが存在した．}%
-  \footnote{%
-  dviwareによって正確な書式は異なるようだが，\epTeX~180901が解釈するpapersize specialは
-  以下の文法に沿ったものになっている：
-\def\<#1>{\langle\mbox{#1}\rangle}
-\begin{align*}
-  \<special> &\longrightarrow \texttt{papersize=}\<length>\texttt{,}\<length>\\
-  \<length>  &\longrightarrow \<decimal>
-    \<optional~\texttt{true}>\<physical unit>\\
-  \<decimal> &\longrightarrow \texttt{.} \mid \<digit>\<decimal> \mid
-    \<decimal>\<digit>
-\end{align*}
-  負の符号や小数点としての「\texttt{,}」，そして一切の空白を許容しないところに
-  注目してほしい．また，\texttt{zw},~\texttt{zh},~\texttt{em},~\texttt{ex}という
-  現在のフォントに依存する単位も使用不可能である．
-  }．
-
-  このプリミティブは\epTeX~180901で追加された．それより前のバージョンでは
-  前段落で述べた機能は常に有効であった．
-
- \csitem[\.{pdflastxpos}, \.{pdflastypos} (read-only integer)]
+ \csitem[\.{pdflastxpos}, \.{pdflastypos} (read-only integer)]\label{pdfsavepos}
   \.{pdfsavepos}\indcs{pdfsavepos}が置かれた場所の，dviにおける出力位置を返す内部整数．
   原点はページの（物理的な意味の）左下隅であり，$y$軸は（物理的な）上方向に向かって増加する．
  \begin{itemize}
@@ -629,8 +602,8 @@ delimiter codeについても同様である．
   真，そうでなければ偽となる条件判断文である．
 
   これらのプリミティブは2015/07/15版の\Pkg{expl3}パッケージで使われた
-  (\cite{15715})ことを受けて実装されたものだが，
-  現在では\Pkg{expl3}パッケージではこれらのプリミティブは要求していない．
+  (\cite{15715})ことを受けて実装されたものである．
+% この直後に\Pkg{expl3}パッケージでは使われなくなったが，2021年以降は要求プリミティブとされた．
 
  \csitem[\.{pdfuniformdeviate} <number>, \.{pdfnormaldeviate}]
   \.{pdfuniformdeviate}は，0以上<number>未満の一様分布に従う乱数
@@ -687,7 +660,9 @@ delimiter codeについても同様である．
 \end{cslist}
 
 
-\section{バージョン番号}
+\section{\epTeX の追加プリミティブ}
+
+\subsection{バージョン番号}
 \pTeX~p3.8.0に\.{ptexversion}が実装されたのと同時に，\epTeX でもバージョン番号を
 取得する\.{epTeXversion}プリミティブが\epTeX~180121から追加された．
 
@@ -703,7 +678,7 @@ p\number\ptexversion.\number\ptexminorversion\ptexrevision-%
 \end{cslist}
 
 
-\section{\.{lastnodechar}プリミティブ}
+\subsection{\.{lastnodechar}プリミティブ}
 本プリミティブは
 \TeX ユーザの集い2014でリクエストを受けて
 実装された(\cite{pdfse})プリミティブで，\epTeX~141119以降のextended modeで利用可能である．
@@ -809,7 +784,7 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 \end{quote}
 と「，」の内部コードが取得される．
 
-\section{\.{lastnodesubtype}プリミティブ}
+\subsection{\.{lastnodesubtype}プリミティブ}
 \cite{tjb28,plt63}などの議論で，「最後のグルーがJFMグルーだけ\.{unskip}する」処理の必要性が
 唱えられてきた．\epTeX にはもともと最後のノードの種別を返す\.{lastnodetype}プリミティブが
 あったが，これでは最後のノードがグルーであるかしかわからない．
@@ -942,7 +917,7 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 %%%
 
 
-\section{\.{epTeXinputencoding}プリミティブ}
+\subsection{\.{epTeXinputencoding}プリミティブ}
 現在読み込んでいるファイルの文字コードを切り替えるプリミティブであり，
 2016/02/01に阿部紀行さんによって実装された．詳細は実装者の解説記事
 \cite{eptexinputenc}を参照してほしいが，おおまかに述べると以下のようになるだろう．
@@ -976,7 +951,47 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
   % （\uccode, \lccode は参照しない）
 \end{cslist}
 
-\section{\.{current[x]spacingmode}プリミティブ}
+
+\subsection{用紙の原点位置の設定，\.{readpapersizespecial}プリミティブ}\label{readpss}
+\pTeX 系列では，用紙サイズの指定には伝統的にpapersize specialが利用されてきた．
+それを考慮して，\epTeX では「特定書式のpapersize specialを読み取って
+\.{pdflastxpos}, \.{pdflastypos}（第\ref{pdfsavepos}節を参照）の原点位置を設定する」と
+いう機能を付加している．
+\begin{dangerous}
+  dviwareによって正確な書式は異なるようだが，\epTeX~180901が解釈するpapersize specialは
+  以下の文法に沿ったものになっている\footnote{%
+  papersize specialで指定した長さは常に\texttt{true}付きで解釈するのが慣習と
+  なっているが，\epTeX~180901より前では\texttt{true}なしの寸法として解釈するという
+  バグが存在した．}．
+  なお，\Pkg{jsclasses}の|papersize|オプションや2016年以降の
+  \Pkg{graphics}/\Pkg{color}パッケージのドライバオプションが発行する書式は，これに合致する．
+\def\<#1>{\langle\mbox{#1}\rangle}
+\begin{align*}
+  \<special> &\longrightarrow \texttt{papersize=}\<length>\texttt{,}\<length>\\
+  \<length>  &\longrightarrow \<decimal>
+    \<optional~\texttt{true}>\<physical unit>\\
+  \<decimal> &\longrightarrow \texttt{.} \mid \<digit>\<decimal> \mid
+    \<decimal>\<digit>
+\end{align*}
+  負の符号や小数点としての「\texttt{,}」，そして一切の空白を許容しないところに
+  注目してほしい．また，\texttt{zw},~\texttt{zh},~\texttt{em},~\texttt{ex}という
+  現在のフォントに依存する単位も使用不可能である．
+\end{dangerous}
+
+また，\epTeX~180901以降では\.{readpapersizespecial}プリミティブによって
+本機能の有効・無効を制御できる．
+それより前のバージョンでは，本機能は常に有効であった．
+
+\begin{cslist}
+ \csitem[\.{readpapersizespecial} (integer)]
+  この内部整数の値が正の場合，\epTeX は
+  papersize specialがdvi中に書き出される時にその内容を解釈し，
+  自動的に\.{pdfpagewidth}, \.{pdfpageheight}の値を設定する．
+  \epTeX~180901で追加され，既定値は1である．
+\end{cslist}
+
+
+\subsection{\.{current[x]spacingmode}プリミティブ}
 もともと\pTeX 系列では，\.{kanjiskip},~\.{xkanjiskip}の挿入が有効になっているか
 直接的に知る方法が\.{showmode}プリミティブしかなかった．
 これでは使い勝手が悪いので，
@@ -1004,7 +1019,7 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 \end{cslist}
 
 
-\section{\.{Uchar}, \.{Ucharcat}プリミティブ}
+\section{Unicode \TeX 由来の機能}
 \hologo{XeTeX}, \hologo{LuaTeX}には，引数<character code>を文字コードとする
 \emph{文字トークン}に展開される「\.{Uchar} <character code>」というプリミティブが存在する
 \footnote{\.{char}は展開不能プリミティブであることに注意．}．
@@ -1089,9 +1104,42 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 \end{dangerous}
 
 
+\section{\TeX\ Liveによる拡張}
+2021年以降の\epTeX/\eupTeX には，\TeX\ Liveチームによって
+\hologo{pdfTeX}及び\hologo{XeTeX}と共通の
+クロスエンジンな拡張機能がいくつか追加されている．
+\begin{cslist}
+ \csitem[\.{tracinglostchars} (integer)]
+  現在のフォント(TFM)に存在しない文字にアクセスしたときのトレース情報を
+  どのように表示するかを決定する内部整数である．
+  \TeX82は，値が正（1以上）の場合に
+\begin{verbatim}
+  Missing character: There is no 文字 in font フォント名!
+\end{verbatim}
+  のメッセージをログファイルに出力する．
+  また\eTeX は，値が2以上の場合に同じメッセージを\.{tracingonline}の値に
+  かかわらずターミナルにも出力する．
+
+  \TeX\ Live 2021以降ではさらに，値が3以上の場合にエラーを発生させ，
+  当該文字コードを16進数で表示するように拡張されている．例えば以下のとおり：
+\begin{verbatim}
+  ! Missing character: There is no 文字 ("XX) in font フォント名.
+\end{verbatim}
+
+  なお，\pTeX 系列では「全ての和文フォントには，和文文字コードとして有効な
+  全ての文字が存在する」という扱いであるため，和文文字コードについて
+  このトレース情報が出力されることはない．
+
+ \csitem[\.{tracingstacklevels} (integer)]
+  \.{tracingstacklevels}の値が正，かつ\.{tracingmacros}の値も正の場合，
+  マクロ展開の深さを示すprefixを出力する．例えば，深さ2のときは |~..| が表示される．
+  なお，指定された数値以上の深さについてはマクロ展開のトレースを切り捨てる．
+  % 実は，このchange file (tracingstacklevels.ch)は素の\pTeX にも適用されている．
+\end{cslist}
+
 
 \begin{comment}
-  \section{互換性}
+\section{互換性}
 \eTeX, \pTeX との互換性をはかるのに有効な手段としては，まず\texttt{TRIP}
 testがある．\cite{h7k}にも書いたが，これは\TeX のソースの全行を実行する
 ようなテストソースであり，\texttt{TRIP} testの実行結果が違えば，どこかの
