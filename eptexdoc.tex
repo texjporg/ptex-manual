@@ -900,7 +900,7 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
     \item 10&\.{mathpunct}\cr
     \item 11&\.{mathinner}\cr
     \item 12&\.{radical}\cr
-    %\item 13&分数（\cs{over}など）\cr
+    %\item 13&分数（\.{over}など）\cr
     \item 14&\.{underline}\cr
     \item 15&\.{overline}\cr
     \item 16&\.{mathaccent}\cr
@@ -1135,6 +1135,59 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
   マクロ展開の深さを示すprefixを出力する．例えば，深さ2のときは |~..| が表示される．
   なお，指定された数値以上の深さについてはマクロ展開のトレースを切り捨てる．
   % 実は，このchange file (tracingstacklevels.ch)は素の\pTeX にも適用されている．
+
+  %% 2021-07-25
+ \csitem[\.{partokenname} <control sequence>]
+  \TeX82では\.{par}という名称の制御綴は特別な役割を持っている．
+  \begin{itemize}
+    \item 以下の場合には自動的に\.{par}が挿入される：
+    \begin{itemize}
+      \item 入力中の空行（2行連続で空行があった場合は2回\.{par}が発行される）
+      \item 水平モード中で\TeX が垂直モード用の命令
+      (\.{vskip}, \.{hrule}, \.{unvbox}, \.{unvcopy}, \.{halign}, \.{end}, \.{dump})
+      に出くわしたとき，その直前
+    \end{itemize}
+    このことを利用して，\LaTeXe~2021-06-01などでは「段落終了時のフック」を
+    実現させるため，\.{par}を再定義している．
+    \item \.{long}なしで定義されたマクロ中の引数には\.{par}は使用できない．
+\begin{verbatim}
+  ! Paragraph ended before \... was complete.
+\end{verbatim}
+    というエラーが発生する．
+    なお，禁止されるのは\.{par}という\emph{名称}の制御綴であって，
+    \verb+\let\endgraf\par+などのように別の名称の制御綴に
+    \.{par}の意味をコピーして用いるのは問題ない．
+  \end{itemize}
+
+  \medskip
+  さて，今回の命令\.{partokenname}は，上記で述べた特別な役割を他の制御綴に移す効果を持つ．
+  \begin{quote}
+	\verb+\partokename \hoge+
+  \end{quote}
+  を実行した際に起こる状況で説明すると，
+  \begin{itemize}
+    \item 上記で述べた「自動挿入される命令」が\.{par}から\.{hoge}に変わる．
+    \item \.{long}なしで定義された制御綴の引数において，\.{par}は許容されるようになるが
+    逆に\.{hoge}が許容されなくなる．
+  \end{itemize}
+  \.{partokenname}の効果は常にグローバルである．
+  
+ \csitem[\.{partokencontext} (integer)]
+  \TeX が\.{par}\footnote{あるいは\.{partokenname}により代わりに別の制御綴になっているかもしれない．}を
+  自動挿入する箇所を制御する内部整数であり，既定値は0である．
+
+  自動挿入箇所は次の通り：
+  \begin{description}
+    \item[いつでも挿入] \TeX82での自動挿入箇所（\.{partokenname}の箇所で説明した）．
+    \item[$\.{partokencontext}>0$のときのみ挿入]
+      \.{vbox}, \.{vtop}, \.{vcenter}それぞれの末尾
+    \item[$\.{partokencontext}>1$のときのみ挿入]
+      \.{insert}, \.{vadjust}, \.{valign}での各セル，\.{noalign}のそれぞれの末尾と，
+    output routineの末尾
+  \end{description}
+  なお，実際の挿入はそれぞれの箇所が水平モードであった場合にのみ行われる．
+
+  
 \end{cslist}
 
 
