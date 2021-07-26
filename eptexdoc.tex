@@ -1108,6 +1108,11 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 2021年以降の\epTeX/\eupTeX には，\TeX\ Liveチームによって
 \hologo{pdfTeX}及び\hologo{XeTeX}と共通の
 クロスエンジンな拡張機能がいくつか追加されている．
+% 実は
+%   * tracingstacklevels.ch (add |\tracingstacklevels| since TL2021)
+%   * partokenname.ch (add |\tracingstacklevels| since TL2022)
+% の change file は e-(u)pTeX のみならず，素の\pTeX にも適用されている．
+
 \begin{cslist}
  \csitem[\.{tracinglostchars} (integer)]
   現在のフォント(TFM)に存在しない文字にアクセスしたときのトレース情報を
@@ -1134,8 +1139,10 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
   \.{tracingstacklevels}の値が正，かつ\.{tracingmacros}の値も正の場合，
   マクロ展開の深さを示すprefixを出力する．例えば，深さ2のときは |~..| が表示される．
   なお，指定された数値以上の深さについてはマクロ展開のトレースを切り捨てる．
-  % 実は，このchange file (tracingstacklevels.ch)は素の\pTeX にも適用されている．
+  \TeX\ Live 2021で追加された．
 
+%%%
+\ifdefined\partokenname
   %% 2021-07-25
  \csitem[\.{partokenname} <control sequence>]
   \TeX82では\.{par}という名称の制御綴は特別な役割を持っている．
@@ -1162,7 +1169,7 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
   \medskip
   さて，今回の命令\.{partokenname}は，上記で述べた特別な役割を他の制御綴に移す効果を持つ．
   \begin{quote}
-	\verb+\partokename \hoge+
+	\verb+\partokenname \hoge+
   \end{quote}
   を実行した際に起こる状況で説明すると，
   \begin{itemize}
@@ -1171,7 +1178,7 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
     逆に\.{hoge}が許容されなくなる．
   \end{itemize}
   \.{partokenname}の効果は常にグローバルである．
-  
+
  \csitem[\.{partokencontext} (integer)]
   \TeX が\.{par}\footnote{あるいは\.{partokenname}により代わりに別の制御綴になっているかもしれない．}を
   自動挿入する箇所を制御する内部整数であり，既定値は0である．
@@ -1186,8 +1193,8 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
     output routineの末尾
   \end{description}
   なお，実際の挿入はそれぞれの箇所が水平モードであった場合にのみ行われる．
-
-  
+\fi
+%%%
 \end{cslist}
 
 
