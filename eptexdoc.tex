@@ -935,7 +935,7 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 \begin{verbatim}
 \epTeXinputencoding sjis
 \end{verbatim}
-  のように，<encoding>は|{}|で囲まないこと\footnote{\TeX\ Live 2020以降，
+  のように，<encoding>は|{}|で囲まないこと\footnote{\TeX~Live 2020以降，
   \.{input}プリミティブでブレースで囲まれたファイル名指定が可能に
   なった(r53729)ことに付随して，\.{epTeXinputencoding}でもブレースで
   囲んだ<encoding>の指定が可能となった．}．
@@ -1104,8 +1104,8 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 \end{dangerous}
 
 
-\section{\TeX\ Liveによる拡張}
-2021年以降の\epTeX/\eupTeX には，\TeX\ Liveチームによって
+\section{\TeX~Liveによる拡張}
+2021年以降の\epTeX/\eupTeX には，\TeX~Liveチームによって
 \hologo{pdfTeX}及び\hologo{XeTeX}と共通の
 クロスエンジンな拡張機能がいくつか追加されている．
 % 実は
@@ -1125,7 +1125,7 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
   また\eTeX は，値が2以上の場合に同じメッセージを\.{tracingonline}の値に
   かかわらずターミナルにも出力する．
 
-  \TeX\ Live 2021以降ではさらに，値が3以上の場合にエラーを発生させ，
+  \TeX~Live 2021以降ではさらに，値が3以上の場合にエラーを発生させ，
   当該文字コードを16進数で表示するように拡張されている．例えば以下のとおり：
 \begin{verbatim}
   ! Missing character: There is no 文字 ("XX) in font フォント名.
@@ -1139,7 +1139,7 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
   \.{tracingstacklevels}の値が正，かつ\.{tracingmacros}の値も正の場合，
   マクロ展開の深さを示すprefixを出力する．例えば，深さ2のときは |~..| が表示される．
   なお，指定された数値以上の深さについてはマクロ展開のトレースを切り捨てる．
-  \TeX\ Live 2021で追加された．
+  \TeX~Live 2021で追加された．
 
 %%%
 \ifdefined\partokenname
@@ -1167,7 +1167,8 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
   \end{itemize}
 
   \medskip
-  さて，今回の命令\.{partokenname}は，上記で述べた特別な役割を他の制御綴に移す効果を持つ．
+  さて，2021-07-25のコミットr60054（\TeX~Liveでは2022年以降）で追加された
+  \.{partokenname}は，上記で述べた特別な役割を他の制御綴に移す効果を持つ．
   \begin{quote}
 	\verb+\partokenname \hoge+
   \end{quote}
@@ -1180,8 +1181,10 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
   \.{partokenname}の効果は常にグローバルである．
 
  \csitem[\.{partokencontext} (integer)]
-  \TeX が\.{par}\footnote{あるいは\.{partokenname}により代わりに別の制御綴になっているかもしれない．}を
+  \TeX が\.{par}\footnote{あるいは\.{partokenname}により
+  代わりに別の制御綴になっているかもしれない．}を
   自動挿入する箇所を制御する内部整数であり，既定値は0である．
+  同じく2021-07-25のコミットr60054（\TeX~Liveでは2022年以降）で追加された．
 
   自動挿入箇所は次の通り：
   \begin{description}
