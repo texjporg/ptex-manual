@@ -444,15 +444,16 @@ is to load a package \Pkg{mathfam256}\footnote{%
 
 %%% 拡張プリミティブ
 \subsection{Additional primitives and keywords}
+% -- as of r60088
 % tex -ini: 322 multiletter control sequences
-% ptex -ini: 366 multiletter control sequences
-% uptex -ini: 374 multiletter control sequences
-% eptex -ini: 379 multiletter control sequences
-% eptex -ini -etex: 469 multiletter control sequences
-% euptex -ini: 387 multiletter control sequences
-% euptex -ini -etex: 477 multiletter control sequences
-% etex (pdftex) -ini: 470 multiletter control sequences
-% etex (pdftex) -ini -etex: 539 multiletter control sequences
+% ptex -ini: 373 multiletter control sequences (= 322 + p:47 + TL:3 + SyncTeX: 1)
+% uptex -ini: 380 multiletter control sequences (= 373 + up:7)
+% eptex -ini: 386 multiletter control sequences
+% eptex -ini -etex: 480 multiletter control sequences (= 373 + e:66 + ep:41)
+% euptex -ini: 393 multiletter control sequences
+% euptex -ini -etex: 488 multiletter control sequences (= 380 + e:66 + ep:41 + eup:1)
+% etex (pdftex) -ini: 476 multiletter control sequences
+% etex (pdftex) -ini -etex: 545 multiletter control sequences
 
 Here we provide only complete lists of additional primitives
 of \pTeX\ family in alphabetical order.
@@ -464,13 +465,6 @@ The features of each primitive can be found in Japanese edition.
 
 \def\New#1{--- New primitive since #1}
 \def\NewMoved#1#2{--- Imported from #1, since #2}
-
-\subsubsection{Sync\TeX\ additions (available in \pTeX, \upTeX, \epTeX, \eupTeX)}
-In the standard build of \TL, Sync\TeX\ extension is unavailable in
-Knuthian \TeX; however, it is enabled in \pTeX\ family.
-\begin{simplelist}
- \csitem[\.{synctex}]
-\end{simplelist}
 
 %%% pTeX のやつ
 \subsubsection{\pTeX\ additions (available in \pTeX, \upTeX, \epTeX, \eupTeX)}
@@ -517,7 +511,7 @@ Knuthian \TeX; however, it is enabled in \pTeX\ family.
  \csitem[\.{textbaselineshiftfactor} \New{p3.7 (\TL2016)}]
  \csitem[\.{tfont}]
  \csitem[\.{toucs} \New{p3.10.0 (\TL2022)}]
- \csitem[\.{ucs} \NewMoved{\upTeX}{p3.10.0 (\TL2022)}]
+ \csitem[\.{ucs} \NewMoved{\upTeX}{p3.10.0 (\TL2022)}\footnotemark]
  \csitem[\.{xkanjiskip}]
  \csitem[\.{xspcode}]
  \csitem[\.{ybaselineshift}]
@@ -527,6 +521,7 @@ Knuthian \TeX; however, it is enabled in \pTeX\ family.
  \csitem[\texttt{zh}\index{zh=\texttt{zh}}]
  \csitem[\texttt{zw}\index{zw=\texttt{zw}}]
 \end{simplelist}
+\footnotetext{The primitive \.{ucs} was part of ``\upTeX\ additions'' until \TL2021.}
 
 %%% upTeX のやつ
 \subsubsection{\upTeX\ additions (available in \upTeX, \eupTeX)}
@@ -594,6 +589,23 @@ Knuthian \TeX; however, it is enabled in \pTeX\ family.
 \subsubsection{\eupTeX\ additions (available in \eupTeX)}
 \begin{simplelist}
  \csitem[\.{currentcjktoken} \New{191112 (\TL2020)}]
+\end{simplelist}
+
+%%% ほか
+\subsubsection{Other cross-engine additions}
+% In the standard build of \TL, Sync\TeX\ extension is unavailable in
+% Knuthian \TeX; however, it is enabled in \pTeX\ family.
+Sync\TeX\ extension (available in \pTeX, \upTeX, \epTeX, \eupTeX):
+\begin{simplelist}
+ \csitem[\.{synctex}]
+\end{simplelist}
+
+\noindent
+\TL additions (available in \pTeX, \upTeX, \epTeX, \eupTeX):
+\begin{simplelist}
+ \csitem[\.{partokencontext} \New{\TL2022}]
+ \csitem[\.{partokenname} \New{\TL2022}]
+ \csitem[\.{tracingstacklevels} \New{\TL2021}]
 \end{simplelist}
 
 % [TODO] 引数は何で返り値は何か，expandable?
