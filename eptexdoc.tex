@@ -797,8 +797,12 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
   \begin{itemize}
     \item 「最後のノード」が文字ノードのときは0が返る．
     \item 現在構築中のリストが空のときは$-1$が返る．
+%%%
+\ifnum\epTeXversion>210629
     \item \epTeX~210701以降では，数式内のノードについてはsubtype値そのままではほとんど意味がないので，
     次ページの表の値を返す．
+\fi
+%%%
   \end{itemize}
 \end{cslist}
 
