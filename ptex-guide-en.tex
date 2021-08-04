@@ -581,6 +581,7 @@ The features of each primitive can be found in Japanese edition.
  \csitem[\.{readpapersizespecial} \New{180901 (\TL2019)}]
  \csitem[\.{Uchar} \New{191112 (\TL2020)}]
  \csitem[\.{Ucharcat} \New{191112 (\TL2020)}]
+ \csitem[\.{vadjust} \texttt{pre} \New{210701 (\TL2022)}]
  \csitem[\.{vfi}]
  \csitem[\texttt{fi}\index{fi=\texttt{fi}}]
 \end{simplelist}
@@ -611,13 +612,19 @@ Sync\TeX\ extension (available in \pTeX, \upTeX, \epTeX, \eupTeX):
 % [TODO] 引数は何で返り値は何か，expandable?
 
 %%% (e-)TeX にあるが (e-)upTeX にないもの
+%%% encTeX 拡張など
 \subsection{Omitted primitives and unsupported features}
 
-Compared to Knuthian \TeX\ and \eTeX,
-some primitives are omitted due to conflict with Japanese handling.
-%%% encTeX 拡張など
-One is enc\TeX\ extension, such as |\mubyte|.
-The ML\TeX\ extension, such as |\charsubdef|, is included but not well-tested.
+Compared to Knuthian \TeX\ and \eTeX, some primitives and extensions are
+omitted due to conflict with Japanese handling.
+\begin{itemize}
+ \item The enc\TeX\ extension, including the primitives |\mubyte| etc.,
+  is unavailable.
+ \item The ML\TeX\ extension, such as |\charsubdef|, is not enabled
+  by default. It becomes available with the command-line option |-mltex|,
+  but not well-tested.
+\end{itemize}
+
 %%% コマンドラインオプションの話
 
 % [TODO] Please also refer to ptex.man1.pdf
