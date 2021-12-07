@@ -464,6 +464,7 @@ The features of each primitive can be found in Japanese edition.
 % [TODO] 追加されたバージョン情報は正しいか？
 
 \def\New#1{--- New primitive since #1}
+\def\NewKey#1{--- New keyword since #1}
 \def\NewMoved#1#2{--- Imported from #1, since #2}
 
 %%% pTeX のやつ
@@ -538,6 +539,7 @@ The features of each primitive can be found in Japanese edition.
 
 %%% e-pTeX/e-upTeX の pdfTeX 由来
 %%% e-pTeX/e-upTeX の Omega 由来
+%%% e-pTeX/e-upTeX の XeTeX/LuaTeX 由来
 %%% その他の独自拡張
 \subsubsection{\epTeX\ additions (available in \epTeX, \eupTeX)}
 \begin{simplelist}
@@ -579,9 +581,12 @@ The features of each primitive can be found in Japanese edition.
  \csitem[\.{pdfstrcmp}]
  \csitem[\.{pdfuniformdeviate} \New{161114 (\TL2017)}]
  \csitem[\.{readpapersizespecial} \New{180901 (\TL2019)}]
+ \csitem[\.{suppresslongerror} \New{211207 (\TL2022)}]
+ \csitem[\.{suppressmathparerror} \New{211207 (\TL2022)}]
+ \csitem[\.{suppressoutererror} \New{211207 (\TL2022)}]
  \csitem[\.{Uchar} \New{191112 (\TL2020)}]
  \csitem[\.{Ucharcat} \New{191112 (\TL2020)}]
- \csitem[\.{vadjust} \texttt{pre} \New{210701 (\TL2022)}]
+ \csitem[\.{vadjust} \texttt{pre} \NewKey{210701 (\TL2022)}]
  \csitem[\.{vfi}]
  \csitem[\texttt{fi}\index{fi=\texttt{fi}}]
 \end{simplelist}
@@ -606,6 +611,7 @@ Sync\TeX\ extension (available in \pTeX, \upTeX, \epTeX, \eupTeX):
 \begin{simplelist}
  \csitem[\.{partokencontext} \New{\TL2022}]
  \csitem[\.{partokenname} \New{\TL2022}]
+ \csitem[\.{showstream} \New{\TL2022}] % only e-(u)pTeX, not (u)pTeX
  \csitem[\.{tracingstacklevels} \New{\TL2021}]
 \end{simplelist}
 

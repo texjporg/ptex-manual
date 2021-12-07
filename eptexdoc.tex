@@ -1024,6 +1024,8 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 
 
 \section{Unicode \TeX 由来の機能}
+
+\subsection{\.{Uchar}, \.{Ucharcat}プリミティブ}
 \hologo{XeTeX}, \hologo{LuaTeX}には，文字コード<character code>を引数にとり
 \emph{文字トークン}に展開される「\.{Uchar} <character code>」というプリミティブが存在する
 \footnote{\.{char}は展開不能プリミティブであることに注意．}．また\hologo{XeTeX}には，
@@ -1106,6 +1108,25 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 	\verb+\Ucharcat\numexpr\jis"3441\relax 17 % エラー回避+
   \end{quote}
 \end{dangerous}
+
+
+%%%
+\ifdefined\suppresslongerror %% e-pTeX 211207
+\subsection{エラー抑制(\.{suppress...error})}
+\hologo{LuaTeX}に実装されているエラー発生を抑止するプリミティブたちのうち
+いくつかを，\epTeX~211207で追加した．
+% 説明文は https://github.com/texjporg/tex-jp-build/pull/127 より
+\begin{cslist}
+ \csitem[\.{suppresslongerror} (integer)]
+  この内部整数が非ゼロのとき，\.{long}なしで定義されたマクロの引数に\.{par}が入った
+  場合の \texttt{! Paragraph ended before \.{...} was complete.} というエラーを抑止する．
+ \csitem[\.{suppressoutererror} (integer)]
+  この内部整数が非ゼロのとき，\.{outer}由来のエラーを抑止する．
+ \csitem[\.{suppressmathparerror} (integer)]
+  この内部整数が非ゼロのとき，数式モード中の\.{par}に由来するエラーを抑止する．
+\end{cslist}
+\fi
+%%%
 
 
 \section{\TeX~Liveによる拡張}
@@ -1219,6 +1240,25 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 値を1にすれば，「\.{vbox}の中身が水平モードで終わった場合」にも
 「暗黙のpar」ではなく「\.{par}という名称の制御綴」が挿入されるので，
 \.{par}の再定義が効く．
+\fi
+%%%
+
+%%%
+\ifdefined\showstream %% 2021-11-07
+\subsection{\.{show}系コマンドの出力制御}
+\begin{cslist}
+ \csitem[\.{showstream} (integer)]
+  通常，\.{show}系コマンド\footnote{具体的には
+  \TeX82の\.{show}, \.{showbox}, \.{showlists}, \.{showthe}と
+  \eTeX の\.{showgroups}, \.{showifs}, \.{showtokens}が該当．}は
+  エラー発生と同様に一旦停止し，種々の情報をターミナルやログファイルに出力する．
+  しかし，内部整数\.{showstream}の値をオープンな出力ストリーム（\.{openout}で
+  オープンされる）に一致させると，種々の情報の出力先がリダイレクトされ，
+  ターミナルやログファイルには出力せず一旦停止もしない．
+  既定値は$-1$であり，これはファイルと一致しないため\TeX82と同じ動作となる．
+  2021-11-07のコミットr60992（\TeX~Liveでは2022年以降）で追加された．
+  % 現状では \showthe\undefined などの不適切な使い方で Segmentation fault
+\end{cslist}
 \fi
 %%%
 
