@@ -1030,6 +1030,7 @@ corresponding to the whole valid Japanese character code range.\label{jfont}
 %%% 縦組は諦めよう
 
 % [TODO] どこに書くか困ったので最後に：内部コードのアレな話
+%%% 和文文字コードは連続でない
 \subsection{Internal kanji encodings}\label{kanji-internal}
 
 The <character code> is a union of the following two:
@@ -1057,6 +1058,8 @@ where
 \]
 Therefore, the overall range of <character code> is \emph{not} continuous.
 
+%%% 和文文字の内部コードとして有効（is_char_kanji が真）かどうかの判定
+%%% → ! Bad character code. エラーを出さないために使える
 To check whether an integer is a valid Japanese character code or not,
 you can use \.{iffontchar} with \epTeX~190709 or later (\TL2020).
 Suppose a count register |\mycount| stores an integer, you can do it as follows:
@@ -1069,6 +1072,24 @@ Here the primitive \.{jfont} is used merely as
 a representative non-empty\footnote{This assumption is always safe after
 one of the standard \pTeX\ formats (e.g. plain \pTeX, \pLaTeX) is loaded.}
 Japanese font containing all valid Japanese character code (see \ref{jfont}).
+
+%%% pTeX がサポートする文字集合は JIS X 0208 のみで，内部コードとして有効な範囲より狭い
+%%% → JIS X 0208 に含まれる文字を表す整数値の判定もできる
+Note that \pTeX\ (not including \upTeX\ with internal Unicode) does not
+support typesetting characters outside JIS~X~0208,
+which is a subset of accepted range of <character code> described above.
+To check if an integer is in the range of JIS~X~0208,
+you can use \.{toucs} with \pTeX~p3.10.0 or later (\TL2022):
+\begin{verbatim}
+  \ifnum\toucs\mycount>0
+    % \mycount is in the range of JIS X 0208
+  \fi
+\end{verbatim}
+The primitive \.{toucs} converts an integer value
+from an internal \Foreign{kanji} code to a Unicode.
+This conversion is based on JIS-Unicode mapping table,\footnote{Defined in
+\code{jisx0208.h} of \code{ptexenc} library.} and returns $-1$
+if no mapping is available for the input integer.
 
 
 \newpage
