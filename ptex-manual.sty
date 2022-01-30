@@ -134,4 +134,18 @@
 \def\dotfill{\leaders\hbox to.6em{\hss .\hss}\hskip\z@ plus1fill}%
 \def\pfill{\unskip~\dotfill\nobreak}
 
+% logos
+\def\eTeXpre{\texorpdfstring{$\varepsilon$\protect\nobreakdash-}{ε-}}
+\def\eTeX{\eTeXpre\TeX}
+\def\epTeX{\eTeXpre\pTeX}\def\eupTeX{\eTeXpre\upTeX}
+\def\pTeX{\texorpdfstring{p\kern-.10em\TeX}{pTeX}}
+\def\upTeX{u\pTeX}\def\pLaTeX{p\LaTeX}\def\upLaTeX{u\pLaTeX}
+\def\NTS{\leavevmode\hbox{$\cal N\kern-0.35em\lower0.5ex\hbox{$\cal T$}%
+  \kern-0.2emS$}\,}
+\def\TeXXeT{\TeX-\reflectbox{\bfseries\TeX-}}
+\def\OMEGA{\texorpdfstring{$\Omega$}{Ω}}
+\def\pdfTeX{pdf\TeX}
+\def\TL{\TeX\ Live\xspace}
+\AtBeginDocument{\providecommand{\texorpdfstring}[2]{#1}}
+
 %%% EOF
