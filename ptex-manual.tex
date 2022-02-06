@@ -64,12 +64,10 @@
 （以下，「コミュニティ版\pTeX 」）についてまとめたものである．
 \pTeX はもともとアスキー株式会社によって開発された\footnote{最新版は
 p3.1.11 (2009/08/17)．\url{https://asciidwango.github.io/ptex/}}ので，
-しばしば「ASCII \pTeX 」と呼ばれる．
-コミュニティ版\pTeX は，ASCII \pTeX に幾つかの改良を加えた
-「ptexenc版\pTeX\footnote{2004年から2011年まで開発されていた，
-UNIX向け日本語\TeX ディストリビューションptetexや後継のptexliveの
-一部であった．なお，バージョン番号はASCII~\pTeX と同じとされた．}」を
-基にしている．そのため，オリジナルのASCII~\pTeX とは
+しばしば「アスキー\pTeX 」または「ASCII \pTeX 」と呼ばれる．
+コミュニティ版\pTeX は，日本語\TeX 開発コミュニティがアスキー\pTeX を
+国際的なディストリビューション（かつてのte\TeX や現在の\TeX\ Live）へ
+導入するにあたって幾つかの改良を加えたものであり，オリジナルとは
 動作が異なる点もあるので注意されたい．
 \begin{itemize}
   \item コミュニティ版\pTeX の開発元：\\
@@ -103,20 +101,95 @@ UNIX向け日本語\TeX ディストリビューションptetexや後継のptexl
 % https://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=460
 
 \TeX82で扱える文字コードの範囲は0--255であった．
-\pTeX ではこれに加えてJIS~X~0208の文字も利用可能になっている．
+\pTeX ではこれに加えてJIS~X~0208の文字も利用可能になっており，
+入力ファイルの文字コードはISO-2022-JP (jis)，EUC-JP (euc)，
+Shift-JIS (sjis)またはUTF-8 (utf8)に対応している．
 
-\pTeX への入力は\emph{「7ビットASCII文字集合」に
-「ISO-2022-JP (jis)，EUC-JP (euc)，Shift-JIS (sjis)または
-UTF-8 (utf8)のいずれかでエンコードされたJIS~X~0208の文字集合」を
-加えたもの}として解釈される．
-なお，入出力ファイルの文字コードは，起動時のオプション|-kanji=|<encoding>に
-よって指定できる（可能な<encoding>の値は|utf8|，|euc|，|sjis|，|jis|）．
+\begin{dangerous}
+ここでは，歴史に興味のある読者への情報として，アスキー\pTeX から
+現在のコミュニティ版\pTeX に至る文字コードの扱いの変遷を述べる．
 
+初期のアスキー\pTeX は「EUC版\pTeX 」「SJIS版\pTeX 」「JIS版\pTeX 」の
+3つのプログラムを別々に用意しており，一つの\pTeX バイナリでは文字コードが
+EUC-JP，Shift-JIS，ISO-2022-JPのどれか一つのファイルしか処理できなかった．
+% JIS のファイルなら EUC/SJIS どちらの ptex でも読み込めますが，
+% これも最初からではなく p2.1.5 (1997年) 以降のようで，
+% それまではスタイルファイルも EUC や SJIS にしておく必要があったようです．
+|-kanji| オプションが追加され，一つの\pTeX バイナリで複数の文字コードを
+選択処理できるようになったのは\pTeX~p3.0.1とp3.0.4の間（2002年10月頃）である．
+% http://tutimura.ath.cx/ptexlive/?ptexenc%2FDetails
+% の土村さんのコメント (2008-02-23) より
+
+コミュニティ版\pTeX は，UNIX向け日本語\TeX ディストリビューション
+ptetex\footnote{土村展之さんによって2004年から2009年まで開発．
+その後継のptexliveは，2010年に\pTeX が\TeX\ Liveに取り込まれる際のベースに
+なった．}の開発過程で誕生した．
+2006年頃から文字コードがUTF-8のファイル入力への対応が進められ，2007年には
+文字コード変換を担う関数群が\code{ptexenc}というライブラリに切り出された．
+現在の\TeX\ Liveでも\code{ptexenc}は種々のプログラムで利用されている．
+\end{dangerous}
+
+\subsection{ファイルの文字コードと内部コード}
+\pTeX への入力は，ファイルの文字コードそのままで扱われるとは限らず，
+\emph{内部コード}に変換されて内部処理に回される．ファイルの文字コードと
+内部コードは，それぞれ起動時のオプションによって制御できる．
+\begin{itemize}
+ \item |-kanji=|<encoding>
+  \begin{quotation}
+   入出力テキストファイルの文字コードを指定する．\\
+   利用可能な<encoding>の値：\code{euc}, \code{sjis}, \code{jis}, \code{utf8}
+  \end{quotation}
+ \item |-kanji-internal=|<encoding>
+  \begin{quotation}
+   内部コードを指定する（INIモード専用\footnote{フォーマットファイルは
+   内部コードに依存するので，実際の処理と整合性をとるため
+   virtual modeでは読み込んだフォーマットファイルと同じ内部コードで
+   動作するように固定している．\pTeX\ p3.8.2以降の仕様．}）．\\
+   利用可能な<encoding>の値：\code{euc}, \code{sjis}
+  \end{quotation}
+\end{itemize}
+このとおり，\pTeX への入力を仮にUTF-8としても，
+必ずEUC-JPかShift-JISのいずれかの内部コードに変換されるため，
+\emph{\pTeX はJIS~X~0208外の文字をサポートしない}．
+
+\pTeX の入出力ファイルの文字コードと内部コードは起動時のバナーから分かる．
+例えば
+\begin{verbatim}
+This is pTeX, Version 3.14159265-p3.8.0 (utf8.euc) (TeX Live 2018)
+(preloaded format=ptex)
+\end{verbatim}
+というバナーの場合は，|(utf8.euc)| から
+\begin{itemize}
+ \item 入出力ファイルの（既定）文字コードはUTF-8（但し，JIS~X~0208の範囲内）
+ \item \pTeX の内部コードはEUC-JP
+\end{itemize}
+という情報が見て取れる．入出力ファイルの文字コードと内部コードが同じ場合は，
+\begin{verbatim}
+This is pTeX, Version 3.14159265-p3.8.0 (sjis) (TeX Live 2018)
+(preloaded format=ptex)
+\end{verbatim}
+のように表示される．この例は，入出力ファイルの文字コードと内部コードが
+ともにShift-JISであることを示す．
+
+\begin{dangerous}
+上にはこのように書いたが，
+極めて細かい話をすれば，起動時のバナーは時にウソをつくので注意．
+ログファイルには記録されるバナーは常に正しい．これは以下の事情による．
+
+virtual modeでは，起動直後にバナーを表示してから，フォーマットファイル
+読込が行われる．この時点で初めて，起動時の内部コードとフォーマットの
+内部コードの整合性が確認される．ここでもし合致しなかった場合は，\pTeX は
+警告を表示してフォーマットに合った内部コードを選択し，以降の処理を行う．
+ログファイルはこの後にオープンされるため，そこには正しい内部コード
+（フォーマットと同じ内部コード）が書き込まれる\cite{build55}．
+
+このようなウソは，\pTeX に限らず|(preloaded format=***)|でも見られる．
+\end{dangerous}
+
+\subsection{和文文字と欧文文字の区別}
+\pTeX への入力は\emph{「7ビットASCII文字集合」に「あるファイルの文字コードで
+エンコードされたJIS~X~0208の文字集合」を加えたもの}として解釈される．
 そして，以下の規則により欧文文字と和文文字に区別して取り扱われる．
-なお，内部コードは|-kanji-internal=|<encoding>によって変更できる
-（可能な値は|euc|，|sjis|）が，こちらはini modeでのフォーマット作成時
-に限られ，virtual modeでは不可である（フォーマットの内部コードと実際の
-処理の整合性をとるため，\pTeX\ p3.8.2以降の仕様）．
 \begin{itemize}
  \item 7ビットASCII文字集合は欧文文字として扱われる．
  \item 最上位ビットが1の場合，\pTeX はそのバイトで始まる列について
@@ -160,45 +233,11 @@ UTF-8 (utf8)のいずれかでエンコードされたJIS~X~0208の文字集合�
  意図通りに出力されるかは全くの別問題である．
 \end{dangerous}
 
-\pTeX の入出力ファイルの文字コードと内部コードは起動時のバナーから分かる．
-例えば
-\begin{verbatim}
-This is pTeX, Version 3.14159265-p3.8.0 (utf8.euc) (TeX Live 2018)
-(preloaded format=ptex)
-\end{verbatim}
-というバナーの場合は，|(utf8.euc)| から
-\begin{itemize}
- \item 入出力ファイルの（既定）文字コードはUTF-8（但し，JIS~X~0208の範囲内）
- \item \pTeX の内部コードはEUC-JP
-\end{itemize}
-という情報が見て取れる．入出力ファイルの文字コードと内部コードが同じ場合は，
-\begin{verbatim}
-This is pTeX, Version 3.14159265-p3.8.0 (sjis) (TeX Live 2018)
-(preloaded format=ptex)
-\end{verbatim}
-のように表示される（この例は，入出力ファイルの文字コードと内部コードが
-ともにShift-JISの場合）．
-
-\begin{dangerous}
-上にはこのように書いたが，
-極めて細かい話をすれば，起動時のバナーは時にウソをつくので注意．
-ログファイルには記録されるバナーは常に正しい．これは以下の事情による．
-
-virtual modeでは，起動直後にバナーを表示してから，フォーマットファイル
-読込が行われる．この時点で初めて，起動時の内部コードとフォーマットの
-内部コードの整合性が確認される．ここでもし合致しなかった場合は，\pTeX は
-警告を表示してフォーマットに合った内部コードを選択し，以降の処理を行う．
-ログファイルはこの後にオープンされるため，そこには正しい内部コード
-（フォーマットと同じ内部コード）が書き込まれる\cite{build55}．
-
-このようなウソは，\pTeX に限らず|(preloaded format=***)|でも見られる．
-\end{dangerous}
-
+% [TODO] 以下の2文は「pTeX の出力するDVIフォーマット」の部に移した方がいいかも
 なお，\pTeX はDVIファイル内の和文文字コードとしてはJISコードを出力する．
 ただし，|\special|命令の文字列は内部コードで符号化されたバイト列として書き出される．
 
-\section{文字コードの取得と指定}
-
+\subsection{文字コードの取得と指定}
 \pTeX でも\TeX82と同様に，
 バッククオート(|`|)を使って「|`あ|」のようにして和文文字の内部コードを
 内部整数として得ることができる．欧文文字については，1文字の制御綴を
@@ -229,14 +268,15 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
 有限オートマトンとして記述できる(\cite{topic})．
 \pTeX では，和文文字には
 16~($\mathit{kanji}$), 17~($\mathit{kana}$), 18~($\mathit{other\_kchar}$)の
-カテゴリーコードの3つのいずれかが
-割り当てられており，\pTeX の入力プロセッサの状態遷移図は
+カテゴリーコードのいずれかが割り当てられており，
+\pTeX の入力プロセッサの状態遷移図は
 \autoref{fig:ptex_input}のように\TeX82のそれを拡張したものになっている．
 
 \autoref{fig:ptex_input}を見れば分かるように，
 （欧文文字直後の改行は空白文字扱いされるのと対照的に）
-\emph{和文文字直後の改行は何も発生しない}．和文文字の直後にグループ開始・終了が来て
-行が終わった場合も同様である．
+\emph{和文文字直後の改行は何も発生しない}．
+これは，日本語の原稿内では自由な箇所で改行が行えたほうが便利なためである．
+% jtexdoc.tex に記載あり
 
 \begin{figure}[b]
 \small
@@ -313,6 +353,66 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
     \footnote{\upTeX では和文文字トークンについてもそのカテゴリーコードの情報が
     含まれるようになった．}．
 \end{itemize}
+
+\begin{dangerous}
+  コントロールワードの一部でない和文文字の直後にグループ開始・終了(|{|, |}|)が
+  有限個という状態で行が終わった場合も，空白文字は発生しない\cite{build87}．
+  理由は不明であるが，以下の入出力例を参照．\par\medskip
+(1)\begin{minipage}[t]{0.4\textwidth}
+\begin{verbatim}
+  あ
+  う
+  {あ}
+  う
+  い
+  う
+  {い}
+  う
+\end{verbatim}
+\end{minipage}\quad → \quad
+\begin{minipage}[t]{0.3\textwidth}
+  あ
+  う
+  {あ}
+  う
+  い
+  う
+  {い}
+  う
+\end{minipage}\par\medskip
+
+(2)\begin{minipage}[t]{0.4\textwidth}
+\begin{verbatim}
+  \def\和{あ}\def\。{い}
+  \和
+  う
+  {\和}
+  う
+  \。
+  う
+  {\。}
+  う
+\end{verbatim}
+\end{minipage}\quad → \quad
+\begin{minipage}[t]{0.3\textwidth}
+  \def\和{あ}\def\。{い}
+  \和
+  う
+  {\和}
+  う
+  \。
+  う
+  {\。}
+  う
+\end{minipage}\par\medskip
+% * 欧文文字直後の改行では空白文字を発生させる
+%     * コントロールワードや「\ 」の直後の改行は何も発生しない
+%     * 「\ 」以外のコントロールシンボルの直後の改行は空白文字を発生させる
+% * 和文文字直後の改行は何も発生させない
+%     * 和文文字→グループ境界 {, } が有限個という状態で行が終わった場合も，
+%       何も発生しない（！）
+% ref. https://qiita.com/h-kitagawa/items/de963380bd3e576ab4e3
+\end{dangerous}
 
 \begin{cslist}
   \csitem[\.{kcatcode} <character code>=<16--18>]
@@ -1555,6 +1655,9 @@ has been |\let| equal to a non-active character token.
  \bibitem{man4} aminophen, 「pTeX の和文文字トークンのカテゴリーコード」，
   2019/04/22,\\
   \url{https://github.com/texjporg/ptex-manual/issues/4}
+ \bibitem{build87} h-kitagawa, 「[ptex] ［和字］+［ブレース］で終わっている行の行端の扱い」，
+  2019/08/05,\\
+  \url{https://github.com/texjporg/tex-jp-build/issues/87}
  \bibitem{dvistd0} TUG DVI Standards Working Group,
   \textit{The DVI Driver Standard, Level 0}.\\
   \url{https://ctan.org/pkg/dvistd}
