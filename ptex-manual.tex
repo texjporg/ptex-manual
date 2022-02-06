@@ -66,7 +66,7 @@
 p3.1.11 (2009/08/17)．\url{https://asciidwango.github.io/ptex/}}ので，
 しばしば「アスキー\pTeX 」または「ASCII \pTeX 」と呼ばれる．
 コミュニティ版\pTeX は，日本語\TeX 開発コミュニティがアスキー\pTeX を
-国際的なディストリビューション（かつてのte\TeX や現在の\TeX\ Live）へ
+国際的なディストリビューション（かつてのte\TeX や現在の\TeX~Live）へ
 導入するにあたって幾つかの改良を加えたものであり，オリジナルとは
 動作が異なる点もあるので注意されたい．
 \begin{itemize}
@@ -122,11 +122,11 @@ EUC-JP，Shift-JIS，ISO-2022-JPのどれか一つのファイルしか処理で
 
 コミュニティ版\pTeX は，UNIX向け日本語\TeX ディストリビューション
 ptetex\footnote{土村展之さんによって2004年から2009年まで開発．
-その後継のptexliveは，2010年に\pTeX が\TeX\ Liveに取り込まれる際のベースに
+その後継のptexliveは，2010年に\pTeX が\TeX~Liveに取り込まれる際のベースに
 なった．}の開発過程で誕生した．
 2006年頃から文字コードがUTF-8のファイル入力への対応が進められ，2007年には
 文字コード変換を担う関数群が\code{ptexenc}というライブラリに切り出された．
-現在の\TeX\ Liveでも\code{ptexenc}は種々のプログラムで利用されている．
+現在の\TeX~Liveでも\code{ptexenc}は種々のプログラムで利用されている．
 \end{dangerous}
 
 \subsection{ファイルの文字コードと内部コード}
@@ -415,12 +415,20 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
 % ref. https://qiita.com/h-kitagawa/items/de963380bd3e576ab4e3
 \end{dangerous}
 
+なお，\TeX82には「|^^|記法」という間接的な入力法があり，|^^ab|のように
+カテゴリーコード7の文字2つに続いて|0|--|9|, |a|--|f|のいずれかが2つ続くと
+それを16進文字コードとする文字入力がなされたのと同じ処理に回るが，
+\pTeX 系列ではこれは\emph{常に欧文扱い}される（アスキー\pTeX~3.1.4以降
+\footnote{\pTeX~3.1.8で制御綴内での扱いが改善された．また，
+コミュニティ版\pTeX~4.0.0で文字列化においても常に欧文扱いするように改修した．
+これについては\ref{sec:printkanji16bit}参照．}）．
+
 \begin{cslist}
   \csitem[\.{kcatcode} <character code>=<16--18>]
-  日本語\TeX 開発コミュニティ版の\pTeX では，和文文字のカテゴリーコード(|\kcatcode|)は
+  コミュニティ版\pTeX では，和文文字のカテゴリーコード(|\kcatcode|)は
   DVI中の上位バイトごと（すなわち，JISコードでいう区ごと）に値が設定可能である
   \footnote{%
-    オリジナルのASCII~\pTeX では，内部コードの上位バイトごとに値が設定可能であった．
+    オリジナルのアスキー\pTeX では，内部コードの上位バイトごとに値が設定可能であった．
     すなわち，内部コードがEUC-JPのときは区ごとに設定可能であったが，
     内部コードがShift-JISのときは
     $2n-1$区・$2n$区($1\leq n\leq 47$)は同一のカテゴリーコードを持つことになる．
@@ -442,18 +450,19 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
   %   * TeX Live 2019 rebuild 2019-05-30 (p3.8.2)
   %   * TeX Live 2020 (p3.8.3)
   %   * TeX Live 2021 (p3.9.0)
-
-  なお，\upTeX においては，|\kcatcode|は大きく仕様変更されている．
 \end{cslist}
 \begin{dangerous}
-  例えば，以下のコードで定義される|\X|, |\Y|で引数終端をしめす「あ」には
-  カテゴリーコードの情報は格納されない．そのため，|\X|,~|\Y|は全く同じ動作となる．
-  \begin{verbatim}
+  例えば，以下のコードで定義される|\X|, |\Y|で引数終端を示す「あ」には
+  カテゴリーコードの情報は格納されない．
+  そのため，\pTeX では|\X|,~|\Y|は全く同じ動作となる．
+\begin{verbatim}
   \kcatcode`あ=16
   \def\X#1あ{\message{X: #1}}
   \kcatcode`あ=17
   \def\Y#1あ{\message{X: #1}}
-  \end{verbatim}
+\end{verbatim}
+  なお，\upTeX では|\kcatcode|は大きく仕様変更されており，
+  |\X|と|\Y|は異なる動作となる．
 \end{dangerous}
 
 \begin{dangerous}
@@ -463,10 +472,8 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
   事実上は「16--18のどれかを格納可能な追加レジスタ」程度の使い方しかない．
 \end{dangerous}
 
-% [TODO] 和文文字を含む文字列化の挙動
-% "kanji character " になることも明文化したい
-% どの \section に含めるかわからないのでとりあえずここに置く
-|\string|や|\meaning|などの文字トークン列生成については以下の通り：
+\subsection{和文文字の文字列化の挙動【\pTeX~4.0.0での改修を含む】}\label{sec:printkanji16bit}
+|\string|や|\meaning|などの文字トークン列生成については以下の通りである．
 \begin{itemize}
   \item 欧文文字は\TeX82と同様で，（文字コード32の空白を除き）
     すべてカテゴリーコード12の文字トークンになるが，
@@ -479,13 +486,42 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
       という問題があった．
       \TeX~Live 2018の\pTeX~p3.8.1でこの問題は修正された(\cite{build37})．}．
   \item 和文文字はそのカテゴリーコードによらず，|\meaning|すると
-    \begin{itemize}
+    \begin{itemize}% すべて "kanji character " になる
       \item \the\kcatcode`漢:\quad \texttt{\meaning 漢}
       \item \the\kcatcode`あ:\quad \texttt{\meaning あ}
       \item \the\kcatcode`）:\quad \texttt{\meaning ）}
     \end{itemize}
     となる．
 \end{itemize}
+
+さて，\pTeX~version 3系列（\TeX~Live 2021まで）では|\meaning|，|\string|等の
+文字列化や制御綴名において和文文字と欧文文字の区別が失われてしまうケースがあった．
+% 途中の結果を一旦配列 |str_pool| に格納する処理で和欧文の区別が失われていた．
+\pTeX~4.0.0以降（\TeX~Live 2022）では，この状況でも
+和欧文の区別が維持される\cite{build81}．
+\begin{dangerous}
+\TeX~Live 2021では，ファイル文字コードUTF-8，内部コードEUC-JPの場合に例えば
+\begin{verbatim}
+  \def\fuga{^^c3^^bf 耽}\fuga
+  \meaning\fuga
+\end{verbatim}
+と入力すると，一行目は\def\fuga{^^c3^^bf 耽}「\code{\fuga}」であるのに対し
+二行目は「\code{macro:->耽 耽}」となっていた（\char\euc"C3BFはEUC-JPで
+\code{"C3BF}である．|^^c3^^bf|の代わりに直接\code{ÿ}と入力しても同様）．
+また
+\begin{verbatim}
+  \catcode"C3=11 \catcode"BF=11
+  \def\耽{P} \def\^^c3^^bf{Q}
+\end{verbatim}
+としたときの|\meaning\耽|は「|macro:->Q|」であった．
+改修後の\TeX~Live 2022では，一つ目の例は
+  \def\fuga{^^c3^^bf 耽}「\code{\meaning\fuga}」% 和欧文が区別される
+であるし，二つ目の例は
+  \catcode"C3=11 \catcode"BF=11
+  \def\耽{P} \def\^^c3^^bf{Q}
+  「\code{\meaning\耽}」% 和欧文が区別されるので "P" になるはず
+となる．
+\end{dangerous}
 
 % jtex.tex の「ラインブレーク」を簡略化
 \section{禁則}
@@ -1659,6 +1695,9 @@ has been |\let| equal to a non-active character token.
  \bibitem{build87} h-kitagawa, 「[ptex] ［和字］+［ブレース］で終わっている行の行端の扱い」，
   2019/08/05,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/87}
+ \bibitem{build81} h-kitagawa, 「バイト列と和文文字トークンの区別」，
+  2019/06/08,\\
+  \url{https://github.com/texjporg/tex-jp-build/issues/81}
  \bibitem{dvistd0} TUG DVI Standards Working Group,
   \textit{The DVI Driver Standard, Level 0}.\\
   \url{https://ctan.org/pkg/dvistd}
