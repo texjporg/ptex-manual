@@ -705,6 +705,8 @@ min10フォントメトリックで「ちょっと」を組むと「ょっ」の
  \csitem[\.{lastnodechar} (read-only integer)]
   現在構築中のリストの「最後のノード」が文字由来であれば，
   そのコード番号（内部コード）を内部整数として返す．
+  リストが空の場合，また
+  「最後のノード」が文字を表すものでなかった場合は，$-1$が返る．
 
   上記「最後のノード」では，\pTeX によって自動挿入される
   \begin{itemize}
@@ -712,10 +714,9 @@ min10フォントメトリックで「ちょっと」を組むと「ょっ」の
     \item 行末禁則処理のために挿入されるペナルティ
     \item 欧文文字のベースライン補正用のノード
   \end{itemize}
-  は無視される．また，「最後のノード」が欧文文字のリガチャであった場合は，
-  リガチャそれ自身のコード番号ではなく，
-  最後の構成要素の文字のコード番号を返す．
-  「最後のノード」が文字を表すものでなかった場合は，$-1$が返る．
+  は無視される．また，現在の実装では「最後のノード」が欧文文字のリガチャで
+  あった場合は，リガチャそれ自身のコード番号ではなく，
+  最後の構成要素の文字のコード番号を返すようにしている．
 \end{cslist}
 
 例えば，\.{lastnodechar}を使って
@@ -774,23 +775,63 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 \end{quote}
 と「，」の内部コードが取得される．
 
+
+%%%
+\ifnum\epTeXversion>220214
+\subsection{\.{lastnodefont}プリミティブ}
+\.{lastnodechar}を補完するものとして，\epTeX~220214 (\TeX~Live 2022)で実装された．
+\begin{cslist}
+ \csitem[\.{lastnodefont} (read-only font identifier)]
+  現在構築中のリストの「最後のノード」が文字由来であれば，
+  そのフォント（内部識別子）を返す．
+  リストが空の場合，また
+  「最後のノード」が文字を表すものでなかった場合は，|\nullfont|が返る．
+
+  ここでも「最後のノード」は\.{lastnodechar}と同様で
+  \begin{itemize}
+    \item JFMによって入るグルー
+    \item 行末禁則処理のために挿入されるペナルティ
+    \item 欧文文字のベースライン補正用のノード
+  \end{itemize}
+  は無視される．
+\end{cslist}
+
+\TeX~Live 2020の\pTeX~(p3.8.3)で追加された|\ifjfont|, |\iftfont|と
+組み合わせれば，「最後のノード」が和文文字かどうかを判別できる
+\footnote{\epTeX では「\.{lastnodechar}が256以上かどうか」でも判別できるが，
+\eupTeX では文字コード0--255の和文文字ノードも存在しうることに注意．}．
+\fi
+%%%
+
+
 \subsection{\.{lastnodesubtype}プリミティブ}
-\cite{tjb28,plt63}などの議論で，「最後のグルーがJFMグルーだけ\.{unskip}する」処理の必要性が
-唱えられてきた．\epTeX にはもともと最後のノードの種別を返す\.{lastnodetype}プリミティブが
+\cite{tjb28,plt63}などの議論で，「最後のグルーがJFMグルーの場合のみ
+\.{unskip}する」処理の必要性が唱えられてきた．
+\eTeX にはもともと最後のノードの種別を返す\.{lastnodetype}プリミティブが
 あったが，これでは最後のノードがグルーであるかしかわからない．
-そのため，\epTeX~180226で\.{lastnodesubtype}プリミティブを追加した．
+そのため，\epTeX~180226で\.{lastnodetype}を補完するものとして，
+\.{lastnodesubtype}プリミティブを追加した．
 
 \begin{cslist}
  \csitem[\.{lastnodesubtype} (read-only integer)]
-  現在構築中のリストの「最後のノード」（\.{lastnodechar}プリミティブと同様）の
-  subtype値を内部整数として返す．
+  現在構築中のリストの最後のノードのsubtype値を内部整数として返す．
+  ここでの最後のノードは\.{lastnodechar}や\.{lastnodefont}とは異なり
   \begin{itemize}
-    \item 「最後のノード」が文字ノードのときは0が返る．
+    \item JFMによって入るグルー
+    \item 行末禁則処理のために挿入されるペナルティ
+  \end{itemize}
+  も対象とするが，
+  \begin{itemize}
+    \item 欧文文字のベースライン補正用のノード
+  \end{itemize}
+  は無視される．
+  \begin{itemize}
+    \item 最後のノードが文字ノードのときは0が返る．
     \item 現在構築中のリストが空のときは$-1$が返る．
 %%%
 \ifnum\epTeXversion>210629
-    \item \epTeX~210701以降では，数式内のノードについてはsubtype値そのままではほとんど意味がないので，
-    次ページの表の値を返す．
+    \item \epTeX~210701以降では，数式内のノードについてはsubtype値そのままでは
+    ほとんど意味がないので，次ページの表の値を返す．
 \fi
 %%%
   \end{itemize}

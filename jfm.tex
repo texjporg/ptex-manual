@@ -280,6 +280,19 @@ TFMはバイナリ形式であるが，これをプロパティ（特性）と�
 \emph{JPL (Japanese Property List)}ファイルである．
 JPLファイルでもPLファイルと同じく，拡張子は\code{.pl}が用いられる．
 
+和文用JPLに特有のプロパティとして，以下が存在する．
+
+\subsection{\code{CHARSINTYPE}}
+
+\subsection{\code{TYPE}}
+
+\subsection{\code{GLUEKERN}}
+
+\subsection{\code{DIRECTION}}
+\code{DIRECTION \codechar{文字列}}の形式で，日本語フォントの組方向を指定する．
+\codechar{文字列}の一文字目が|Y|であれば横組，|T|であれば縦組として扱う．
+未指定の場合はデフォルトで横組として扱う．
+
 
 % -- tables begin
 \DeleteShortVerb{|}
@@ -525,7 +538,7 @@ JFMおよび和文VFを操作する種々の機能を提供するPerlスクリ�
 
 しばしば「|min10|系」と呼ばれる．
 歴史が非常に古く，開発当時のドキュメントは残念ながらほとんど残っていない．
-以下は，株式会社アスキーによる「日本語\TeX version j1.7」\cite{jtex1.7}に
+以下は，株式会社アスキーによる「日本語\TeX\ version j1.7」\cite{jtex1.7}に
 付属していたドキュメント|README.KANJI|からの抜粋である．
 
 \begin{quotation}
