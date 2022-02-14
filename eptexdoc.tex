@@ -710,7 +710,7 @@ min10フォントメトリックで「ちょっと」を組むと「ょっ」の
 
   上記「最後のノード」では，\pTeX によって自動挿入される
   \begin{itemize}
-    \item JFMによって入るグルー
+    \item メトリック由来の空白（JFMグルー，カーン）
     \item 行末禁則処理のために挿入されるペナルティ
     \item 欧文文字のベースライン補正用のノード
   \end{itemize}
@@ -742,8 +742,9 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 \begin{quote}
 abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 \end{quote}
-となり，見た目では同じ「fi」が\.{lastnodechar}実行時の「最後のノード」であるかのように見えても，
-それが合字の場合（左側）では\.{lastnodechar}の実行結果は最後の構成要素「i」のコード番号105となる．
+となり，見た目では同じ「fi」が\.{lastnodechar}実行時の「最後のノード」で
+あるかのように見えても，それが合字の場合（左側）では\.{lastnodechar}の
+実行結果は最後の構成要素「i」のコード番号105となる．
 
 \begin{dangerous}
   「|これは，|」とソース中に入力したときの
@@ -760,8 +761,8 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 \JY1/hmc/m/it/10 ，
 \glue(refer from jfm) 4.62341 minus 4.62341
 \end{verbatim}
-  しかし，数段落上の説明の通り，\.{lastnodechar}は\pTeX の和文処理によって自動的に挿入された
-  これらJFM由来の空白を無視する．
+  しかし，数段落上の説明の通り，\.{lastnodechar}は\pTeX の和文処理によって
+  自動的に挿入されたこれらJFM由来の空白を無視する．
 \end{dangerous}
 
 「最後のノード」を見ているので，
@@ -789,7 +790,7 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 
   ここでも「最後のノード」は\.{lastnodechar}と同様で
   \begin{itemize}
-    \item JFMによって入るグルー
+    \item メトリック由来の空白（JFMグルー，カーン）
     \item 行末禁則処理のために挿入されるペナルティ
     \item 欧文文字のベースライン補正用のノード
   \end{itemize}
@@ -815,23 +816,20 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 \begin{cslist}
  \csitem[\.{lastnodesubtype} (read-only integer)]
   現在構築中のリストの最後のノードのsubtype値を内部整数として返す．
-  ここでの最後のノードは\.{lastnodechar}や\.{lastnodefont}とは異なり
+  ここでの最後のノードは\.{lastnodetype}と同様である．
+  すなわち，\.{lastnodechar}や\.{lastnodefont}とは
   \begin{itemize}
-    \item JFMによって入るグルー
+    \item メトリック由来の空白（JFMグルー，カーン）
     \item 行末禁則処理のために挿入されるペナルティ
   \end{itemize}
-  も対象とするが，
-  \begin{itemize}
-    \item 欧文文字のベースライン補正用のノード
-  \end{itemize}
-  は無視される．
+  も対象とするという点で異なる．
   \begin{itemize}
     \item 最後のノードが文字ノードのときは0が返る．
     \item 現在構築中のリストが空のときは$-1$が返る．
 %%%
 \ifnum\epTeXversion>210629
-    \item \epTeX~210701以降では，数式内のノードについてはsubtype値そのままでは
-    ほとんど意味がないので，次ページの表の値を返す．
+    \item \epTeX~210701以降では，数式内のノードについてはsubtype値
+      そのままではほとんど意味がないので，次ページの表の値を返す．
 \fi
 %%%
   \end{itemize}
@@ -946,7 +944,8 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
   \footnotetext{\.{displaystyle}, \.{textstyle}, \.{scriptstyle}, \.{scriptscriptstyle}.}
   なお，\verb+\left...[\middle]...\right+の直後で\.{lastnodesubtype}を使用しても，
   \verb+\left...[\middle]...\right+全体が一つの内部数式(\.{mathinner})となるので，
-  \.{right}に「対応する」\.{lastnodesubtype}の値は取得できない．\.{over}プリミティブなどによる分数についても類似の事情がある．
+  \.{right}に「対応する」\.{lastnodesubtype}の値は取得できない．
+  \.{over}プリミティブなどによる分数についても類似の事情がある．
 \end{description}
 \fi
 %%%
