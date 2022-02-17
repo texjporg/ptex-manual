@@ -365,7 +365,7 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
 \begin{dangerous}
   コントロールワードの一部でない和文文字の直後にグループ開始・終了(|{|, |}|)が
   有限個という状態で行が終わった場合も，空白文字は発生しない\cite{build87}．
-  理由は不明であるが，以下の入出力例を参照．\par\medskip
+  以下の入出力例を参照．\par\medskip
 (1)\begin{minipage}[t]{0.4\textwidth}
 \begin{verbatim}
   あ
@@ -387,7 +387,7 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
   う
   {い}
   う
-\end{minipage}\par\medskip
+\end{minipage}\par\medskip % 常に「あうあういういう」
 
 (2)\begin{minipage}[t]{0.4\textwidth}
 \begin{verbatim}
@@ -412,8 +412,42 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
   う
   {\。}
   う
-\end{minipage}\par\medskip
-  ちなみに，\pTeX~p3.8.1以前では，(2)の結果は「あうあ うい うい う」であった．
+\end{minipage}\par\medskip % p4.0.0以降：「あうあういういう」
+\ifdefined\ptexlineendmode
+  \noindent
+  ちなみに，(2)の上記の結果は\pTeX~p4.0.0以降での挙動である．
+\begin{itemize}
+ \item \pTeX~p3.8.1以前（アスキー版も同じ）では「
+ \begingroup
+  \ptexlineendmode=3
+  \def\和{あ}\def\。{い}
+  \和
+  う
+  {\和}
+  う
+  \。
+  う
+  {\。}
+  う
+ \endgroup % p3.8.1以前：「あうあ うい うい う」
+  」
+ \item \pTeX~p3.8.2以降p3.10.0までは「
+ \begingroup
+  \ptexlineendmode=1
+  \def\和{あ}\def\。{い}
+  \和
+  う
+  {\和}
+  う
+  \。
+  う
+  {\。}
+  う
+ \endgroup % p3.0.0以降：「あうあ ういういう」
+  」
+\end{itemize}
+  であった．
+\fi
 % * 欧文文字直後の改行では空白文字を発生させる
 %     * コントロールワードや「\ 」の直後の改行は何も発生しない
 %     * 「\ 」以外のコントロールシンボルの直後の改行は空白文字を発生させる
