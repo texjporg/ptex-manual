@@ -183,7 +183,7 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
 ログファイルはこの後にオープンされるため，そこには正しい内部コード
 （フォーマットと同じ内部コード）が書き込まれる\cite{build55}．
 
-このようなウソは，\pTeX に限らず|(preloaded format=***)|でも見られる．
+このようなウソは，\pTeX に限らず\code{(preloaded format=***)}でも見られる．
 \end{dangerous}
 
 \subsection{和文文字と欧文文字の区別}
@@ -193,7 +193,8 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
 \begin{itemize}
  \item 7ビットASCII文字集合は欧文文字として扱われる．
  \item 最上位ビットが1の場合，\pTeX はそのバイトで始まる列について
-    EUC-JPまたはShift-JISのいずれかの内部コードへの変換を試みる．
+    ファイルの文字コードからEUC-JPまたはShift-JISのいずれかの
+    内部コードへの変換を試みる．
     和文文字の内部コードとして許される整数は
     $256c_1+c_2$，但し$c_i\in C_i$であり，ここで
   \begin{description}
@@ -204,9 +205,9 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
     $C_2=\{\hex{40},\dots,\hex{7e}\}\cup\{\hex{80},\dots,\hex{fc}\}$.
   \end{description}
     である．この内部コードのパターンに合えば和文文字として扱われ，
-    合わなければ8ビット欧文文字のバイト列として扱われる．\footnote{例えば，
+    合わなければ8ビット欧文文字のバイト列として扱われる\footnote{例えば，
     入力ファイルの文字コードがUTF-8の場合，JIS~X~0208にない文字は
-    UTF-8のバイト列として読み込まれる．}
+    UTF-8のバイト列として読み込まれる．}．
 \end{itemize}
 % 参考：kanji.c の |is_char_kanji| の実装
 
@@ -218,7 +219,29 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
 コミュニティ版\pTeX~4.0.0で文字列化においても常に欧文扱いするように改修した．
 これについては\ref{sec:printkanji16bit}参照．}）．
 
-% [TODO] 8ビット欧文文字の ^^ab 形式への変換について
+最近（2010年代以降）では，\pTeX でもファイルの文字コードをUTF-8とする
+利用が増えてきた．
+コミュニティ版\pTeX では，\code{ptexenc}ライブラリによって
+UTF-8ファイル入力を内部コードEUC-JPまたはShift-JISに変換する際に
+以下の特殊な加工を行っている．
+% http://tutimura.ath.cx/ptetex/?UTF-8%C2%D0%B1%FE%282%29
+\begin{itemize}
+ \item Unicodeでのバラツキを同一視する多対一変換
+  \footnote{例えば，ソースファイル中の全角ダーシ(\code{U+2015})と
+  EMダーシ(\code{U+2014})は同一視され，内部的にはJISコード\code{"213D}と
+  して扱われ，ファイルに書き出される時は\code{U+2015}になる．}
+ \item BOMの無視（ファイル先頭に限らず）
+ \item 濁音・半濁音の合字処理
+ \item JISに変換できない文字を|^^ab|形式に変換
+  \footnote{例えば，ソースファイル中にçのような欧文文字を直接書くと，
+  これは和文文字の内部コードに変換できないため|^^c3^^a7|に変換される．}
+\end{itemize}
+なお，UTF-8ファイル出力時にはこのような加工の逆変換は行わない（入力時に
+加工されたままで出力される）．
+
+このように\emph{\pTeX は入力を内部コードに変換する処理を含むため，
+オリジナルの\TeX や\pdfTeX などの欧文\TeX とは入力に関して必ずしも
+互換でない}ことに注意が必要である．
 
 \begin{dangerous}
  以上で述べた「内部コードの範囲」はJIS~X~0213の漢字集合1面（Shift-JISの場合は2面も）を
@@ -240,10 +263,6 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
  また，DVIに文字として出力されたからといって，それをPostScriptやPDFに変換したときに
  意図通りに出力されるかは全くの別問題である．
 \end{dangerous}
-
-% [TODO] 以下の2文は「pTeX の出力するDVIフォーマット」の部に移した方がいいかも
-なお，\pTeX はDVIファイル内の和文文字コードとしてはJISコードを出力する．
-ただし，|\special|命令の文字列は内部コードで符号化されたバイト列として書き出される．
 
 \subsection{文字コードの取得と指定}
 \pTeX でも\TeX82と同様に，
@@ -555,6 +574,13 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
   \def\耽{P} \def\^^c3^^bf{Q}
   「\code{\meaning\耽}」% 和欧文が区別されるので "P" になるはず
 となる．
+% メモ：上の例は「^^c5^^bf <=> 顛」でもよかったのだが，
+% マニュアルの欧文フォント newtx/newtx で表示可能な文字にした．
+% 外部ファイル出力の変化例：
+%   \label{ß}%        % TL2021: <C3>^^9f => TL2022: ^^c3^^9f
+%   \label{^^c3^^9f}% % TL2021: <C3>^^9f => TL2022: ^^c3^^9f
+%   \label{ÿ}%        % TL2021: 耽       => TL2022: ^^c3^^bf
+%   \label{^^c3^^bf}% % TL2021: 耽       => TL2022: ^^c3^^bf
 \end{dangerous}
 
 % jtex.tex の「ラインブレーク」を簡略化
@@ -1683,6 +1709,9 @@ has been |\let| equal to a non-active character token.
 一方，ポストアンブル部の|post_post|命令に続くフォーマットIDは
 \pTeX でも通常2であるが，\pTeX の拡張DVI命令である|dir|が
 使用されている場合のみ3にセットされる．
+
+% [TODO] 書き方を工夫したい．
+|\special|命令の文字列は内部コードで符号化されたバイト列として書き出される．
 
 \begin{thebibliography}{99}
  \bibitem{topic} Victor Eijkhout, \textit{\TeX\ by Topic, A \TeX nician's Reference},
