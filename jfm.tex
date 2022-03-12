@@ -132,7 +132,7 @@ JFMファイルでもTFMファイルと同じく，拡張子は\code{.tfm}が用
   \item[\node{remainder} (8bits)]
 \end{description}
 
-JFMでは$\size{bc}$は必ずゼロ\footnote{前節にある通り，文字コード及び
+JFMでは$\size{bc}$は必ずゼロ\footnote{前節にあるとおり，文字コード及び
 文字タイプの項が0のものが必ず1つ存在するため．}なので，
 1つのJFMに含まれる\node{char\_info}は全部で$\size{ec}+1$ワードになる．
 
@@ -271,27 +271,46 @@ JFMで扱うことができなかった．また，オリジナルの仕様で�
 それと同様である．2018年2月に日本語\TeX{}開発コミュニティによって，
 \pTeX{}及びpPLtoTFで新たにサポートされた．
 
+\subsection{JFMフォーマットの制約事項}
 
-\section{JPLファイル}\label{jpl-format}
+冒頭に述べたとおり，文字タイプ(\node{char\_type})の上限は255であり，
+それに伴い可能な字幅も最大256種類しか許されない（さらに同じ字幅でも
+\node{glue}又は\node{kern}の挿入規則を変える場合はその分減る）．
+しかし，実際のフォントでは字幅が256種類を超えることもあり，
+そのような時にJFMフォーマットは使用できない．
 
-TFMはバイナリ形式であるが，これをプロパティ（特性）という概念を使って
-テキスト形式で視覚化したものがPL (Property List)ファイルである．
-同様に，JFMをテキスト形式で視覚化したものが
-\emph{JPL (Japanese Property List)}ファイルである．
-JPLファイルでもPLファイルと同じく，拡張子は\code{.pl}が用いられる．
+例として，OTFパッケージ(japanese-otf) \cite{jotf}が提供する
+「ヒラギノフォントのプロポーショナル仮名を使う|\propshape|命令」では
+\begin{itemize}
+ \item 組版時に使われる\code{(up)phiraminw3-h.tfm}などの
+  「(u)\pTeX 用JFM」は，約物類とプロポーショナル仮名のみに対応する
+  ので，字幅が256種類以内
+ \item VFを介して実際のフォントに割り当てられる
+  \code{hiramin-w3-h.tfm}などの「DVIドライバ用JFM」は，
+  Adobe-Japan1-5の20{,}317文字を全てCIDコード順に実際のフォントに
+  即して定義しようとして，字幅が256種類を超えてしまう
+\end{itemize}
+という状況になっており，後者はJFMフォーマットで定義できない．
 
-和文用JPLに特有のプロパティとして，以下が存在する．
-
-\subsection{\code{CHARSINTYPE}}
-
-\subsection{\code{TYPE}}
-
-\subsection{\code{GLUEKERN}}
-
-\subsection{\code{DIRECTION}}
-\code{DIRECTION \codechar{文字列}}の形式で，日本語フォントの組方向を指定する．
-\codechar{文字列}の一文字目が|Y|であれば横組，|T|であれば縦組として扱う．
-未指定の場合はデフォルトで横組として扱う．
+一方で，\OMEGA で使われるOFMフォーマットは最大65{,}536種類の字幅を
+定義でき，かつ主要なDVIドライバ(\code{dvipdfmx}, \code{dvips})は
+JFMとOFMの両方に対応している．
+そこで\emph{あくまで回避策であるが}，(u)\pTeX 用JFMはそのままに，
+機能しないDVIドライバ用JFMの代わりに「正しい字幅を定義したOFM」を
+用意して\code{dvipdfmx}や\code{dvips}に優先的に使わせるという方法が
+長らく用いられてきた．OTFパッケージが提供するOFMファイル群（|\CID|で
+使われる\code{otf-cjmr-h.ofm}\footnote{実はこちらは字幅が256種類
+以内であり，JFMフォーマットで十分対応できるが．}や|\propshape|で
+使われる\code{hiramin-w3-h.ofm}など）はこの目的で用意されている\cite{cidofm}．
+% メモ：\def\xspace{}
+%   * OTFパッケージの|\CID|, |\propshape|では
+%     DVIドライバ用JFMに割り当てるCMapは恒等変換|Identity-{H,V}|を指定
+%   * \TL~2021以前の\code{dvips}では，
+%     回避策として用意された縦組用OFMがかえって邪魔となり不正な出力になった
+%     （\code{-noomega}でOFMを無視する必要があった）が，
+%     \TL~2022以降は「OFMの|FONTDIR RT|をJFMの|DIRECTION TATE|と同等に扱う」
+%     という改修を入れており，
+%     \code{otf-cj**-v.ofm}や\code{hira***-w*-v.ofm}もそれを利用するようにした
 
 
 % -- tables begin
@@ -365,6 +384,30 @@ $\size{ng}$ & $\size{np}$ \\ \hline
 \end{table}
 \MakeShortVerb*{|}
 % -- tables end
+\clearpage
+
+
+\section{JPLファイル}\label{jpl-format}
+
+TFMはバイナリ形式であるが，これをプロパティ（特性）という概念を使って
+テキスト形式で視覚化したものがPL (Property List)ファイルである．
+同様に，JFMをテキスト形式で視覚化したものが
+\emph{JPL (Japanese Property List)}ファイルである．
+JPLファイルでもPLファイルと同じく，拡張子は\code{.pl}が用いられる．
+
+和文用JPLに特有のプロパティとして，以下が存在する．
+
+\subsection{\code{CHARSINTYPE}}
+
+\subsection{\code{TYPE}}
+
+\subsection{\code{GLUEKERN}}
+
+\subsection{\code{DIRECTION}}
+\code{DIRECTION \codechar{文字列}}の形式で，日本語フォントの組方向を指定する．
+\codechar{文字列}の一文字目が|Y|であれば横組，|T|であれば縦組として扱う．
+未指定の場合はデフォルトで横組として扱う．
+
 \clearpage
 
 
@@ -656,6 +699,12 @@ zw，zhの値を仮定した既存スタイルに影響を与えないように
  \bibitem{jistfm}
    奥村晴彦，「pLaTeX2e 新ドキュメントクラス」，2016/07/07,\\
    |https://oku.edu.mie-u.ac.jp/~okumura/jsclasses/|
+ \bibitem{jotf}
+   Shuzaburo Saito，「Open Type Font用VF」，2019/04/01,\\
+   |https://psitau.kitunebi.com/otf.html|
+ \bibitem{cidofm}
+   Hironobu Yamashita，「otf-cjXX-X.ofm は何のため？」，2019/05/31,\\
+   |https://github.com/texjporg/japanese-otf-mirror/issues/15|
 \end{thebibliography}
 
 \end{document}
