@@ -13,7 +13,7 @@
 
 \def\size#1{\mathit{#1}}
 \def\code#1{\texttt{#1}}
-\def\codechar#1{\ensuremath{\langle\mbox{\null\code{#1}\null}\rangle}}
+\def\codechar#1{\ensuremath{\langle\mbox{\kern0pt\code{#1}\kern0pt}\rangle}}
 
 \title{\emph{JFMファイルフォーマット}}
 \author{ASCII Corporation \& Japanese \TeX\ Development Community}
@@ -398,6 +398,32 @@ JPLファイルでもPLファイルと同じく，拡張子は\code{.pl}が用�
 和文用JPLに特有のプロパティとして，以下が存在する．
 
 \subsection{\code{CHARSINTYPE}}
+\code{CHARSINTYPE \codechar{1バイト長の整数} \codechar{任意個数の和文文字}}の
+形式で，文字タイプ\node{char\_type}及びそれに属する文字コードを設定する．
+以下に示すのは，開き括弧類を\node{char\_type}が1のグループに，
+閉じ括弧類を\node{char\_type}が2のグループに指定する例である（最初の
+\code{O 1}と\code{O 2}はそれぞれ8進数の1，2）．
+\begin{verbatim}
+(CHARSINTYPE O 1
+   （ 〔 ［ ｛ 〈 《 「 『 【
+   )
+(CHARSINTYPE O 2
+   ） 〕 ］ ｝ 〉 》 」 』 】
+   )
+\end{verbatim}
+
+なお，\codechar{任意個数の和文文字}は直接入力のほか16進数コード値で与える
+こともできる．JISコードの場合は\code{J}で始め，UCSコード（\upTeX 専用）の
+場合は\code{U}で始める．
+以下の指定は上の例と等価である（例えば\codechar{（}はJIS~0x214A）．
+\begin{verbatim}
+(CHARSINTYPE O 1
+   J 214A J 214C J 214E J 2150 J 2152 J 2154 J 2156 J 2158 J 215A
+   )
+(CHARSINTYPE O 2
+   J 214B J 214D J 214F J 2151 J 2153 J 2155 J 2157 J 2159 J 215B
+   )
+\end{verbatim}
 
 \subsection{\code{TYPE}}
 
@@ -407,6 +433,15 @@ JPLファイルでもPLファイルと同じく，拡張子は\code{.pl}が用�
 \code{DIRECTION \codechar{文字列}}の形式で，日本語フォントの組方向を指定する．
 \codechar{文字列}の一文字目が|Y|であれば横組，|T|であれば縦組として扱う．
 未指定の場合はデフォルトで横組として扱う．
+(u)\pTeX と一緒に標準で配布しているものは，横組用に
+\begin{verbatim}
+(DIRECTION YOKO)
+\end{verbatim}
+を，縦組用に
+\begin{verbatim}
+(DIRECTION TATE)
+\end{verbatim}
+を指定している．
 
 \clearpage
 
