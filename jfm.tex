@@ -426,8 +426,34 @@ JPLファイルでもPLファイルと同じく，拡張子は\code{.pl}が用�
 \end{verbatim}
 
 \subsection{\code{TYPE}}
+\code{TYPE \codechar{1バイト長の整数} \codechar{プロパティリスト}}の
+形式で，文字タイプ\node{char\_type}に含まれる文字の性質を定義する．
+欧文用PLの\code{CHARACTER}プロパティに相当するが，利用可能な下位のプロパティは
+\begin{itemize}
+ \item \code{CHARWD \codechar{実数値}}：文字の幅
+ \item \code{CHARHT \codechar{実数値}}：文字の高さ
+ \item \code{CHARDP \codechar{実数値}}：文字の深さ
+ \item \code{CHARIC \codechar{実数値}}：文字のイタリック補正値
+\end{itemize}
+に限られる（\code{NEXTLARGER}と\code{VARCHAR}は使えない）．
+
+以下の例は，\pTeX の既定で使用している|min10.tfm|のソース|min10.pl|からの
+抜粋である．|min10.tfm|のデザインサイズは10.0\,ptであるので，これは
+文字タイプ0に含まれる文字の幅を9.62216\,pt，高さを7.77588\,pt，
+深さを1.38855\,ptという定義である．
+\begin{verbatim}
+(TYPE O 0
+   (CHARWD R 0.962216)
+   (CHARHT R 0.777588)
+   (CHARDP R 0.138855)
+   )
+\end{verbatim}
 
 \subsection{\code{GLUEKERN}}
+JFMの\node{glue\_kern}テーブルに収めるプログラムを記述する．
+欧文用PLの\code{LIGTABLE}と似ているが，\code{LIG}の代わりに\code{GLUE}を
+用いるところが異なる．
+% [TODO] 書きかけ
 
 \subsection{\code{DIRECTION}}
 \code{DIRECTION \codechar{文字列}}の形式で，日本語フォントの組方向を指定する．
@@ -661,13 +687,15 @@ I」を参照して下さい。（中略）
 があります。
 \end{quotation}
 
+\jfont\minten=min10 % used in this paragraph!
 通常の和文フォントは正方形の仮想ボディに収まるようにデザインされるが，
-例えば公称10ポイントの|min10|は「幅9.62216pt，高さ7.77588pt，深さ1.38855pt」の
+例えば公称10ポイントの|min10|は「幅\the\fontcharwd\minten`漢，
+高さ\the\fontcharht\minten`漢，深さ\the\fontchardp\minten`漢」の
+% 幅9.62216pt，高さ7.77588pt，深さ1.38855pt
 扁平な矩形でデザインされている（$\mathrm{zw}=9.62216\,\mathrm{pt}$と
 $\mathrm{zh}=9.16443\,\mathrm{pt}$が一致しない）．
-また，例えば|ちょっと|が「ちょっと」ではなく
-「{\jfont\minten=min10 \minten ちょっと}」と詰まるなどの
-不自然な挙動も知られている\cite{min10otobe}．
+また，例えば|ちょっと|が「ちょっと」ではなく「{\minten ちょっと}」と
+詰まるなどの不自然な挙動も知られている\cite{min10otobe}．
 ただし，\emph{互換性維持のため，コミュニティが修正を行う予定はない}．
 
 \paragraph{JISフォントメトリック}
