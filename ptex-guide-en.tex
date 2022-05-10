@@ -957,6 +957,11 @@ For simplicity, first we introduce of input handling of \eupTeX.
 %%% e-upTeX の和文トークンの話：和文トークンが混ざっているので注意
 \subsection{Japanese tokens}
 
+%%% 文字トークンが和文であるかを判定する方法
+%%% (1) \meaning が kanji で始まるかどうか
+%%% (2) pTeX: 文字コードが 256 以上かどうか
+%%% (3) upTeX: 予め作っておいた \kcatcode 16--19 のトークン各々と \ifcat で比較
+
 %%% 和文組版の厳選トピック
 \section{Basic introduction to Japanese typesetting}
 
