@@ -524,7 +524,7 @@ JFMを扱うのは当然であるが，ここではJFMおよび関連するフ�
 
 \subsection{chkdvifont}
 
-\TeX\ Live 2019で追加された比較的新しいコマンドであり，
+\TeX~Live 2019で追加された比較的新しいコマンドであり，
 TFM/JFMファイルの簡単な情報を表示する機能を持つ（\OMEGA 用のOFMファイルにも対応）．
 
 実行例を示す（注意：ファイル名の拡張子は省略不可．また，ファイルが
@@ -726,9 +726,7 @@ zw，zhの値を仮定した既存スタイルに影響を与えないように
 対応は以下のとおり（左が\pTeX 用JFM，右がDVIドライバ用JFMである
 \footnote{DVIドライバ用JFMは全ての文字を全角扱いとしており，グルー挿入などは
 一切定義していない．当然，\pTeX の組版時には使用すべきでない．}．
-実際のOpenType/TrueTypeフォントの割り当ては，mapファイルに依存する）．
-% [TODO] この割り当てを定義するのが ptex-fontmaps である，まで言及したい．
-% kanji-config-updmap のドキュメントまで導線を張るつもりだが，別の節にまとめる．
+実際のOpenType/TrueTypeフォントの割り当ては，mapファイルに依存する；後述）．
 \begin{itemize}
   \item |min*.tfm| → |min*.vf| → |rml.tfm|（→明朝体フォント，横組）
   \item |goth*.tfm| → |goth*.vf| → |gbm.tfm|（→ゴシック体フォント，横組）
@@ -748,10 +746,76 @@ zw，zhの値を仮定した既存スタイルに影響を与えないように
 
 \subsection{uptex-fonts}
 
-[TODO] 執筆予定．
+配布場所は |https://github.com/texjporg/uptex-fonts| であり，
+内容物は以下のとおり．なお，\upTeX および\upLaTeX のフォーマットでは，既定で
+横組用に |upjisr-h.tfm| と |upjisg-h.tfm| を，
+縦組用に |upjisr-v.tfm| と |upjisg-v.tfm| を使用している．
 
-% クオート記号
+\paragraph{日本語用（upjis系）}
+
+JISフォントメトリックを基に，JIS~X~0208→Unicodeで追加された記号類を
+各文字タイプに追加した日本語用メトリックである．
+|upjis*|と|upjpn*|のJFMの中身は同じであり，
+対応するVFも（2022年現在は）実質的に同等である．
+
+\begin{dangerous}
+両者の違いは歴史的経緯にすぎない．
+かつてはDVIドライバが|set3|命令すなわち「3バイト以上の文字出力」に
+非対応のケースが多かったため，以下の仕様を設けていた．
+\begin{itemize}
+  \item 標準フォント|upjis*| … BMP内のみ出力可（VFは|set2|まで）
+  \item オプションの|upjpn*| … BMP外も出力可（VFは|set3|も使用）
+\end{itemize}
+しかし，2018年以降はDVIドライバの|set3|対応が進んだことから，
+標準フォント|upjis*|でも「Adobe-Japan1で定義されたBMP外の文字」を
+出力できるように，VFに|set3|命令も使用することとした\cite{upf3}．
+さらに，\TeX~Live 2021以降は各種DVIドライバによるJFM由来のVFの解釈が
+以下のように拡張された：
+\begin{quote}
+|MAPFONT|で指示されているfont IDの一番若いものがJFMであり，\par
+要求されたコードポイントが明言されていない場合は，\par
+それが最小のfont IDに属すとみなし，そのコードポイントそのものを出力する．
+\end{quote}
+この解釈拡張により，VFに個々の文字を（|set3|命令を使うなどして）定義することなく，
+省略されている場合でも文字出力が可能となった\cite{tjb99}．
+\end{dangerous}
+
+\paragraph{中国語簡体字用（upsch系）・中国語繁体字用（uptch系）・韓国語用（upkor系）}
+
+日本語と中国語・韓国語では，
+実際のフォントにおける記号類のデザイン（仮想ボディの中での配置）や
+字詰めの方式が異なる点が多い．
+そこで，\emph{実験的ではあるが}，日本語用（upjis系）の組み方では
+明らかに不自然な点を調整したJFMをそれぞれ用意した．
+詳細は\cite{upf2}を参照されたい．
+
+\paragraph{対応するVFと実フォント}
+
+対応は以下のとおり（左が\upTeX 用JFM，右がDVIドライバ用JFMである．
+実際のOpenType/TrueTypeフォントの割り当ては，mapファイルに依存する；後述）．
+\begin{itemize}
+  \item |upjisr-*.tfm| → |upjisr-*.vf| → |uprml-*.tfm|（→日本語・明朝体）
+  \item |upjisg-*.tfm| → |upjisg-*.vf| → |upgbm-*.tfm|（→日本語・ゴシック体）
+  \item |upjpnrm-*.tfm| → |upjpnrm-*.vf| → |uprml-*.tfm|（→日本語・明朝体）
+  \item |upjpngt-*.tfm| → |upjpngt-*.vf| → |upgbm-*.tfm|（→日本語・ゴシック体）
+  \item |upschrm-*.tfm| → |upschrm-*.vf| → |upstsl-*.tfm|（→簡体中国語・宋体）
+  \item |upschgt-*.tfm| → |upschgt-*.vf| → |upstht-*.tfm|（→簡体中国語・黒体）
+  \item |uptchrm-*.tfm| → |uptchrm-*.vf| → |upmsl-*.tfm|（→繁体中国語・宋体）
+  \item |uptchgt-*.tfm| → |uptchgt-*.vf| → |upmhm-*.tfm|（→繁体中国語・黒体）
+  \item |upkorrm-*.tfm| → |upkorrm-*.vf| → |uphysmjm-*.tfm|（→韓国語・バタン体）
+  \item |upkorgt-*.tfm| → |upkorgt-*.vf| → |uphygt-*.tfm|（→韓国語・ドトゥム体）
+\end{itemize}
+
+[TODO] クオート記号の割り当て
 % https://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=3153
+
+\subsection{実フォントへの割り当て (ptex-fontmaps)}
+
+先述のとおり，「DVIドライバ用JFM」に実際のOpenType/TrueTypeフォントを
+割り当てるのはmapファイルの仕事である．
+\TeX~Liveでは|ptex-fontmaps|として複数のプリセットを用意しており，
+それらを|kanji-config-updmap(-sys)|というコマンドで切り替えることができる．
+詳細は公式ドキュメント及び |https://github.com/texjporg/ptex-fontmaps| を参照のこと．
 
 \begin{thebibliography}{99}
  \bibitem{jtex1.7}
@@ -768,6 +832,15 @@ zw，zhの値を仮定した既存スタイルに影響を与えないように
  \bibitem{cidofm}
    Hironobu Yamashita，「otf-cjXX-X.ofm は何のため？」，2019/05/31,\\
    |https://github.com/texjporg/japanese-otf-mirror/issues/15|
+ \bibitem{upf3}
+   Takuji Tanaka，「uptex-fontsで提供するフォントの文字範囲など」，2017/07/22,\\
+   |https://github.com/texjporg/uptex-fonts/issues/3|
+ \bibitem{tjb99}
+   Takuji Tanaka，「和文vfの fallback を dviware で」，2020/03/11,\\
+   |https://github.com/texjporg/tex-jp-build/issues/99|
+ \bibitem{upf2}
+   Hironobu Yamashita，「中韓フォントの JFM」，2017/07/01,\\
+   |https://github.com/texjporg/uptex-fonts/issues/2|
 \end{thebibliography}
 
 \end{document}
