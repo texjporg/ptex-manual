@@ -51,7 +51,6 @@
 
 \frenchspacing
 \begin{document}
-\catcode`\<=13
 \title{\emph{\pTeX マニュアル}}
 \author{日本語\TeX 開発コミュニティ\null
 \thanks{\url{https://texjp.org},\ e-mail: \texttt{issue(at)texjp.org}}}
@@ -1392,6 +1391,7 @@ JFMファイルもTFMファイルと同様の情報を持つが，
        和文の縦組用フォントのいずれも
        |\font|, |\jfont|, |\tfont|のどれを用いても定義できる
        （要求された実際のTFM/JFMに応じて，自動的にアサインされる）．
+       書式については後述．
  \item |\the|等で「現在のフォント」を取得する際には，
        |\jfont|で「和文の横組用フォント」を，
        |\tfont|で「和文の縦組用フォント」を返す．
@@ -1404,7 +1404,7 @@ JFMファイルもTFMファイルと同様の情報を持つが，
 
 \begin{dangerous}
   細かい話をすれば，\pTeX のini modeでのフォーマット作成時に和文フォントを
-  何も選択しなければ，|\fontname\jfont|が|\nullfont|となり，
+  何も選択しなければ，|\fontname\jfont|が|nullfont|となり，
   また和文文字を入力してもノードは作られない\footnote{ただし，
   $\.{tracinglostchars}>0$でも
   \code{Missing character: There is no あ in font nullfont!}のような
@@ -1418,6 +1418,104 @@ JFMファイルもTFMファイルと同様の情報を持つが，
   % https://twitter.com/doraTeX/status/1098584763277824000
   % https://twitter.com/zr_tex8r/status/1098594165573722112
 \end{dangerous}
+
+%%% [TODO] \font [in <encoding>], \ptextracingfonts => TL2023
+\ifx\ptextracingfonts\undefined\else
+%
+なお，\pTeX~4.x.x以降では\.{font}, \.{jfont}, \.{tfont}のいずれも
+フォントを定義する際の書式が拡張されている．
+\begin{itemize}
+ \item \TeX82書式：
+   \.{font}<control sequence><equals><file name><at clause>
+ \item (u)\pTeX 書式：
+   \.{font} [<in spec>] <control sequence><equals><file name><at clause>
+\end{itemize}
+なお，ここで
+\begin{itemize}
+ \item <in spec> $\longrightarrow$ |in| <encoding>
+ \item <at clause> $\longrightarrow$ |at| <dimen> $\OR$ |scaled| <number> $\OR$ <optional spaces>
+\end{itemize}
+であり，追加された<in spec>は
+「和文フォントを定義したJFMがJISエンコードであるかUnicodeエンコードであるか」
+を明示的に指定する場合に用いる．指定可能な<encoding>は|jis|, |ucs|に限られる．
+この書式を用いることで，例えば
+\begin{itemize}
+ \item \pTeX（内部コード|euc|または|sjis|）でも
+   \verb|\font in ucs \myfontA=upjisr-h|により\upTeX 用JFMである
+   |upjisr-h.tfm| (UCS-encoded)を，
+ \item \upTeX（内部コード|uptex|すなわちUnicode）でも
+   \verb|\font in jis \myfontB=min10|により\pTeX 用JFMである
+   |min10.tfm| (JIS-encoded)を，
+\end{itemize}
+それぞれ（エンジン内部でJIS⇔Unicode変換を行いながら）読み込んで
+正しくグルー・カーンを挿入できるし，DVIへの出力時にも（逆変換により）
+指定されたエンコードで文字を出力する
+\footnote{この新書式を導入した目的は，
+将来\upTeX の内部コードがUnicode固定になった場合に
+字幅やグルー・カーンが定義された\pTeX 用JFM/VFセットを
+\upTeX 用に用意しなおさなくても済むようにするためである\cite{tjb149}．}．
+% 明示指定された文字コードが実際のJFMに合致するかの自動判定は行わない．
+% また，\pTeX での in jis 指定・\upTeX での in ucs 指定は冗長であると
+% ともに，現在の実装コードでは文字クラス(char\_type)の検索が遅くなる．
+% これは\pTeX の実装はJFMフォーマットの仕様の「char\_typeテーブル内には
+% 文字コードの昇順で収められていなければならない」という規定を前提に
+% 検索最適化されているのに対し，文字コード変換が絡むと順番が崩れるためである．
+
+\begin{dangerous}
+  \pTeX で\verb|\font in ucs ...|により\upTeX 用JFMを読み込んでも，
+  JIS~X~0208外の文字が出力できるわけではない．
+  また，\upTeX で
+\begin{verbatim}
+\kcatcode"D8=16\relax % JIS範囲外の文字(Latin-1 Supplement)を和文扱いに
+\font in jis\x=jis \x <文字> % 例えば U+00D8 など
+\end{verbatim}
+  のように文字コードJISのフォント指定下で範囲外の文字を使うと，
+  DVI出力中（|\shipout|時）に
+\begin{verbatim}
+Character <文字> ("D8) cannot be typeset in JIS-encoded JFM jis,
+so I use .notdef glyph instead.
+\end{verbatim}
+  という警告\footnote{この警告も\.{tracinglostchars}に従う．
+  Missing character警告と違ってノードは破棄されないのでlostという
+  名称は微妙だが…．また，JIS範囲外の警告が発生するタイミングは
+  Missing character警告（ノード生成失敗時に発生）とは異なるので，
+  \.{shipout}時の\.{tracinglostchars}の値に依ることになる．}が発生し，
+  DVIには豆腐（\verb+set2 0+）が書かれる．
+\end{dangerous}
+
+\begin{dangerous}
+  なお，\TeX82における読込済フォントの判定
+  （「同じTFMファイル名」かつ「同じサイズ」）は
+  (u)\pTeX でも変更していないため，
+  文字コード無指定・\verb+in jis+指定・\verb+in ucs+指定だけを変えて
+  複数回読み込もうとしても，新しいフォント識別子(font identifier)は
+  発行されないし，最初のエンコードが常に使われる．
+\begin{verbatim}
+%#!ptex
+\font\xA=min10
+\font in jis\xB=min10 % => min10 は無指定時のエンコードのまま
+\font in ucs\xC=min10 % => min10 は無指定時のエンコードのまま
+\end{verbatim}
+\begin{verbatim}
+%#!ptex
+\font in ucs\yA=umin10
+\font\yB=umin10 % => umin10 は Unicode のまま
+\font in jis\yC=umin10 % => umin10 は Unicode のまま
+\end{verbatim}
+\end{dangerous}
+
+\begin{dangerous}
+  欧文フォントに対する<in spec>は意味を持たないので，単に無視される．
+  また\.{font}, \.{jfont}, \.{tfont}の直後が|in|でないか
+  <encoding>が|jis|, |ucs|以外の場合は
+\begin{verbatim}
+! Missing control sequence inserted.
+\end{verbatim}
+  というエラーが発生する（\TeX82と同じ挙動）．
+\end{dangerous}
+%
+\fi
+%%%
 
 \begin{cslist}
 \csitem[\.{ifjfont} <\,font>, \.{iftfont} <\,font>]
@@ -1455,7 +1553,6 @@ JFMファイルもTFMファイルと同様の情報を持つが，
   「\verb+! Bad character code (...).+」エラーが発生するからである．
 \end{dangerous}
 
-
 \begin{cslist}
 \csitem[\.{jfam}=<number>]
   現在の和文数式フォントファミリの番号を格納する
@@ -1476,6 +1573,66 @@ JFMファイルもTFMファイルと同様の情報を持つが，
 ! Not one-byte family.
 \end{verbatim}
   というエラーが発生する．
+
+%%% [TODO] \ptextracingfonts => TL2023
+\ifx\ptextracingfonts\undefined\else
+%
+\csitem[\.{ptextracingfonts} (integer)]
+  |\tracingoutput=1|のときに意味を持つパラメータで，
+  これは元来|\shipout|時にログに出るものであるから，
+  「|\shipout|時点での値」によって以下の情報を表示する．
+  \pTeX~4.x.xで導入された．
+ \begin{itemize}
+  \item 値を1以上に設定すると，\pdfTeX の|\pdftracingfonts|と同じ書式で
+   フォント名とサイズを表示する（font expansionには非対応）．
+   % LuaTeX にも \tracingfonts はあるが LaTeX の \tracingfonts と衝突
+   % XeTeX の \XeTeXtracingfonts は読込フォントの所在ディレクトリを返す別物
+  \item 値を2以上に設定すると，追加で(u)\pTeX 特有の以下の情報を表示する．
+   \begin{itemize}
+    \item 和文フォント(JFM)の横組(|/YOKO|)・縦組(|/TATE|)の区別
+    \item 明示的なエンコード指定（\verb+in jis+ → |+JIS| / \verb+in ucs+ → |+Unicode|）
+   \end{itemize}
+ \end{itemize}
+  書式は以下のようになる．
+ \begin{itemize}
+  \item 欧文フォントの場合
+    \footnote{サイズがTFMデザインサイズと同じ場合は|@サイズ|が省略される．}
+    $\rightarrow$ |ファイル名@サイズ|
+  \item 和文フォントの場合
+    \footnote{サイズについては欧文フォントと同様．
+      和文フォントでは|/YOKO|又は|/TATE|のいずれか一方が\emph{常に}表示される．
+      また文字コード無指定の場合は|+文字コード|が省略される．}
+    $\rightarrow$ |ファイル名@サイズ/組方向+文字コード|
+ \end{itemize}
+%
+\fi
+%%%
+
+%%% [TODO] \ptexfontname => TL2023
+\ifx\ptexfontname\undefined\else
+%
+\csitem[\.{ptexfontname}]
+  \pTeX~4.x.xで導入された．
+  欧文フォントに対しては\.{fontname}と類似だが，
+  フォントサイズの表示が|... at ...pt|ではなく|...@...pt|の書式となる．
+  また，和文フォントに対しては追加情報として以下も表示する．
+   \begin{itemize}
+    \item 和文フォント(JFM)の場合は横組・縦組の情報を表示
+    \item 明示的に\verb+in jis+/\verb+in ucs+が指定された場合に限って文字コードを表示
+   \end{itemize}
+  書式は\.{ptextracingfonts}と同じであるが，その値は\.{ptexfontname}の出力に影響しない．
+  ここでは例を示そう．
+ \begin{itemize}
+  \item |\font\x=cmr10 at 7pt| → {\font\x=cmr10 at 7pt \code{\ptexfontname\x}}
+  \item |\font\x=nmin10| → {\font\x=nmin10 \code{\ptexfontname\x}}
+  \item |\font\x=min10 at 8pt| → {\font\x=min10 at 8pt \code{\ptexfontname\x}}
+  \item |\font in jis \x=ngoth10 at 6pt| → {\font in jis \x=ngoth10 at 6pt \code{\ptexfontname\x}}
+  \item |\font in ucs \x=utgoth10| → {\font in ucs \x=utgoth10 \code{\ptexfontname\x}}
+ \end{itemize}
+  これにより「そのフォントがJISコードとUnicodeのどちらでDVI出力されるか」を知ることができます。
+%
+\fi
+%%%
 \end{cslist}
 
 \section{文字コード変換，漢数字}
@@ -1504,6 +1661,15 @@ p3.1.2で復活したという経緯がある．}．
 
 \csitem[\.{toucs} <number>]
   内部コードからUnicodeへの変換を行う．\pTeX~3.10.0で追加した．
+
+%%% [TODO] \tojis => TL2023
+\ifx\tojis\undefined\else
+%
+\csitem[\.{tojis} <number>]
+  内部コードからJISコードへの変換を行う．\pTeX~4.x.xで追加した．
+%
+\fi
+%%%
 \end{cslist}
 
 \begin{dangerous}
@@ -1533,6 +1699,12 @@ p3.1.2で復活したという経緯がある．}．
     \item 文字コード変換が\emph{必要}なケース…
         不正な文字コードを与えると$-1$を返す．（返り値を統一）
   \end{itemize}
+%%% [TODO] \tojis => TL2023
+\ifx\tojis\undefined\else
+%
+  これは\pTeX~4.x.xで追加した\.{tojis}も同様である．
+%
+\fi
 %%%
 %
 % pTeX-3.10.0 での実装メモ (2021-06-29 @aminophen)
@@ -1910,6 +2082,9 @@ has been |\let| equal to a non-active character token.
  \bibitem{tjb81} h-kitagawa, 「バイト列と和文文字トークンの区別」，
   2019/06/08,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/81}
+ \bibitem{tjb149} aminophen, 「[upTeX] JIS-encoded TFM」，
+  2022/10/15,\\
+  \url{https://github.com/texjporg/tex-jp-build/issues/149}
  \bibitem{dvistd0} TUG DVI Standards Working Group,
   \textit{The DVI Driver Standard, Level 0}.\\
   \url{https://ctan.org/pkg/dvistd}
