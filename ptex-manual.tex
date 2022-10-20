@@ -115,7 +115,7 @@ EUC-JP，Shift-JIS，ISO-2022-JPのどれか一つのファイルしか処理で
 % これも最初からではなく p2.1.5 (1997年) 以降のようで，
 % それまではスタイルファイルも EUC や SJIS にしておく必要があったようです．
 |-kanji| オプションが追加され，一つの\pTeX バイナリで複数の文字コードを
-選択処理できるようになったのは\pTeX~p3.0.1とp3.0.4の間（2002年10月頃）である．
+選択処理できるようになったのは\pTeX~3.0.1と3.0.4の間（2002年10月頃）である．
 % http://tutimura.ath.cx/ptexlive/?ptexenc%2FDetails
 % の土村さんのコメント (2008-02-23) より
 
@@ -180,7 +180,7 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
 内部コードの整合性が確認される．ここでもし合致しなかった場合は，\pTeX は
 警告を表示してフォーマットに合った内部コードを選択し，以降の処理を行う．
 ログファイルはこの後にオープンされるため，そこには正しい内部コード
-（フォーマットと同じ内部コード）が書き込まれる\cite{build55}．
+（フォーマットと同じ内部コード）が書き込まれる\cite{tjb55}．
 
 このようなウソは，\pTeX に限らず\code{(preloaded format=***)}でも見られる．
 \end{dangerous}
@@ -330,7 +330,7 @@ UTF-8ファイル入力を内部コードEUC-JPまたはShift-JISに変換する
     \footnote{「|\】|」のような和文のコントロールシンボルで行が終わった場合，
     「|\!|」のような欧文コントロールシンボルと同様に改行由来の空白が追加されてしまい，
     和文文字直後の改行は何も発生しないという原則に反していたが，
-    これは\TeX~Live 2019の\pTeX~p3.8.2で修正された(\cite{build37})．}．
+    これは\TeX~Live 2019の\pTeX~3.8.2で修正された(\cite{tjb37})．}．
   \item 後で説明する|\jcharwidowpenalty|は，カテゴリーコードが16,~17の和文文字の前にのみ
     挿入されうるもので，カテゴリーコードが18の和文文字の前には挿入されない．
   \item 欧文文字は\TeX82と同様に1つの文字トークンはカテゴリーコード$c$と文字コード$s$の組
@@ -425,12 +425,12 @@ UTF-8ファイル入力を内部コードEUC-JPまたはShift-JISに変換する
     ``$5\tpar$''のような下付き添字は「挿入するトークン」を表す．\\
     但し，``$9\tign$'', ``$10\tign$''はその文字を無視することを示している．
   }
-  \caption{\pTeX~p4.0.0（既定）の入力プロセッサの状態遷移図}
+  \caption{\pTeX~4.0.0（既定）の入力プロセッサの状態遷移図}
   \label{fig:ptex_input}
 \end{figure}
 
 先に述べた通りであるが，\pTeX の入力プロセッサは\TeX82のそれを拡張したものになっている．
-\autoref{fig:ptex_input}は\emph{\pTeX~p4.0.0既定時}における入力プロセッサの状態遷移図である．
+\autoref{fig:ptex_input}は\emph{\pTeX~4.0.0既定時}における入力プロセッサの状態遷移図である．
 \TeX82から拡張された点，および説明が必要な点を以下に述べる．
 \begin{description}
   \item[内部状態の追加] \TeX82 では状態\textit{N} (new line)，状態\textit{M} (middle of line)，
@@ -482,7 +482,7 @@ UTF-8ファイル入力を内部コードEUC-JPまたはShift-JISに変換する
     和文文字の直後にグループ開始・終了が1つ以上
   \end{description}
 
-  このプリミティブは\pTeX~p4.0.0で追加された．既定値は0（つまり$x=y=z=0$）．
+  このプリミティブは\pTeX~4.0.0で追加された．既定値は0（つまり$x=y=z=0$）．
 \end{cslist}
 \begin{dangerous}
   「和文文字からなるコントロールシンボルの直後にグループ開始・終了が1つ以上ある」状態で行が終了した場合，
@@ -664,10 +664,10 @@ UTF-8ファイル入力を内部コードEUC-JPまたはShift-JISに変換する
 
   なお，以前の\pTeX の入力プロセッサの挙動は
   \begin{itemize}
-    \item \pTeX~p3.8.1以前（アスキー版も同じ）の挙動は|\ptexlineendmode=3|~($(x,y,z)=(1,1,0)$)
-    \item \pTeX~p3.8.2以降p3.10.0まで挙動は|\ptexlineendmode=1|~($(x,y,z)=(1,0,0)$)
+    \item \pTeX~3.8.1以前（アスキー版も同じ）の挙動は|\ptexlineendmode=3|~($(x,y,z)=(1,1,0)$)
+    \item \pTeX~3.8.2以降3.10.0までの挙動は|\ptexlineendmode=1|~($(x,y,z)=(1,0,0)$)
   \end{itemize}
-  としてそれぞれ再現できる(\cite{build87})．
+  としてそれぞれ再現できる(\cite{tjb87})．
 
 % * 欧文文字直後の改行では空白文字を発生させる
 %     * コントロールワードや「\ 」の直後の改行は何も発生しない
@@ -692,7 +692,7 @@ UTF-8ファイル入力を内部コードEUC-JPまたはShift-JISに変換する
     \footnote{「|\】|」のように和文文字からなるコントロールシンボルを文字列化する際に，
       バージョンp3.7.2以前の\pTeX では「|\】 |」と後ろに余計な空白文字を補ってしまう
       という問題があった．
-      \TeX~Live 2018の\pTeX~p3.8.1でこの問題は修正された(\cite{build37})．}．
+      \TeX~Live 2018の\pTeX~3.8.1でこの問題は修正された(\cite{tjb37})．}．
   \item 和文文字はそのカテゴリーコードによらず，|\meaning|すると
     \begin{itemize}% すべて "kanji character " になる
       \item \the\kcatcode`漢:\quad \texttt{\meaning 漢}
@@ -706,7 +706,7 @@ UTF-8ファイル入力を内部コードEUC-JPまたはShift-JISに変換する
 文字列化や制御綴名において和文文字と欧文文字の区別が失われてしまうケースがあった．
 % 途中の結果を一旦配列 |str_pool| に格納する処理で和欧文の区別が失われていた．
 \pTeX~4.0.0以降（\TeX~Live 2022）では，この状況でも
-和欧文の区別が維持される\cite{build81}．
+和欧文の区別が維持される\cite{tjb81}．
 \begin{dangerous}
 \TeX~Live 2021では，ファイル文字コードUTF-8，内部コードEUC-JPの場合に例えば
 \begin{verbatim}
@@ -823,7 +823,7 @@ UTF-8ファイル入力を内部コードEUC-JPまたはShift-JISに変換する
 \.{lastpenalty}で取得できるし，\.{unpenalty}で取り除くこともできる
 \footnote{以前の\pTeX では，\.{unpenalty}したはずの
 和文文字の後方の\.{postbreakpenalty}が復活してしまう場合があったが，
-2017-04-06のコミット(r43707)で修正された\cite{build11}．}．
+2017-04-06のコミット(r43707)で修正された\cite{tjb11}．}．
 % ただ，JFMグルーが後方に挿入される和文文字では上手くいかない．
 % https://github.com/texjporg/tex-jp-build/issues/67
 しかし，上述の通り，欧文文字に設定された\.{postbreakpenalty}は
@@ -840,7 +840,7 @@ UTF-8ファイル入力を内部コードEUC-JPまたはShift-JISに変換する
 禁則テーブルには256文字分の領域しかないので，
 禁則ペナルティを指定できる文字数は最大で256文字までである．
 
-禁則テーブルからの登録の削除は以下の時に行われる\cite{build26,build57}：
+禁則テーブルからの登録の削除は以下の時に行われる\cite{tjb26,build57}：
 \begin{itemize}
  \item ペナルティ値0をグローバルに（つまり，|\global|を用いて）
   設定した場合．
@@ -1063,8 +1063,8 @@ UTF-8ファイル入力を内部コードEUC-JPまたはShift-JISに変換する
 \end{verbatim}
 \end{itemize}
   以前の\pTeX では「この命令が実行された位置」が何を指すのか大雑把でわかりにくかったが，
-  \TeX~Live 2019の\pTeX~p3.8.2以降では，明確に\emph{新たなノードが追加されない限り}，と
-  定めた(\cite{build28,forum_2566})．すなわち，
+  \TeX~Live 2019の\pTeX~3.8.2以降では，明確に\emph{新たなノードが追加されない限り}，と
+  定めた(\cite{tjb28,forum_2566})．すなわち，
   \begin{enumerate}
     \item |\inhibitglue|は，ノード挿入処理を行う命令
     (|\null|,~|\hskip|, |\kern|, |\vrule|,~\dots)が後ろに来た場合は無効化される．
@@ -1106,7 +1106,7 @@ UTF-8ファイル入力を内部コードEUC-JPまたはShift-JISに変換する
 \begin{cslist}
 \csitem[\.{disinhibitglue}]
   |\inhibitglue|の効果を無効化（つまり，メトリック由来の空白の挿入を許可）する．
-  \pTeX~p3.8.2で新しく追加された．
+  \pTeX~3.8.2で新しく追加された．
 \end{cslist}
 
 
@@ -1299,7 +1299,7 @@ DtoU方向での数式ディレクションはそれぞれ非数式の場合と�
  二重にベースライン補正がされる
 \end{quote}
 という問題が起きてしまう．この問題を解決するための命令が以下の3つの命令であり，
-\pTeX~p3.7\footnote{\TeX~Live 2016，厳密には2016-03-05のコミット(r39938)．}で追加された．
+\pTeX~3.7\footnote{\TeX~Live 2016，厳密には2016-03-05のコミット(r39938)．}で追加された．
 \begin{cslist}
  \csitem[\.{textbaselineshiftfactor}=<number>,
   \.{scriptbaselineshiftfactor}=<number>]\vspace{-\itemsep}
@@ -1498,18 +1498,12 @@ p3.1.2で復活したという経緯がある．}．
   たとえば，|\char\jis"346E|，|\char\euc"B0A5|，|\char\sjis"8A79|は，
   それぞれ「\char\jis"346E」，「\char\euc"B0A5」，「\char\sjis"8A79」である．
 
-%%% [TODO] \ucs, \toucs => pTeX version p3.10.0
-\ifx\toucs\undefined\else
-%
 \csitem[\.{ucs} <number>]
   Unicodeから内部コードへの変換を行う．
   もともと\upTeX で実装されていたが，\pTeX~3.10.0で取り入れた．
 
 \csitem[\.{toucs} <number>]
   内部コードからUnicodeへの変換を行う．\pTeX~3.10.0で追加した．
-%
-\fi
-%%%
 \end{cslist}
 
 \begin{dangerous}
@@ -1605,7 +1599,7 @@ p3.1.2で復活したという経緯がある．}．
   |\kansujichar|は整数値パラメータであるが，p3.8.2までは
   「代入できるが取得はできない」という挙動であった
   （例えば|\count255=\kansujichar1|はエラー）．
-  \pTeX~p3.8.3で取得もできるように修正された(\cite{build93})が，
+  \pTeX~3.8.3で取得もできるように修正された(\cite{tjb93})が，
   以前の\pTeX も考慮すると，値の取得は以下のようにするのが安全である：
   |\count255=\expandafter`\kansuji1|
   % \count123=\kansujichar45 のように \kansujichar の引数が不正な場合は，
@@ -1644,7 +1638,7 @@ p3.1.2で復活したという経緯がある．}．
   用いることもでき\footnote{ただし，\upTeX で
   0--127の文字コードを|\kansujichar|で指定した場合のみ，
   |\kansuji|で生成されるトークンはカテゴリーコード12の
-  欧文文字トークンになる\cite{build36}．}，
+  欧文文字トークンになる\cite{tjb36}．}，
   これは時に“|\kansuji|トリック”と呼ばれる．例えば
 \begin{verbatim}
   \kansujichar1=\jis"2422 \edef\X{\kansuji1}
@@ -1709,7 +1703,7 @@ p3.1.2で復活したという経緯がある．}．
 \begin{verbatim}
 \number\ptexversion.\number\ptexminorversion\ptexrevision
 \end{verbatim}
-  で取得できる．\pTeX~p3.8.0で導入された．
+  で取得できる．\pTeX~3.8.0で導入された．
 \end{cslist}
 
 \newpage
@@ -1830,7 +1824,7 @@ has been |\let| equal to a non-active character token.
 一方，文字コードについては，確かにtex.webは|\if|判定において
 コントロールシークエンスを256とみなしている．しかし，\upTeX では
 文字コード256の和文文字と衝突するので，2019-05-06のコミット(r51021)で
-「原理的に文字コードが取り得ない値」に変更した(\cite{build68})．
+「原理的に文字コードが取り得ない値」に変更した(\cite{tjb68})．
 \end{dangerous}
 
 \newpage
@@ -1877,43 +1871,43 @@ has been |\let| equal to a non-active character token.
  \bibitem{tatemath} aminophen, 「縦数式ディレクションとベースライン補正」，
   2016/09/05,\\
   \url{https://github.com/texjporg/platex/issues/22}
- \bibitem{build26} h-kitagawa, 「禁則テーブル，|\inhibitxspcode| 情報テーブルからのエントリ削除」，
+ \bibitem{tjb26} h-kitagawa, 「禁則テーブル，|\inhibitxspcode| 情報テーブルからのエントリ削除」，
   2017/09/10,\\
   \url{https://github.com/texjporg/tex-jp-build/pull/26}
- \bibitem{build57} Man-Ting-Fang, \textit{[upTeX] Unexpected behaviour in kinsoku processing},
+ \bibitem{tjb57} Man-Ting-Fang, \textit{[upTeX] Unexpected behaviour in kinsoku processing},
   2018/04/13,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/57}
- \bibitem{build11} aminophen, 「pTeX の後禁則ペナルティ」，
+ \bibitem{tjb11} aminophen, 「pTeX の後禁則ペナルティ」，
   2017/04/05,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/11}
- \bibitem{build28} h-kitagawa, 「[ptex] |\inhibitglue|の効力」，
+ \bibitem{tjb28} h-kitagawa, 「[ptex] |\inhibitglue|の効力」，
   2017/09/20,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/28}
- \bibitem{build36} aminophen, 「欧文文字の|\kansujichar|，|\inhibitxspcode|」，
+ \bibitem{tjb36} aminophen, 「欧文文字の|\kansujichar|，|\inhibitxspcode|」，
   2017/11/26,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/36}
- \bibitem{build93} aminophen, 「[ptex] reading |\kansujichar|」，
+ \bibitem{tjb93} aminophen, 「[ptex] reading |\kansujichar|」，
   2019/10/14,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/93}
- \bibitem{build37} aminophen, 「和文のコントロールシンボル」，
+ \bibitem{tjb37} aminophen, 「和文のコントロールシンボル」，
   2017/11/29,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/37}
- \bibitem{build55} aminophen, 「[(u)pTeX] 内部コードの -kanji-internal オプション」，
+ \bibitem{tjb55} aminophen, 「[(u)pTeX] 内部コードの -kanji-internal オプション」，
   2018/04/03,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/55}
  \bibitem{forum_2566} aminophen, 「\TeX~Live 2019 での |\inhibitglue| の挙動変更【予定】」，
   2019/02/06,\\
   \url{https://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=2566}
- \bibitem{build68} aminophen, 「upTeX の |\if| と |\ifcat|」，
+ \bibitem{tjb68} aminophen, 「upTeX の |\if| と |\ifcat|」，
   2019/01/17,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/68}
  \bibitem{man4} aminophen, 「pTeX の和文文字トークンのカテゴリーコード」，
   2019/04/22,\\
   \url{https://github.com/texjporg/ptex-manual/issues/4}
- \bibitem{build87} h-kitagawa, 「[ptex] ［和字］+［ブレース］で終わっている行の行端の扱い」，
+ \bibitem{tjb87} h-kitagawa, 「[ptex] ［和字］+［ブレース］で終わっている行の行端の扱い」，
   2019/08/05,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/87}
- \bibitem{build81} h-kitagawa, 「バイト列と和文文字トークンの区別」，
+ \bibitem{tjb81} h-kitagawa, 「バイト列と和文文字トークンの区別」，
   2019/06/08,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/81}
  \bibitem{dvistd0} TUG DVI Standards Working Group,
