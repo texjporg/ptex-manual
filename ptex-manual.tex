@@ -1629,7 +1629,12 @@ so I use .notdef glyph instead.
   \item |\font in jis \x=ngoth10 at 6pt| → {\font in jis \x=ngoth10 at 6pt \code{\ptexfontname\x}}
   \item |\font in ucs \x=utgoth10| → {\font in ucs \x=utgoth10 \code{\ptexfontname\x}}
  \end{itemize}
-  これにより「そのフォントがJISコードとUnicodeのどちらでDVI出力されるか」を知ることができます。
+  これにより
+  「そのフォントがJISコードとUnicodeのどちらでDVI出力されるか」
+  を知ることができるし，
+  TFMファイル名には現れることがない|/|が含まれるかどうかで
+  「和文フォントかどうか」
+  を判定することもできる．
 %
 \fi
 %%%
