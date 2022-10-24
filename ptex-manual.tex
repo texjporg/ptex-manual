@@ -1422,7 +1422,7 @@ JFMファイルもTFMファイルと同様の情報を持つが，
 %%% [TODO] \font [in <encoding>], \ptextracingfonts => TL2023
 \ifx\ptextracingfonts\undefined\else
 %
-なお，\pTeX~4.x.x以降では\.{font}, \.{jfont}, \.{tfont}のいずれも
+なお，\pTeX~4.1.0以降では\.{font}, \.{jfont}, \.{tfont}のいずれも
 フォントを定義する際の書式が拡張されている．
 \begin{itemize}
  \item \TeX82書式：
@@ -1581,7 +1581,7 @@ so I use .notdef glyph instead.
   |\tracingoutput=1|のときに意味を持つパラメータで，
   これは元来|\shipout|時にログに出るものであるから，
   「|\shipout|時点での値」によって以下の情報を表示する．
-  \pTeX~4.x.xで導入された．
+  \pTeX~4.1.0で導入された．
  \begin{itemize}
   \item 値を1以上に設定すると，\pdfTeX の|\pdftracingfonts|と同じ書式で
    フォント名とサイズを表示する（font expansionには非対応）．
@@ -1612,7 +1612,7 @@ so I use .notdef glyph instead.
 \ifx\ptexfontname\undefined\else
 %
 \csitem[\.{ptexfontname}]
-  \pTeX~4.x.xで導入された．
+  \pTeX~4.1.0で導入された．
   欧文フォントに対しては\.{fontname}と類似だが，
   フォントサイズの表示が|... at ...pt|ではなく|...@...pt|の書式となる．
   また，和文フォントに対しては追加情報として以下も表示する．
@@ -1671,7 +1671,7 @@ p3.1.2で復活したという経緯がある．}．
 \ifx\tojis\undefined\else
 %
 \csitem[\.{tojis} <number>]
-  内部コードからJISコードへの変換を行う．\pTeX~4.x.xで追加した．
+  内部コードからJISコードへの変換を行う．\pTeX~4.1.0で追加した．
 %
 \fi
 %%%
@@ -1707,7 +1707,7 @@ p3.1.2で復活したという経緯がある．}．
 %%% [TODO] \tojis => TL2023
 \ifx\tojis\undefined\else
 %
-  これは\pTeX~4.x.xで追加した\.{tojis}も同様である．
+  これは\pTeX~4.1.0で追加した\.{tojis}も同様である．
 %
 \fi
 %%%
