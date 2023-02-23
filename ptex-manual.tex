@@ -1419,9 +1419,6 @@ JFMファイルもTFMファイルと同様の情報を持つが，
   % https://twitter.com/zr_tex8r/status/1098594165573722112
 \end{dangerous}
 
-%%% [TODO] \font [in <encoding>], \ptextracingfonts => TL2023
-\ifx\ptextracingfonts\undefined\else
-%
 なお，\pTeX~4.1.0以降では\.{font}, \.{jfont}, \.{tfont}のいずれも
 フォントを定義する際の書式が拡張されている．
 \begin{itemize}
@@ -1513,9 +1510,6 @@ so I use .notdef glyph instead.
 \end{verbatim}
   というエラーが発生する（\TeX82と同じ挙動）．
 \end{dangerous}
-%
-\fi
-%%%
 
 \begin{cslist}
 \csitem[\.{ifjfont} <\,font>, \.{iftfont} <\,font>]
@@ -1574,9 +1568,6 @@ so I use .notdef glyph instead.
 \end{verbatim}
   というエラーが発生する．
 
-%%% [TODO] \ptextracingfonts => TL2023
-\ifx\ptextracingfonts\undefined\else
-%
 \csitem[\.{ptextracingfonts} (integer)]
   |\tracingoutput=1|のときに意味を持つパラメータで，
   これは元来|\shipout|時にログに出るものであるから，
@@ -1604,13 +1595,7 @@ so I use .notdef glyph instead.
       また文字コード無指定の場合は|+文字コード|が省略される．}
     $\rightarrow$ |ファイル名@サイズ/組方向+文字コード|
  \end{itemize}
-%
-\fi
-%%%
 
-%%% [TODO] \ptexfontname => TL2023
-\ifx\ptexfontname\undefined\else
-%
 \csitem[\.{ptexfontname}]
   \pTeX~4.1.0で導入された．
   欧文フォントに対しては\.{fontname}と類似だが，
@@ -1635,9 +1620,6 @@ so I use .notdef glyph instead.
   TFMファイル名には現れることがない|/|が含まれるかどうかで
   「和文フォントかどうか」
   を判定することもできる．
-%
-\fi
-%%%
 \end{cslist}
 
 \section{文字コード変換，漢数字}
@@ -1667,14 +1649,8 @@ p3.1.2で復活したという経緯がある．}．
 \csitem[\.{toucs} <number>]
   内部コードからUnicodeへの変換を行う．\pTeX~3.10.0で追加した．
 
-%%% [TODO] \tojis => TL2023
-\ifx\tojis\undefined\else
-%
 \csitem[\.{tojis} <number>]
   内部コードからJISコードへの変換を行う．\pTeX~4.1.0で追加した．
-%
-\fi
-%%%
 \end{cslist}
 
 \begin{dangerous}
@@ -1704,12 +1680,7 @@ p3.1.2で復活したという経緯がある．}．
     \item 文字コード変換が\emph{必要}なケース…
         不正な文字コードを与えると$-1$を返す．（返り値を統一）
   \end{itemize}
-%%% [TODO] \tojis => TL2023
-\ifx\tojis\undefined\else
-%
   これは\pTeX~4.1.0で追加した\.{tojis}も同様である．
-%
-\fi
 %%%
 %
 % pTeX-3.10.0 での実装メモ (2021-06-29 @aminophen)

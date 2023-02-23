@@ -304,6 +304,7 @@ tracing機能や条件判断文の強化などあるが，そこら辺はパッ�
   |is_char_kanji|は非負かどうかの判定になっている．
 \end{dangerous}
 
+
 \section{\OMEGA 由来の機能（旧名称：\texttt{FAM256}パッチ）}
 \epTeX には，掲示板\TeX\ Q\ \&\ Aの山本氏の書き込み
 \cite{yamamoto}に刺激されて作った，本節で説明する\OMEGA の一部
@@ -633,8 +634,6 @@ delimiter codeについても同様である．
   \LaTeX~2019-10-01で行われる変更(\cite{latex95,tjb83})で必要になったために
   \epTeX~190709で導入された．
 
-%%%
-\ifnum\epTeXversion>210629
  \csitem[\.{vadjust} \texttt{pre} <vertical mode material>]
   \.{vadjust}自体は\TeX82に存在し，それが現れた行の
   \emph{直後}に<vertical mode material>を配置するものである．
@@ -645,8 +644,6 @@ delimiter codeについても同様である．
 
   発端は，2021年2月にPandocで「ハイパーリンクのターゲットを行の下端ではなく
   上端にする」という目的で|\vadjust pre|が使われたことである\cite{tjb115}．
-\fi
-%%%
 \end{cslist}
 
 
@@ -777,8 +774,6 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 と「，」の内部コードが取得される．
 
 
-%%%
-\ifnum\epTeXversion>220213
 \subsection{\.{lastnodefont}プリミティブ}
 \.{lastnodechar}を補完するものとして，\epTeX~220214 (\TeX~Live 2022)で実装された．
 \begin{cslist}
@@ -801,8 +796,6 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 組み合わせれば，「最後のノード」が和文文字かどうかを判別できる
 \footnote{\epTeX では「\.{lastnodechar}が256以上かどうか」でも判別できるが，
 \eupTeX では文字コード0--255の和文文字ノードも存在しうることに注意．}．
-\fi
-%%%
 
 
 \subsection{\.{lastnodesubtype}プリミティブ}
@@ -826,12 +819,8 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
   \begin{itemize}
     \item 最後のノードが文字ノードのときは0が返る．
     \item 現在構築中のリストが空のときは$-1$が返る．
-%%%
-\ifnum\epTeXversion>210629
     \item \epTeX~210701以降では，数式内のノードについてはsubtype値
       そのままではほとんど意味がないので，次ページの表の値を返す．
-\fi
-%%%
   \end{itemize}
 \end{cslist}
 
@@ -912,8 +901,6 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 \end{verbatim}
 として定義している．
 
-%%%
-\ifnum\epTeXversion>210629
 \paragraph{\epTeX~210701以降の注意}
 上でも述べたように，数式内のノードについてはsubtype値はほとんど意味を持たないので，
 これらに対する\.{lastnodesubtype}ではsubtype値でなく以下の値を返すようにした：
@@ -947,8 +934,6 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
   \.{right}に「対応する」\.{lastnodesubtype}の値は取得できない．
   \.{over}プリミティブなどによる分数についても類似の事情がある．
 \end{description}
-\fi
-%%%
 
 
 \subsection{\.{epTeXinputencoding}プリミティブ}
@@ -1140,8 +1125,6 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 \end{dangerous}
 
 
-%%%
-\ifdefined\suppresslongerror %% e-pTeX 211207
 \subsection{エラー抑制(\.{suppress...error})}
 \hologo{LuaTeX}に実装されているエラー発生を抑止するプリミティブたちのうち
 いくつかを，\epTeX~211207で追加した．
@@ -1155,8 +1138,6 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
  \csitem[\.{suppressmathparerror} (integer)]
   この内部整数が非ゼロのとき，数式モード中の\.{par}に由来するエラーを抑止する．
 \end{cslist}
-\fi
-%%%
 
 
 \section{\TeX~Liveによる拡張}
@@ -1202,8 +1183,7 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
   \TeX~Live 2021で追加された．
 \end{cslist}
 
-%%%
-\ifdefined\partokenname %% 2021-07-25
+
 \subsection{parトークンの制御}
 \TeX82では\.{par}という名称の制御綴は特別な役割を持っている．
 \begin{itemize}
@@ -1274,11 +1254,8 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 値を1にすれば，「\.{vbox}の中身が水平モードで終わった場合」にも
 「暗黙のpar」ではなく「\.{par}という名称の制御綴」が挿入されるので，
 \.{par}の再定義が効く．
-\fi
-%%%
 
-%%%
-\ifdefined\showstream %% 2021-11-07
+
 \subsection{\.{show}系コマンドの出力制御}
 \begin{cslist}
  \csitem[\.{showstream} (integer)]
@@ -1293,8 +1270,6 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
   既定値は$-1$であり，これはファイルと一致しないため\TeX82と同じ動作となる．
   2021-11-07のコミットr60992（\TeX~Liveでは2022年以降）で追加された．
 \end{cslist}
-\fi
-%%%
 
 
 \begin{comment}
