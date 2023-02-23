@@ -1272,6 +1272,20 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 \end{cslist}
 
 
+\subsection{展開遅延\.{special}}
+\begin{cslist}
+ \csitem[\.{special} \texttt{shipout} <general text>]
+  \TeX82の\.{special}プリミティブは，\.{immediate}\.{write}と同様に
+  引数のトークン列を「即座に」完全展開する．
+  \epTeX~230214（\TeX~Live 2023以降：2023-02-13のコミットr65815を参照）
+  では，新たにキーワード|shipout|を付けるとトークンの展開を
+  「ページをDVIファイルに出力する時点」まで遅らせる
+  （非\.{immediate}な\.{write}と同様）ことができる．同様の機能が
+  \hologo{pdfTeX}, \hologo{XeTeX}, \hologo{LuaTeX}, Alephで
+  一斉に実装されている．
+\end{cslist}
+
+
 \begin{comment}
 \section{互換性}
 \eTeX, \pTeX との互換性をはかるのに有効な手段としては，まず\texttt{TRIP}
