@@ -129,8 +129,43 @@ ptetex\footnote{土村展之さんによって2004年から2009年まで開発�
 
 \subsection{ファイルの文字コードと内部コード}
 \pTeX への入力は，ファイルの文字コードそのままで扱われるとは限らず，
-\emph{内部コード}に変換されて内部処理に回される．ファイルの文字コードと
-内部コードは，それぞれ起動時のオプションによって制御できる．
+\emph{内部コード}に変換されて内部処理に回される．
+内部コードはWindowsではShift-JIS，それ以外ではEUC-JPが既定であるが，
+起動時のオプション|-kanji-internal|（後述）によって制御できる．
+
+入力ファイルの文字コードは次の順番で決まる（\code{ptexenc}による）．
+処理はファイルの先頭行を読むときに行われる．
+% 注：|PTEX_IN_FILTER| が定義されている場合は別．
+\begin{enumerate}
+ \item ファイル先頭にUTF-8のBOM\footnote{正確には，最初の4byteが
+   \code{0xEF 0xBB 0xBF 0x7E}以下．}を見つけたらUTF-8（BOM付き）とみなす．
+ \item 文字コード推測機能が有効ならば推測を行い，成功すれば
+   それを採用する\footnote{\TeX~Live 2022以前はWindows専用の機能であったが，
+   \TeX~Live 2023で全てのプラットフォームで利用可能となった\cite{tjb142}．
+   kpathsearchライブラリ変数|guess_input_kanji_encoding|によって制御でき，
+   値が1ならば有効，0ならば無効である．}．
+ \item 起動時のオプション|-kanji|（後述）による指定があればそれを使う．
+ \item 環境変数|PTEX_KANJI_ENC|が定義されていればそれを使う．
+ \item 以上で決まらない場合は既定の文字コード\footnote{\TeX~Live 2018以降は
+   全てのプラットフォームでUTF-8である．\TeX~Live 2017以前は
+   WindowsではShift-JIS，それ以外ではUTF-8であった．}を使う．
+\end{enumerate}
+% 以上の記述は阿部さんのブログを基に作成．
+% http://abenori.blogspot.com/2016/02/e-ptexeptexinputencoding.html
+% なお LaTeX2e 2018-04-01 での inputenc UTF-8 既定化に合わせて
+% Windows (W32TeX) でも Shift-JIS から UTF-8 に変更されている．
+% https://okumuralab.org/tex/mod/forum/discuss.php?d=2396
+
+なお，ISO-2022-JPでエンコードされた文字は現在の文字コードによらず正しく読まれる．
+% ISO-2022-JP (JIS) でエンコードされたバイト列は 7 ビットであって，
+% 他の 3 つの文字コードと明らかに区別ができるため。
+% 実際には，他の文字コードのファイルの途中に JIS の文字列が混ざっていても
+% 全て正常に読み込まれる。
+% https://qiita.com/zr_tex8r/items/beda5a7702b84409436e
+また，\epTeX の|\epTeXinputencoding|を使用すればその次の行から
+新しい文字コードで読まれる（\texttt{./eptexdoc.pdf}を参照）．
+
+\paragraph{\pTeX 系列の起動時のオプション}
 \begin{itemize}
  \item |-kanji=|<encoding>
   \begin{quotation}
@@ -150,7 +185,8 @@ ptetex\footnote{土村展之さんによって2004年から2009年まで開発�
 必ずEUC-JPかShift-JISのいずれかの内部コードに変換されるため，
 \emph{\pTeX はJIS~X~0208外の文字をサポートしない}．
 
-\pTeX の入出力ファイルの文字コードと内部コードは起動時のバナーから分かる．
+\paragraph{\pTeX 系列の起動時のバナー}
+入出力ファイルの文字コードと内部コードは起動時のバナーから分かる．
 例えば
 \begin{verbatim}
 This is pTeX, Version 3.14159265-p3.8.0 (utf8.euc) (TeX Live 2018)
@@ -2062,6 +2098,9 @@ has been |\let| equal to a non-active character token.
  \bibitem{tjb81} h-kitagawa, 「バイト列と和文文字トークンの区別」，
   2019/06/08,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/81}
+ \bibitem{tjb142} t-tk, 「[ptexenc] 入力ファイルの文字コードの自動判定」，
+  2022/06/05,\\
+  \url{https://github.com/texjporg/tex-jp-build/issues/142}
  \bibitem{tjb149} aminophen, 「[upTeX] JIS-encoded TFM」，
   2022/10/15,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/149}
