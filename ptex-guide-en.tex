@@ -13,6 +13,7 @@
 \usepackage[defaultsups]{newpxtext}
 \usepackage[zerostyle=c,straightquotes]{newtxtt}
 \usepackage{newpxmath}
+\usepackage{color}
 \usepackage[hyperfootnotes=false]{hyperref}
 \usepackage{pxjahyper}
 \usepackage{hologo}
@@ -833,7 +834,7 @@ is as follows:
 \end{itemize}
 
 %%% 指定のコードの和文トークンを得る方法
-\subsubsection{Creating a Japanese character token with a specified code}
+\subsubsection{Creating a Japanese character token with a specified code}\label{jtoken-tricks}
 
 Short version:
 \begin{itemize}
@@ -968,21 +969,128 @@ First, some \pdfTeX-specific primitives are absent. Examples:
 %%% その他ムニャムニャ
 
 %%% ファイルの文字コードはどうするか
-\subsection{Recommendation for file encoding}
+\subsection{Recommendation for file encoding}\label{file-enc}
+
+Due to historical reasons,
+multiple encodings are commonly used for Japanese text.
+Sometimes user documents and distribution files (classes, packages)
+may have different encodings.
+Among those, the universal UTF-8 and
+three major legacy encodings (ISO-2022-JP, EUC-JP, Shift-JIS)
+are accepted as input to \pTeX\ family,
+depending on the configuration and runtime options.
+To make this possible,
+\pTeX\ family does code conversion in input and output.
+
+The details are too complicated, so here we propose
+the optimum solution for Japanese file encoding
+for package/class developers who aim to support \pTeX\ family:
 
 %%% 全部アスキーにしてしまえ
 %%% UTF-8 にしたい場合はムニャムニャ
 %%% \epTeXinputencoding を使う話
+\begin{itemize}
+ \item \underline{If you want to distribute files on CTAN/\TL, please use UTF-8.}
+   \par
+   UTF-8 files are \emph{almost always} safe enough
+   for recent \pTeX/\upTeX\ (2018--),
+   and the same files will have no problem when read by Western \TeX.
+   To secure this ``\emph{almost always}'' to ``\emph{always}'', please add
+   below at the beginning of your individual UTF-8 files:\par\quad
+   \verb+\ifx\epTeXinputencoding\undefined \else \epTeXinputencoding utf8 \fi+\par
+   it will help \pTeX\ family to read forcibly in UTF-8,
+   so it becomes \emph{always} safe for 2016--.
+ \item \underline{If you aim to support broader legacy environment of \pTeX\ specifically, ...}
+   \par
+   Extra care is required for missing features and
+   different configurations which can lead to failure of reading UTF-8.
+   There is no such thing as a perfect solution; instead,
+   you should choose between encoding in ISO-2022-JP
+   or writing in ASCII characters.
+  \begin{itemize}
+   \item Encoding in ISO-2022-JP:\par
+    All historical versions of \pTeX\ family can always read
+    ISO-2022-JP properly because it's a 7-bit encoding
+    safely distinguished from others.
+    This is why many old packages/classes widely used in Japan
+    are particularly encoded in ISO-2022-JP.\par
+    On the other hand, ISO-2022-JP is unsupported in Western \TeX;
+    also, CTAN/\TL requires some special handling of uploaded files.
+   \item Writing in ASCII characters:\par
+    Safe for Western \TeX\ and CTAN/\TL, but often requires lots of
+    {\TeX}niques and hard-to-read programmings (e.g. generating
+    Japanese tokens as in Section \ref{jtoken-tricks}, or encoding into
+    hex dump as in \Pkg{bxjalipsum.sty}, ...)
+  \end{itemize}
+  ... Annoying? Please forget that legacy environment ;-)
+\end{itemize}
+
+\begin{dangerous}
+For your information, here is the behavior of the common default
+configuration available in the latest \TL distribution (since 2023).
+\begin{itemize}
+ \def\Opt#1{\textcolor{red}{#1}}
+ \item \upTeX\ default: always properly reads \Opt{UTF-8} and ISO-2022-JP.
+ \item \pTeX\ default: always properly reads ISO-2022-JP.
+   It also properly reads \Opt{UTF-8} almost always\footnote{The
+   exception of ``almost always'' comes from a failure of guessing;
+   at the expense of properly reading a certain amount of
+   Shift-JIS and EUC-JP, there are occasional misreading of UTF-8.},
+   and successful results of ``guess-input-enc'' conversion of
+   Shift-JIS and EUC-JP.
+ \item When the command-line option \verb+-kanji=(sjis|euc)+ is
+   specified: \Opt{UTF-8} above is replaced with the given encoding.
+\end{itemize}
+\end{dangerous}
+
+\begin{dangerous}
+Note on older versions:
+\begin{itemize}
+ \item The ``guess-input-enc'' conversion status above is relatively new:
+  \begin{itemize}
+   \item In \TL2023, it is available for all platform of \TL.
+     Default on for (\eTeXpre)\pTeX, off for (\eTeXpre)\upTeX,
+     but also controlled by runtime option \code{-(no-)guess-input-enc}.
+   \item In \TL2022 and older, it was limited for Windows only;
+     also, default on for all of (\eTeXpre)(u)\pTeX.
+     For Unix it was not implemented yet.
+  \end{itemize}
+ \item In \TL2017 and older,
+   the default input encoding of (\eTeXpre)\pTeX\ was
+   Shift-JIS for Windows, UTF-8 for Unix.
+ \item The primitive \.{epTeXinputencoding} was added to
+   \epTeX/\eupTeX\ in \TL2016. Older versions does not have it.
+ \item Very old distributions by ASCII Corporation (--2009)
+   supported only legacy encodings; UTF-8 was not allowed.
+\end{itemize}
+\end{dangerous}
 
 %%% e-upTeX の入力解析：euc/sjis を語りたくないので utf8.uptex 前提
 \subsection{Input handling}
 
-For simplicity, first we introduce of input handling of \eupTeX.
-
+For simplicity, first we introduce how \upTeX\ handles the input
+when all files are UTF-8.
 %%% 文字の和文扱い・欧文扱い
 %%% 和文カテゴリーコード
 %%% \...cjktoken
+\begin{enumerate}
+ \item An input line is stored into the internal buffer.
+   (No effective code conversion here for \upTeX\footnote{To be precise,
+   it passes through a code conversion; however, this is an identity conversion
+   which has no effect because \upTeX\ defaults to internal Unicode.}.)
+ \item The input processor reads the buffer.
+   Here Japanese character tokens are distinguished from
+   ordinary 8-bit character tokens.
+ \item ... [TODO]
+\end{enumerate}
+
 %%% ちなみに e-pTeX では：euc/sjis があることにだけ触れる
+The situation is more complicated in \pTeX.
+As described in Section \ref{file-enc}, it accepts UTF-8 input;
+however, \pTeX\ uses a legacy encoding as the internal Japanese encoding
+(default: Shift-JIS on Windows, and EUC-JP otherwise).
+This means that \pTeX\ does code conversion in input and output.
+... [TODO]
 
 %%% e-upTeX の和文トークンの話：和文トークンが混ざっているので注意
 \subsection{Japanese tokens}
