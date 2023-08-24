@@ -205,10 +205,10 @@ p3.1.11 (2009/08/17)．\url{https://asciidwango.github.io/ptex/}}ので，
 %%%%%
 \part{\pTeX の日本語組版と追加プリミティブ}
 
-ここでは，\pTeX の日本語組版の概略と，それを実現するために導入された
+ここでは，\pTeX 系列の日本語組版の概略と，それを実現するために導入された
 プリミティブを説明する．
 
-\section{\pTeX で利用可能な文字}
+\section{\pTeX 系列で利用可能な文字}
 \label{sec:ptexchar}
 
 % このマニュアルを英語化する際は以下も参照．
@@ -217,7 +217,8 @@ p3.1.11 (2009/08/17)．\url{https://asciidwango.github.io/ptex/}}ので，
 % https://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=460
 
 \TeX82で扱える文字コードの範囲は0--255であった．
-\pTeX ではこれに加えてJIS~X~0208の文字も利用可能になっており，
+\pTeX ではこれに加えてJIS~X~0208すなわちJIS第1, 2水準の文字も利用可能である．
+\upTeX の既定状態（内部コードUnicode）ではUnicodeの文字を扱える．
 入力ファイルの文字コードはISO-2022-JP (jis)，EUC-JP (euc)，
 Shift-JIS (sjis)またはUTF-8 (utf8)に対応している．
 
@@ -248,14 +249,28 @@ pte\TeX\footnote{土村展之さんによって2004年から2009年まで開発�
 現在の\TeX~Liveでも\code{ptexenc}は種々のプログラムで利用されている．
 \end{dangerous}
 
-\subsection{ファイルの文字コードと内部コード}
-\pTeX への入力は，ファイルの文字コードそのままで扱われるとは限らず，
-\emph{内部コード}に変換されて内部処理に回される．
-内部コードはWindowsではShift-JIS，それ以外ではEUC-JPが既定であるが，
-起動時のオプション|-kanji-internal|（後述）によって制御できる．
+なお，本節（\ref{sec:ptexchar}節）全体を通して
+\epTeX は\pTeX と同じ，\eupTeX は\upTeX と同じである．
 
-入力ファイルの文字コードは次の順番で決まる（\code{ptexenc}による）．
-処理はファイルの先頭行を読むときに行われる．
+\subsection{ファイルの文字コードと内部コード}
+\pTeX 系列への入力は，ファイルの文字コードそのままで扱われるとは限らず，
+各行は\emph{内部コード}に変換されてから内部処理に回される．
+ファイルの文字コードと内部コードが異なる場合は
+\code{ptexenc}ライブラリに従って文字コード変換が発生することとなる．
+\TeX の入力プロセッサに実際に渡るのはこの変換結果である．
+
+\pTeX の内部コードはWindowsではShift-JIS，それ以外ではEUC-JPが既定であり，
+\upTeX の内部コードは既定でUnicodeであるが，
+起動時のオプション|-kanji-internal|（INIモード時のみ有効：後述）に
+よって制御できる．
+
+\pTeX/\upTeX の入出力ファイルの文字コードは，
+\TeX~Live 2018以降は全てのプラットフォームでUTF-8が既定である
+\footnote{\TeX~Live 2017以前では\pTeX に限り，
+WindowsではShift-JIS，それ以外ではUTF-8であった．
+\upTeX は当初から全てのプラットフォームでUTF-8であった．}が，
+個別の入力ファイルの文字コードは次の順番で決まる（\code{ptexenc}による）．
+この決定手続きはファイルの先頭行を読むときに行われる．
 % 注：|PTEX_IN_FILTER| が定義されている場合は別．
 \begin{enumerate}
  \item ファイル先頭にUTF-8のBOM\footnote{正確には，最初の4byteが
@@ -267,9 +282,7 @@ pte\TeX\footnote{土村展之さんによって2004年から2009年まで開発�
    値が1ならば有効，0ならば無効である．}．
  \item 起動時のオプション|-kanji|（後述）による指定があればそれを使う．
  \item 環境変数|PTEX_KANJI_ENC|が定義されていればそれを使う．
- \item 以上で決まらない場合は既定の文字コード\footnote{\TeX~Live 2018以降は
-   全てのプラットフォームでUTF-8である．\TeX~Live 2017以前は
-   WindowsではShift-JIS，それ以外ではUTF-8であった．}を使う．
+ \item 以上で決まらない場合は既定の文字コードを使う．
 \end{enumerate}
 % 以上の記述は阿部さんのブログを基に作成．
 % http://abenori.blogspot.com/2016/02/e-ptexeptexinputencoding.html
@@ -300,11 +313,17 @@ pte\TeX\footnote{土村展之さんによって2004年から2009年まで開発�
    virtual modeでは読み込んだフォーマットファイルと同じ内部コードで
    動作するように固定している．\pTeX\ p3.8.2以降の仕様．}）．\\
    利用可能な<encoding>の値：\code{euc}, \code{sjis}
+   \quad （\upTeX のみ：\code{uptex}も利用可能）
   \end{quotation}
 \end{itemize}
-この通り，\pTeX への入力を仮にUTF-8としても，
-必ずEUC-JPかShift-JISのいずれかの内部コードに変換されるため，
-\emph{\pTeX はJIS~X~0208外の文字をサポートしない}．
+この通り，\pTeX で利用可能な内部コードは\code{euc} (EUC-JP)か
+\code{sjis} (Shift-JIS)のいずれかであるため，
+入力を仮にUTF-8としても必ず内部コードへの変換が起こる．
+したがって，\emph{\pTeX はJIS~X~0208外の文字をサポートしない}．
+\upTeX では既定状態の内部コードが\code{uptex} (Unicode)なので，
+入力をUTF-8とすれば変換は“ほとんど”起こらない\footnote{例外は
+\code{ptexenc}による基底文字と濁点に分解された形（結合文字列）の
+合成など：後述．}．
 
 \paragraph{\pTeX 系列の起動時のバナー}
 入出力ファイルの文字コードと内部コードは起動時のバナーから分かる．
@@ -341,10 +360,10 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
 このようなウソは，\pTeX に限らず\code{(preloaded format=***)}でも見られる．
 \end{dangerous}
 
-\subsection{和文文字と欧文文字の区別}
+\subsection{和文文字と欧文文字の区別【\pTeX の場合】}
 \pTeX への入力は\emph{「7ビットASCII文字集合」に「あるファイルの文字コードで
 エンコードされたJIS~X~0208の文字集合」を加えたもの}として解釈される．
-そして，以下の規則により欧文文字と和文文字に区別して取り扱われる．
+そして，以下の規則により和文文字と欧文文字に区別して取り扱われる．
 \begin{itemize}
  \item 7ビットASCII文字集合は欧文文字として扱われる．
  \item 最上位ビットが1の場合，\pTeX はそのバイトで始まる列について
@@ -359,10 +378,12 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
     $C_1=\{\hex{81},\dots,\hex{9f}\}\cup\{\hex{e0},\dots,\hex{fc}\}$,\\
     $C_2=\{\hex{40},\dots,\hex{7e}\}\cup\{\hex{80},\dots,\hex{fc}\}$.
   \end{description}
-    である．この内部コードのパターンに合えば和文文字として扱われ，
-    合わなければ8ビット欧文文字のバイト列として扱われる\footnote{例えば，
-    入力ファイルの文字コードがUTF-8の場合，JIS~X~0208にない文字は
-    UTF-8のバイト列として読み込まれる．}．
+    である．この
+    内部コードのパターンに合えば「変換後の文字コードを持つ一つの和文文字」
+    として扱われ，合わなければ「8ビット欧文文字のバイト列」として
+    扱われる\footnote{例えば，入力ファイルの文字コードがUTF-8の場合，
+    JIS~X~0208にない文字は一旦|^^ab|形式への変換を経てUTF-8のバイト列と
+    して扱われる．}．
 \end{itemize}
 % 参考：kanji.c の |is_char_kanji| の実装
 
@@ -387,9 +408,10 @@ UTF-8ファイル入力を内部コードEUC-JPまたはShift-JISに変換する
   して扱われ，ファイルに書き出される時は\code{U+2015}になる．}
  \item BOMの無視（ファイル先頭に限らず）
  \item 結合濁点(\code{U+3099})・半濁点(\code{U+309A})の合字処理
- \item JISに変換できない文字を|^^ab|形式に変換
+ \item JIS外のため変換できない文字を|^^ab|形式に変換
   \footnote{例えば，ソースファイル中にçのような欧文文字を直接書くと，
-  これは和文文字の内部コードに変換できないため|^^c3^^a7|に変換される．}
+  これは和文文字の内部コードに変換できないため|^^c3^^a7|に変換される．
+  文字|^|の|\catcode|が7かどうかは関係なく無条件．}
 \end{itemize}
 なお，UTF-8ファイル出力時にはこのような加工の逆変換は行わない（入力時に
 加工されたままで出力される）．
@@ -422,6 +444,54 @@ UTF-8ファイル入力を内部コードEUC-JPまたはShift-JISに変換する
  また，DVIに文字として出力されたからといって，それをPostScriptやPDFに変換したときに
  意図通りに出力されるかは全くの別問題である．
 \end{dangerous}
+
+\subsection{和文文字と欧文文字の区別【\upTeX の場合】}
+\upTeX は\pTeX と事情が異なり，さらに既定の内部Unicodeと
+内部レガシー（2023-06-01以降の\pLaTeX で利用）でも異なるので，ここで説明する．
+
+まず，\upTeX の内部レガシー（EUC-JPまたはShift-JIS）の方は\pTeX に近い．
+% pLaTeX がこの状態なので記載必要！
+\begin{itemize}% [TODO] aminophen 2023-08-24: 記載してみた：正しいか？
+  \item 文字集合は「7ビットASCII文字集合」に「あるファイルの文字コードで
+    エンコードされたJIS~X~0208の文字集合」を加えたもの．（\pTeX と同様）
+  \item 和文文字と欧文文字の区別は以下の規則による：
+%
+\begin{itemize}
+ \item 7ビットASCII文字集合は欧文文字として扱われる．
+ \item 最上位ビットが1の場合　…中略…　
+    内部コードへの変換を試みる（この点は\pTeX と同様）．
+    内部コードのパターンに合えば「変換後の文字コードを持つ一文字」
+    として扱われ（それが和文扱いになるか欧文扱いになるかは
+    |\kcatcode|に依存），合わなければ「8ビット欧文文字のバイト列」
+    として扱われる．
+    % pTeX で和文固定の文字（例えば "あ"）も
+    % upTeX -kanji-internal=euc/sjis なら \kcatcode=15 で欧文扱いできる．
+    % ただし入力ファイルの文字コードによらず内部コードにより
+    % 結果は ^^a4^^a2 (euc) / ^^82^^a0 (sjis) になる．
+\end{itemize}
+%
+ \item 「|^^|記法」は常に欧文扱いされる．（\pTeX と同様）
+  \item \code{ptexenc}ライブラリによる特殊加工も\pTeX と同様．
+\end{itemize}
+
+\upTeX の既定（内部Unicode）においては… [TODO]
+\begin{itemize}% [TODO] aminophen 2023-08-24: 記載してみた：未完成
+  \item 文字集合はUnicode全体．
+  \item 和文文字と欧文文字の区別は…．% [TODO]
+  \item |^^|記法が常に欧文扱いされる点は\pTeX と同様．
+  \item \code{ptexenc}ライブラリによる特殊加工については，
+    内部Unicodeの場合以下となる：
+   \begin{itemize}
+    \item Unicode多対一変換は行われない．
+    \item BOMの無視は行う．
+    \item 結合濁点・半濁点の合字処理は行う（\TeX~Live 2016以降）．
+    \item 範囲外の文字はないので|^^ab|形式への変換は起こらない．
+   \end{itemize}
+\end{itemize}
+
+いずれの場合も，\upTeX は
+オリジナルの\TeX や\pdfTeX などの欧文\TeX とは入力に関して必ずしも
+互換でないが，\pTeX と比較すれば幾分差異が軽減されている．
 
 \subsection{文字コードの取得と指定}
 \pTeX でも\TeX82と同様に，
@@ -535,7 +605,8 @@ UTF-8ファイル入力を内部コードEUC-JPまたはShift-JISに変換する
 % upTeX の既定では，全角数字とアルファベット(Halfwidth and Fullwidth Forms)・
 % ギリシャ文字・キリル文字の全てが18である．
 
-\subsection{\pTeX の入力プロセッサ【\pTeX~4.0.0での改修を含む】}\label{sec:ptex_input}
+\subsection{\pTeX の入力プロセッサ}% \pTeX~4.0.0での改修を含む
+\label{sec:ptex_input}
 \begin{figure}[tb]
 \small
 \[
@@ -835,7 +906,8 @@ UTF-8ファイル入力を内部コードEUC-JPまたはShift-JISに変換する
 % ref. https://qiita.com/h-kitagawa/items/de963380bd3e576ab4e3
 \end{dangerous}
 
-\subsection{和文文字の文字列化の挙動【\pTeX~4.0.0での改修を含む】}\label{sec:printkanji16bit}
+\subsection{和文文字の文字列化の挙動}% \pTeX~4.0.0での改修を含む
+\label{sec:printkanji16bit}
 |\string|や|\meaning|などの文字トークン列生成については以下の通りである．
 \begin{itemize}
   \item 欧文文字は\TeX82と同様で，（文字コード32の空白を除き）
@@ -860,7 +932,7 @@ UTF-8ファイル入力を内部コードEUC-JPまたはShift-JISに変換する
 さて，\pTeX~version 3系列（\TeX~Live 2021まで）では|\meaning|，|\string|等の
 文字列化や制御綴名において和文文字と欧文文字の区別が失われてしまうケースがあった．
 % 途中の結果を一旦配列 |str_pool| に格納する処理で和欧文の区別が失われていた．
-\pTeX~4.0.0以降（\TeX~Live 2022）では，この状況でも
+\emph{\pTeX~4.0.0以降}（\TeX~Live 2022）では，この状況でも
 和欧文の区別が維持される\cite{tjb81}．
 \begin{dangerous}
 \TeX~Live 2021では，ファイル文字コードUTF-8，内部コードEUC-JPの場合に例えば
