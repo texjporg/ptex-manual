@@ -136,6 +136,7 @@
 \def\pfill{\unskip~\dotfill\nobreak}
 
 % logos
+\RequirePackage{hologo}
 \def\eTeXpre{\texorpdfstring{$\varepsilon$\protect\nobreakdash-}{ε-}}
 \def\eTeX{\eTeXpre\TeX}
 \def\epTeX{\eTeXpre\pTeX}\def\eupTeX{\eTeXpre\upTeX}
@@ -145,7 +146,9 @@
   \kern-0.2emS$}\,}
 \def\TeXXeT{\TeX-\reflectbox{\bfseries\TeX-}}
 \def\OMEGA{\texorpdfstring{$\Omega$}{Ω}}
-\def\pdfTeX{pdf\TeX}
+\def\pdfTeX{\hologo{pdfTeX}}
+\def\XeTeX{\hologo{XeTeX}}
+\def\LuaTeX{\hologo{LuaTeX}}
 \def\TL{\TeX\ Live\xspace}
 \AtBeginDocument{\providecommand{\texorpdfstring}[2]{#1}}
 

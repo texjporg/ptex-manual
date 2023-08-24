@@ -15,7 +15,6 @@
 \usepackage{newpxmath}
 \usepackage[hyperfootnotes=false]{hyperref}
 \usepackage{pxjahyper}
-\usepackage{hologo}
 \usepackage{makeidx}\makeindex
 % common
 \usepackage{ptex-manual}
@@ -49,17 +48,21 @@
 
 \def\_{\leavevmode\vrule width .45em height -.2ex depth .3ex\relax}
 
+\def\Pver{p\the\ptexversion.\the\ptexminorversion\ptexrevision}
+\def\UPver{\Pver-u\the\uptexversion\uptexrevision}
+
 \frenchspacing
 \begin{document}
 \title{\emph{\pTeX マニュアル}}
 \author{日本語\TeX 開発コミュニティ\null
 \thanks{\url{https://texjp.org},\ e-mail: \texttt{issue(at)texjp.org}}}
-\date{version p\the\ptexversion.\the\ptexminorversion\ptexrevision，\today}
+\date{\pTeX: version \Pver \\ \upTeX: vesrion \UPver \\[1ex] \today}
 \maketitle
 
 本ドキュメントは，日本語\TeX 開発コミュニティ版の
-\pTeX~p\the\ptexversion.\the\ptexminorversion\ptexrevision
-（以下，「コミュニティ版\pTeX 」）についてまとめたものである．
+\pTeX~\Pver（以下，「コミュニティ版\pTeX 」）および
+\upTeX~\UPver についてまとめたものである．
+
 \pTeX はもともとアスキー株式会社によって開発された\footnote{最新版は
 p3.1.11 (2009/08/17)．\url{https://asciidwango.github.io/ptex/}}ので，
 しばしば「アスキー\pTeX 」または「ASCII \pTeX 」と呼ばれる．
@@ -67,6 +70,17 @@ p3.1.11 (2009/08/17)．\url{https://asciidwango.github.io/ptex/}}ので，
 国際的なディストリビューション（かつてのte\TeX や現在の\TeX~Live）へ
 導入するにあたって幾つかの改良を加えたものであり，オリジナルとは
 動作が異なる点もあるので注意されたい．
+
+\upTeX は田中琢爾氏による\pTeX の拡張版であり，
+\epTeX および\eupTeX は北川弘典氏によりそれぞれ\pTeX と\upTeX に
+\eTeX がマージされた拡張版である．
+これらはいずれもコミュニティ版\pTeX をベースに開発されており，
+総称して「\pTeX 系列」と呼ばれる．
+
+本ドキュメント(\jobname.pdf)では，\pTeX 系列における共通機能と
+\upTeX による拡張を説明する．% 和文文字トークンの扱いが異なる
+\epTeX による拡張についてはeptexdoc.pdfを参照されたい．
+
 \begin{itemize}
   \item コミュニティ版\pTeX の開発元：\\
     \url{https://github.com/texjporg/tex-jp-build/}
@@ -74,15 +88,119 @@ p3.1.11 (2009/08/17)．\url{https://asciidwango.github.io/ptex/}}ので，
     \url{https://github.com/texjporg/ptex-manual/}
 \end{itemize}
 
-なお，本ドキュメントで述べる\pTeX のプリミティブや拡張機能は，
-一般に「\pTeX 系列」と呼ばれる\epTeX, \upTeX, \eupTeX でも
-そのまま利用可能である．\upTeX, \eupTeX については
-文字コードや和文文字トークンの扱いが異なるので，簡単に注記してある．
-
 \newpage
 \tableofcontents
 
 \newpage
+
+%%%%%
+\section*{表記について}
+\pTeX 系列については，以下のようにまとめた表記もしばしば用いられる．
+\begin{itemize}
+  \item \pTeX, \upTeX → (u)\pTeX
+  \item \pTeX, \epTeX → (\eTeXpre)\pTeX
+  \item \upTeX, \eupTeX → (\eTeXpre)\upTeX
+  \item \epTeX, \eupTeX → \eTeXpre(u)\pTeX
+  \item \pTeX, \upTeX, \epTeX, \eupTeX → (\eTeXpre)(u)\pTeX
+\end{itemize}
+
+本ドキュメントでは，特に断らない限り単に\pTeX と表記すれば
+(\eTeXpre)(u)\pTeX の4種類全てを指すこととする．
+また\upTeX と表記すれば(\eTeXpre)\upTeX の2種類を指すこととする．
+
+ただし，節タイトルで\emph{【\pTeX の場合】【\upTeX の場合】}の
+ように分割した箇所については，
+それぞれ(\eTeXpre)\pTeX と(\eTeXpre)\upTeX を指すこととする．
+また，（すぐ下のように）列挙する形で記す場合は
+それぞれ単独のエンジンを指す．
+
+\section*{\TeX~Liveにおける配布}
+\def\MODEext{{\tiny 拡張モード}}
+\the\year 現在，\TeX~Liveで配布されている主要なエンジンと
+\pTeX 系列の関係性は以下の図で表される．
+独立したプログラム（バイナリ）として配布されているものを
+\fbox{枠}で囲んである．\par\vskip-35pt
+\[
+\xymatrix@ur{
+ \text{\fbox{\TeX}}   \ar[r]\ar[d] & \text{\eTeX}   \ar[r]\ar[d]\ar[rd]
+   & \text{\fbox{\pdfTeX}} \ar[rd] & \\
+ \text{\pTeX}  \ar[r]\ar[d] & \text{\fbox{\epTeX}} \ar[d]
+   & \text{\fbox{\hologo{XeTeX}}}       & \text{\fbox{Lua\TeX}} \\
+ \text{\upTeX} \ar[r]       & \text{\fbox{\eupTeX}} & & %\\ &&&
+}
+\]
+
+\TeX~Live 2022までは
+\pTeX, \upTeX, \epTeX, \eupTeX の4種類のエンジンが
+独立したプログラムとして配布されていたが，
+\TeX~Live 2023では素の\pTeX と\upTeX の配布が停止され，
+それぞれ\epTeX と\eupTeX の互換モード（\code{-etex}スイッチ無効，
+すなわちextended modeでない状態）に置き換えられた
+\footnote{例えば，2022年まではコマンド\code{ptex}で
+\code{This is pTeX, Version ...}が起動していたが，2023年は
+\code{This is e-pTeX, Version ...}が起動する．
+ここだけ見るとコマンド\code{eptex}と似ているが，\code{eptex}では
+直後に\code{entering extended mode}と拡張モードに入るのと異なり，
+\code{ptex}では拡張モードに入らないので，\eTeX 特有の
+機能およびプリミティブは無効化された状態となる．}．
+\begin{table}[ht]
+  \centering
+  \begin{tabular}{ccc}
+    \code{コマンド名} & \TeX~Live 2022まで & \TeX~Live 2023 \\
+    \code{ptex} & \pTeX & \epTeX の互換モード \\
+    \code{uptex} & \upTeX & \eupTeX の互換モード \\
+    \code{eptex} & \epTeX\MODEext & →変更なし \\
+    \code{euptex} & \eupTeX\MODEext & →変更なし \\
+  \end{tabular}
+\end{table}
+
+\section*{\pTeX 系列における\LaTeX}
+(\eTeXpre)\pTeX で動くように調整された\LaTeX を\pLaTeX，
+(\eTeXpre)\upTeX で動くように調整された\LaTeX を\upLaTeX と呼ぶ．
+
+\pLaTeX はもともとアスキー株式会社によって\pTeX と一体で
+開発されていた\footnote{最新版は2006/11/10．これを
+「アスキー版\pLaTeX」と呼ぶことにする．}．
+2010年にコミュニティ版\pTeX が\TeX~Liveに収録されて以降，
+そこで独自の改良や仕様変更が加えられるようになり，
+またベースである\LaTeX も更新が進んでいる．
+特に2020年以降は，\LaTeX は素の\TeX では動作せず，
+拡張モードの\eTeX~``$+\alpha$''が動作条件となっており，
+したがって素の(u)\pTeX では動作しない．
+そうした流れに合わせてアスキー版\pLaTeX からforkしたのが
+「コミュニティ版\pLaTeX」である．
+\upLaTeX はもともとアスキー版\pLaTeX を元に\upTeX と一体で
+開発されていたが，現在はコミュニティ版\pLaTeX をベースにしている．
+
+\begin{itemize}
+  \item コミュニティ版\pLaTeX の開発元：\\
+    \url{https://github.com/texjporg/platex/}
+  \item コミュニティ版\upLaTeX の開発元：\\
+    \url{https://github.com/texjporg/uplatex/}
+\end{itemize}
+
+\TeX~Liveでのエンジン利用状況は以下の通りである．
+ここで，2023-06-01以降は\code{platex}で\epTeX ではなく
+「\eupTeX の内部処理をレガシーなEUC-JP/Shift-JISに変更した状態」
+が起動することに注意\footnote{(\eTeXpre)\upTeX は
+通常のコマンド名\code{uptex}や\code{euptex}で起動されると
+内部処理をUnicodeで行うが，
+コマンド名\code{ptex}や\code{eptex}で起動されると
+内部処理を(\eTeXpre)\pTeX 同様のレガシーエンコーディングで行う．
+内部コードの差異だけであり，その他の(\eTeXpre)\upTeX 特有の
+機能およびプリミティブは利用可能な状態である．
+本文中\code{-kanji-internal}の説明も参照．}．
+\begin{table}[ht]
+  \centering
+  \begin{tabular}{ccc}
+    \code{コマンド名} & \TeX~Live 2012から2023初期まで & \TeX~Live 2023の2023-06-01以降 \\
+    \code{platex} & \epTeX\MODEext & \eupTeX\MODEext の内部レガシー \\
+    \code{uplatex} & \eupTeX\MODEext & →変更なし \\
+  \end{tabular}
+\end{table}
+
+\clearpage
+
 
 %%%%%
 \part{\pTeX の日本語組版と追加プリミティブ}
@@ -119,9 +237,12 @@ EUC-JP，Shift-JIS，ISO-2022-JPのどれか一つのファイルしか処理で
 % の土村さんのコメント (2008-02-23) より
 
 コミュニティ版\pTeX は，UNIX向け日本語\TeX ディストリビューション
-ptetex\footnote{土村展之さんによって2004年から2009年まで開発．
+pte\TeX\footnote{土村展之さんによって2004年から2009年まで開発．
 その後継のptexliveは，2010年に\pTeX が\TeX~Liveに取り込まれる際のベースに
 なった．}の開発過程で誕生した．
+% コミュニティ版という呼称は2004年当初からのものではなく
+% 2016年頃に生じたものであるが，系譜上ptetexと一体で
+% 開発されてきたものをコミュニティ版と後から呼ぶことにする．
 2006年頃から文字コードがUTF-8のファイル入力への対応が進められ，2007年には
 文字コード変換を担う関数群が\code{ptexenc}というライブラリに切り出された．
 現在の\TeX~Liveでも\code{ptexenc}は種々のプログラムで利用されている．
@@ -328,6 +449,7 @@ UTF-8ファイル入力を内部コードEUC-JPまたはShift-JISに変換する
 \end{description}
 
 \section{和文文字と\.{kcatcode}}
+
 \TeX82では各文字に0--15のカテゴリーコードを割り当てており，
 \TeX82の入力プロセッサは「どのカテゴリーコードの文字が来たか」で状態が遷移する
 有限オートマトンとして記述できる(\cite{topic})．
@@ -713,8 +835,6 @@ UTF-8ファイル入力を内部コードEUC-JPまたはShift-JISに変換する
 % ref. https://qiita.com/h-kitagawa/items/de963380bd3e576ab4e3
 \end{dangerous}
 
-
-
 \subsection{和文文字の文字列化の挙動【\pTeX~4.0.0での改修を含む】}\label{sec:printkanji16bit}
 |\string|や|\meaning|などの文字トークン列生成については以下の通りである．
 \begin{itemize}
@@ -776,6 +896,7 @@ UTF-8ファイル入力を内部コードEUC-JPまたはShift-JISに変換する
 % jtex.tex の「ラインブレーク」を簡略化
 \section{禁則}
 \label{sec:kinsoku}
+
 欧文と和文の処理で見かけ上最も大きな違いは，行分割処理であろう．
 \begin{itemize}
 \item 欧文中での行分割は，ハイフネーション処理等の
@@ -1735,7 +1856,7 @@ p3.1.2で復活したという経緯がある．}．
 %    => ptexenc に従う．ただし \jis, \sjis, \euc, \kuten, \ucs, \toucs の
 %       返り値が 0 の場合は -1 を表示．
 %  * uptex-m.ch の実装
-%    => ptexenc 及び ptex-base.ch に従う．ただし，内部コード uptex の時の
+%    => ptexenc および ptex-base.ch に従う．ただし，内部コード uptex の時の
 %       \ucs0 と \toucs0 は（ptex-base.ch が無条件に -1 を表示しようとするが，
 %       ここは無変換とすべきなので）0 を表示．
 %
