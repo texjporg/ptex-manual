@@ -722,11 +722,11 @@ zw，zhの値を仮定した既存スタイルに影響を与えないように
 \paragraph{対応するVFと実フォント}
 
 第\ref{makejvf}節で述べたとおり，\pTeX で使用するJFMと実際のフォントでは
-一部の字幅が異なり，その位置ずれを補正するためにVFを用いている．
+約物など一部の字幅が異なり，その位置ずれを補正するためにVFを用いている．
 対応は以下のとおり（左が\pTeX 用JFM，右がDVIドライバ用JFMである
 \footnote{DVIドライバ用JFMは全ての文字を全角扱いとしており，グルー挿入などは
-一切定義していない．当然，\pTeX の組版時には使用すべきでない．}．
-実際のOpenType/TrueTypeフォントの割り当ては，mapファイルに依存する；後述）．
+一切定義していない．当然，\pTeX の組版時には使用すべきでない．}）．
+実際のCID/OpenType/TrueTypeフォントの割り当ては，後述のmapファイルに依存する．
 \begin{itemize}
   \item |min*.tfm| → |min*.vf| → |rml.tfm|（→明朝体フォント，横組）
   \item |goth*.tfm| → |goth*.vf| → |gbm.tfm|（→ゴシック体フォント，横組）
@@ -737,12 +737,19 @@ zw，zhの値を仮定した既存スタイルに影響を与えないように
   \item |jis*-v.tfm| → |jis*-v.vf| → |rmlv.tfm|（→明朝体フォント，縦組）
   \item |jisg*-v.tfm| → |jisg*-v.vf| → |gbmv.tfm|（→ゴシック体フォント，縦組）
 \end{itemize}
-
-また，|tmin*.vf|及び|tgoth*.vf|では「縦書き時にソース中に
-クオート\codechar{’}\codechar{”}を入力すると，
+なお，|tmin*.vf|及び|tgoth*.vf|では「縦書き時には
+クオート\codechar{’}\codechar{”}を出力する代わりに，
 ミニュート\codechar{′}\codechar{″}を加工した文字に置き換える」と
-いう処置も加えてある（\code{makejvf}の |-m| オプションの機能による）．
+いう処置も加えてある（\code{makejvf}の |-m| オプションの機能）．
 一方，|jis*-v.vf|及び|jisg*-v.vf|ではそのような処置を行わない．
+
+上記のDVI用ドライバ用JFMから実際のフォントにアクセスする際は，
+（JFMがJISでエンコードしてあるため）JIS→CIDへの変換が必要である．
+この変換にはAdobeが配布しているCMapの|H|（横組用）と|V|（縦組用）が
+利用でき\footnote{ただし，Adobeの|H|と|V|は古く，
+JISコードから「JIS90字形のCID」へのマッピングである．
+「JIS2004字形のCID」へのマッピングは日本語\TeX 開発コミュニティが
+用意した|2004-H|と|2004-V|が必要．}，これもmapファイルで指定する．
 
 \subsection{uptex-fonts}
 
@@ -791,8 +798,8 @@ JISフォントメトリックを基に，JIS~X~0208→Unicodeで追加された
 
 \paragraph{対応するVFと実フォント}
 
-対応は以下のとおり（左が\upTeX 用JFM，右がDVIドライバ用JFMである．
-実際のOpenType/TrueTypeフォントの割り当ては，mapファイルに依存する；後述）．
+対応は以下のとおり（左が\upTeX 用JFM，右がDVIドライバ用JFMである）．
+実際のCID/OpenType/TrueTypeフォントの割り当ては，後述のmapファイルに依存する．
 \begin{itemize}
   \item |upjisr-*.tfm| → |upjisr-*.vf| → |uprml-*.tfm|（→日本語・明朝体）
   \item |upjisg-*.tfm| → |upjisg-*.vf| → |upgbm-*.tfm|（→日本語・ゴシック体）
@@ -806,8 +813,42 @@ JISフォントメトリックを基に，JIS~X~0208→Unicodeで追加された
   \item |upkorgt-*.tfm| → |upkorgt-*.vf| → |uphygt-*.tfm|（→韓国語・ドトゥム体）
 \end{itemize}
 
-[TODO] クオート記号の割り当て
+上記のDVI用ドライバ用JFMから実際のフォントにアクセスする際は，
+（JFMがUnicodeでエンコードしてあるため）Unicode→CIDへの変換が必要である．
+この変換には各言語についてAdobeが配布しているCMapの|Uni*-UTF16-H|（横組用）と
+|Uni*-UTF16-V|（縦組用）が利用でき\footnote{日本語については特に，
+|UniJIS-...|がUnicodeから「JIS90字形のCID」へ，
+|UniJIS2004-...|が「JIS2004字形のCID」へのマッピングとして，
+Adobeによって両方用意されている．}，これもmapファイルで指定する．
+
+\begin{dangerous}
+% クオート記号の割り当て
 % https://oku.edu.mie-u.ac.jp/tex/mod/forum/discuss.php?d=3153
+日本語の横組用|upjis〜-h.vf|及び|upjpn〜-h.vf|では
+\begin{itemize}
+ \item クオート記号\codechar{‘}\codechar{’}\codechar{“}\codechar{”}だけを
+  特別に|uprml-hq.tfm|または|upgbm-hq.tfm|へ
+ \item その他の文字を標準の|uprml-h.tfm|または|upgbm-h.tfm|へ
+\end{itemize}
+というように，VFで4文字だけ割り当て先を分けている．
+これは，実際のフォントにアクセスする際のUnicode→CID変換時に
+標準の|UniJIS*-UTF16-H|だけではクオート記号が
+欧文グリフのCID~98,96,108,122にマッピングされてしまい，
+\pTeX 互換のCID~670..673（全角幅）にならないのを避けるためである．
+この4文字のUnicode→CID変換はちょうど|UniJIS-UCS2-H|が
+都合よく事足りるので，|ptex-fontmaps|で利用している．
+\end{dangerous}
+\begin{table}[b]
+\centering
+\begin{tabular}{ccccc}\hline
+文字 & Unicode & JIS~X~0208
+ & CID (UniJIS-UTF16-H) & CID (UniJIS-UCS2-H) \\ \hline
+\codechar{‘} & U+2018 & 1-38 & 98 & 670 \\
+\codechar{’} & U+2019 & 1-39 & 96 & 671 \\
+\codechar{“} & U+201C & 1-40 & 108 & 672 \\
+\codechar{”} & U+201D & 1-41 & 122 & 673 \\ \hline
+\end{tabular}
+\end{table}
 
 \subsection{実フォントへの割り当て (ptex-fontmaps)}
 
