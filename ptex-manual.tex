@@ -217,47 +217,21 @@ p3.1.11 (2009/08/17)．\url{https://asciidwango.github.io/ptex/}}ので，
 % https://okumuralab.org/tex/mod/forum/discuss.php?d=460
 
 \TeX82で扱える文字コードの範囲は0--255であった．
-\pTeX ではこれに加えてJIS~X~0208すなわちJIS第1, 2水準の文字も利用可能である．
-\upTeX の既定状態（内部コードUnicode）ではUnicodeの文字を扱える．
-入力ファイルの文字コードはISO-2022-JP (jis)，EUC-JP (euc)，
-Shift-JIS (sjis)またはUTF-8 (utf8)に対応している．
-
-\begin{dangerous}
-ここでは，歴史に興味のある読者への情報として，アスキー\pTeX から
-現在のコミュニティ版\pTeX に至る文字コードの扱いの変遷を述べる．
-
-初期のアスキー\pTeX は「EUC版\pTeX 」「SJIS版\pTeX 」「JIS版\pTeX 」の
-3つのプログラムを別々に用意しており，一つの\pTeX バイナリでは文字コードが
-EUC-JP，Shift-JIS，ISO-2022-JPのどれか一つのファイルしか処理できなかった．
-% JIS のファイルなら EUC/SJIS どちらの ptex でも読み込めますが，
-% これも最初からではなく p2.1.5 (1997年) 以降のようで，
-% それまではスタイルファイルも EUC や SJIS にしておく必要があったようです．
-|-kanji| オプションが追加され，一つの\pTeX バイナリで複数の文字コードを
-選択処理できるようになったのは\pTeX~3.0.1と3.0.4の間（2002年10月頃）である．
-% http://tutimura.ath.cx/ptexlive/?ptexenc%2FDetails
-% の土村さんのコメント (2008-02-23) より
-
-コミュニティ版\pTeX は，UNIX向け日本語\TeX ディストリビューション
-pte\TeX\footnote{土村展之さんによって2004年から2009年まで開発．
-その後継のptexliveは，2010年に\pTeX が\TeX~Liveに取り込まれる際のベースに
-なった．}の開発過程で誕生した．
-% コミュニティ版という呼称は2004年当初からのものではなく
-% 2016年頃に生じたものであるが，系譜上ptetexと一体で
-% 開発されてきたものをコミュニティ版と後から呼ぶことにする．
-2006年頃から文字コードがUTF-8のファイル入力への対応が進められ，2007年には
-文字コード変換を担う関数群が\code{ptexenc}というライブラリに切り出された．
-現在の\TeX~Liveでも\code{ptexenc}は種々のプログラムで利用されている．
-\end{dangerous}
+\pTeX 系列では，日本語の文字を（\LaTeX の\code{inpuenc}のようなアクティブ化
+によらず）直接扱えるように，文字コードとして有効な範囲を拡張している．
 
 なお，本節（\ref{sec:ptexchar}節）全体を通して
 \epTeX は\pTeX と同じ，\eupTeX は\upTeX と同じである．
 
 \subsection{ファイルの文字コードと内部コード}
-\pTeX 系列への入力は，ファイルの文字コードそのままで扱われるとは限らず，
-各行は\emph{内部コード}に変換されてから内部処理に回される．
+\pTeX 系列は，\emph{入出力ファイルの文字コード}として
+ISO-2022-JP (jis)，EUC-JP (euc)，Shift-JIS (sjis)またはUTF-8 (utf8)に対応している．
+ただし，入力はそのままの文字コードで扱われるとは限らず，
+各行は\emph{内部コード}に変換されてから内部処理に回され，
+ファイル出力時にもやはり内部コードからの変換が行われる．
 ファイルの文字コードと内部コードが異なる場合は
 \code{ptexenc}ライブラリに従って文字コード変換が発生することとなる．
-\TeX の入力プロセッサに実際に渡るのはこの変換結果である．
+\TeX の入力プロセッサに実際に渡るのは入力各行の変換結果である．
 
 \pTeX の内部コードはWindowsではShift-JIS，それ以外ではEUC-JPが既定であり，
 \upTeX の内部コードは既定でUnicodeであるが，
@@ -299,6 +273,33 @@ WindowsではShift-JIS，それ以外ではUTF-8であった．
 また，\epTeX の|\epTeXinputencoding|を使用すればその次の行から
 新しい文字コードで読まれる（\texttt{./eptexdoc.pdf}を参照）．
 
+\begin{dangerous}
+ここでは，歴史に興味のある読者への情報として，アスキー\pTeX から
+現在のコミュニティ版\pTeX に至る文字コードの扱いの変遷を述べる．
+
+初期のアスキー\pTeX は「EUC版\pTeX 」「SJIS版\pTeX 」「JIS版\pTeX 」の
+3つのプログラムを別々に用意しており，一つの\pTeX バイナリでは文字コードが
+EUC-JP，Shift-JIS，ISO-2022-JPのどれか一つのファイルしか処理できなかった．
+% JIS のファイルなら EUC/SJIS どちらの ptex でも読み込めますが，
+% これも最初からではなく p2.1.5 (1997年) 以降のようで，
+% それまではスタイルファイルも EUC や SJIS にしておく必要があったようです．
+|-kanji| オプションが追加され，一つの\pTeX バイナリで複数の文字コードを
+選択処理できるようになったのは\pTeX~3.0.1と3.0.4の間（2002年10月頃）である．
+% http://tutimura.ath.cx/ptexlive/?ptexenc%2FDetails
+% の土村さんのコメント (2008-02-23) より
+
+コミュニティ版\pTeX は，UNIX向け日本語\TeX ディストリビューション
+pte\TeX\footnote{土村展之さんによって2004年から2009年まで開発．
+その後継のptexliveは，2010年に\pTeX が\TeX~Liveに取り込まれる際のベースに
+なった．}の開発過程で誕生した．
+% コミュニティ版という呼称は2004年当初からのものではなく
+% 2016年頃に生じたものであるが，系譜上ptetexと一体で
+% 開発されてきたものをコミュニティ版と後から呼ぶことにする．
+2006年頃から文字コードがUTF-8のファイル入力への対応が進められ，2007年には
+文字コード変換を担う関数群が\code{ptexenc}というライブラリに切り出された．
+現在の\TeX~Liveでも\code{ptexenc}は種々のプログラムで利用されている．
+\end{dangerous}
+
 \paragraph{\pTeX 系列の起動時のオプション}
 \begin{itemize}
  \item |-kanji=|<encoding>
@@ -316,10 +317,9 @@ WindowsではShift-JIS，それ以外ではUTF-8であった．
    \quad （\upTeX のみ：\code{uptex}も利用可能）
   \end{quotation}
 \end{itemize}
-この通り，\pTeX で利用可能な内部コードは\code{euc} (EUC-JP)か
+\pTeX で利用可能な内部コードは\code{euc} (EUC-JP)か
 \code{sjis} (Shift-JIS)のいずれかであるため，
 入力を仮にUTF-8としても必ず内部コードへの変換が起こる．
-したがって，\emph{\pTeX はJIS~X~0208外の文字をサポートしない}．
 \upTeX では既定状態の内部コードが\code{uptex} (Unicode)なので，
 入力をUTF-8とすれば変換は“ほとんど”起こらない\footnote{例外は
 \code{ptexenc}による基底文字と濁点に分解された形（結合文字列）の
@@ -342,8 +342,7 @@ This is pTeX, Version 3.14159265-p3.8.0 (utf8.euc) (TeX Live 2018)
 This is pTeX, Version 3.14159265-p3.8.0 (sjis) (TeX Live 2018)
 (preloaded format=ptex)
 \end{verbatim}
-のように表示される．この例は，入出力ファイルの文字コードと内部コードが
-ともにShift-JISであることを示す．
+のように表示される（入出力ファイルの文字コードと内部コードがともにShift-JISである例）．
 
 \begin{dangerous}
 上にはこのように書いたが，
@@ -361,9 +360,10 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
 \end{dangerous}
 
 \subsection{和文文字と欧文文字の区別【\pTeX の場合】}
-\pTeX への入力は\emph{「7ビットASCII文字集合」に「あるファイルの文字コードで
+\pTeX では，JIS~X~0208すなわちJIS第1, 2水準の文字を利用可能である．
+入力は\emph{「7ビットASCII文字集合」に「あるファイルの文字コードで
 エンコードされたJIS~X~0208の文字集合」を加えたもの}として解釈される．
-そして，以下の規則により和文文字と欧文文字に区別して取り扱われる
+そして，以下の規則により和文文字と欧文文字に区別して取り扱われる．
 \begin{itemize}
  \item 7ビットASCII文字集合は\emph{欧文文字}として扱われる．
     また，\TeX82互換の「|^^|記法」という間接的な入力法
@@ -396,7 +396,6 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
 % https://www.ma.ns.tcu.ac.jp/Pages/TeX/line.input.html
 % アスキー pTeX 3.1.4 における ^^ 記法の改修
 % https://www.ma.ns.tcu.ac.jp/Pages/TeX/hat.hat.a.b.html
-% 内部コードの範囲：kanji.c の |is_char_kanji| の実装
 
 \begin{dangerous}
 一遍に書いているが，
@@ -411,10 +410,18 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
 文字|^|の|\catcode|が7かどうかは関係なく|^^|が用いられる．
 \end{dangerous}
 
+\pTeX における有効な文字コードの範囲は
+「欧文文字として有効な文字コード(0--255)」と
+「和文文字として有効な文字コード（内部コードとして許される整数値）」の和集合であり，
+前者は1バイト・後者は2バイトなので互いに重ならない．
+% 内部コードの範囲：kanji.c の |is_char_kanji| の実装
+
 最近（2010年代以降）では，\pTeX でもファイルの文字コードをUTF-8とする
 利用が増えてきた．
 コミュニティ版\pTeX はUTF-8ファイル入力に対応しているが，
-\code{ptexenc}による前処理に以下の特殊な加工を含めてある．
+先述の通り内部コードはEUC-JPまたはShift-JISのいずれかであるため，
+\emph{\pTeX はJIS~X~0208外の文字をサポートしない}．
+なお，\code{ptexenc}による前処理に以下の特殊な加工を含めてある．
 % http://tutimura.ath.cx/ptetex/?UTF-8%C2%D0%B1%FE%282%29
 \begin{itemize}
  \item Unicodeでのバラツキを同一視する多対一変換（表\ref{table:jis_uni_var}）
@@ -459,7 +466,6 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
 \subsection{和文文字と欧文文字の区別【\upTeX の場合】}
 \upTeX は\pTeX と事情が異なるので，ここで説明する．
 \pTeX との違いを\emph{強調}してある．
-
 \begin{itemize}
   \item 文字集合は内部コードにより範囲が異なる．
     \begin{itemize}
@@ -489,15 +495,6 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
     % ただし入力ファイルの文字コードによらず内部コードにより
     % 結果は ^^a4^^a2 (euc) / ^^82^^a0 (sjis) になる．
     %
-    % 内部コード Unicode (uptex) では
-    % 「0..0x10FFFF」よりも広い「TeX が扱える 0 以上の整数値全体」
-    % が文字コードとして有効である．
-    % upTeX 内部では 0x110000 以上の文字コードを扱うことができ，
-    % DVI 出力時には「文字コード mod 0x110000」で書き込まれる．
-    % これは 0x10FFFF 以下のカテゴリーコードや禁則ペナルティの
-    % しがらみの影響を受けない目的で otf パッケージで使われる：
-    % https://okumuralab.org/~okumura/texfaq/qa/50036.html
-    %
 \end{itemize}
 %
  \item \code{ptexenc}ライブラリによる前処理も\pTeX と類似だが，
@@ -522,6 +519,32 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
 % https://okumuralab.org/tex/mod/forum/discuss.php?d=1701
 %
 \end{itemize}
+
+\upTeX における有効な文字コードの範囲は
+「欧文文字として有効な文字コード(0--255)」と
+「和文文字として有効な文字コード」の和集合である．
+内部レガシーの場合は\pTeX と全く同じであり，
+前者は1バイト・後者は2バイトなので互いに重ならない．
+内部Unicodeの場合は後者がUnicode全体（0以上0x10FFFF以下
+\footnote{実は上限が0x10FFFFというのは嘘である：
+0x110000以上も有効な文字コードであり，特殊な用途で利用される．
+% 「0..0x10FFFF」よりも広い「TeX が扱える 0 以上の整数値全体」
+内部コードUnicode (\code{uptex})の
+\upTeX では，和文文字トークンおよび和文文字ノードにおいて
+文字コードをUTF-32の下位24bitで格納する．
+DVI出力時には「文字コード mod 0x110000」で書き込まれる．
+これはUnicodeの正規の文字コード（0x10FFFF以下）のカテゴリーコードや
+禁則ペナルティのしがらみの影響を受けない目的でOTFパッケージで使われる．}の
+整数値）となるので，\emph{0--255の範囲は重なっており
+和文・欧文どちらの文字コードとしても有効である}ことに注意．
+% 内部コードの範囲：kanji.c の |is_char_kanji| の実装
+% 0x110000 以上の扱い
+% https://okumuralab.org/~okumura/texfaq/qa/50036.html
+% https://gist.github.com/aminophen/43b5f7f8592fc66210935f67d4d88391
+
+% [TODO] 後の和文文字トークンの説明で触れる：
+%   * 和文文字トークンは 128-- の文字コードが有効で，0--127 はあり得ない
+%   * 和文文字ノードは 0--127 の文字コードもあり得る（\kchar で生成）
 
 いずれの場合も，\upTeX は
 オリジナルの\TeX や\pdfTeX などの欧文\TeX とは入力に関して必ずしも
