@@ -1,6 +1,5 @@
 %%% common macros for ptex-manual documents
 \def\headfont{\normalfont\mathversion{bold}\sffamily}
-\def\node#1{\textit{#1}}
 \def\.#1{\texorpdfstring{%
      \leavevmode\hbox{\texttt{\textbackslash#1}}\ifmmode\else\textcompwordmark\fi}{\textbackslash #1}}
 
@@ -24,12 +23,27 @@
 \def\paragraph#1{\par\medskip\par\noindent\emph{■#1}\par\nobreak}
 
 \def\Pkg#1{\textsf{#1}}
+\def\code{\begingroup\catcode`\_=12 \code@}
+\def\code@#1{\endgroup\texttt{#1}}
+\def\file{\begingroup\catcode`\_=12 \file@}
+\def\file@#1{\endgroup\textsf{#1}}
+\def\node{\begingroup\catcode`\_=12 \node@}
+\def\node@#1{\endgroup\textit{#1}}
+\def\hex#1{\ifmmode\mbox\fi{\texttt{"#1}}}%"
+\def\codechar#1{\ensuremath{\langle\mbox{\kern0pt\code{#1}\kern0pt}\rangle}}
+\def\>{\ifhmode\hskip\xkanjiskip\fi}
+
+% print character code in hexadecimal
+\def\codeHEX#1{\code{\omathchardef\omc@=#1\relax\strip@omch@r{\meaning\omc@}}}
+{\escapechar-1 \xdef\omch@r{\string\omathchar}}
+\def\strip@omch@r#1{\expandafter\strip@omch@r@#1}
+\expandafter\def\expandafter\strip@omch@r@\expandafter#\expandafter1\omch@r#2{#2}
+
 \let\@lessthan <
 \begingroup
 \catcode`\<=13
 \gdef<{\ifmmode\@lessthan\else\expandafter\@@meta\fi}
 \gdef\@@meta#1>{\ensuremath{\langle\hbox{\normalfont\textit{#1}}\rangle}}
-\gdef\hex#1{\ifmmode\mbox\fi{\texttt{"#1}}}%"
 \endgroup
 \AtBeginDocument{\catcode`\<=13\relax}
 \let\OR |
@@ -37,6 +51,7 @@
 \xspcode`\\=3
 \xspcode`\*=3
 \xspcode`\-=3
+\xspcode`\"=3
 \xspcode23=3 % \textcompwordmark
 
 \normalsize
