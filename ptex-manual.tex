@@ -542,8 +542,7 @@ DVI出力時には「文字コード mod 0x110000」で書き込まれる．
 % 内部コードの範囲：kanji.c の |is_char_kanji| の実装
 % 0x110000 以上の扱い：0x1000000 以下は otf で意図的に利用．
 % https://okumuralab.org/~okumura/texfaq/qa/50036.html
-% [TODO] 実装上「0..0x1000000」よりも広い「TeX が扱える 0 以上の整数値全体」が有効？
-% https://gist.github.com/aminophen/43b5f7f8592fc66210935f67d4d88391
+% https://github.com/texjporg/tex-jp-build/issues/160
 
 いずれの場合も，\upTeX は
 オリジナルの\TeX や\pdfTeX などの欧文\TeX とは入力に関して必ずしも
@@ -2392,7 +2391,7 @@ p3.1.2で復活したという経緯がある．}．
 \end{cslist}
 この追加と同時に，(\eTeXpre)\upTeX では以下が追加されている．
 \begin{cslist}
- \csitem[\.{uptexversion}, \.{uptexrevision}]
+ \csitem[\.{uptexversion}, \.{uptexrevision}（\emph{\upTeX のみ}）]
   \upTeX のバージョン番号はu$x{.}y$の形式となっており，
   それらを取得するための命令である．
   \.{uptexversion}は$x$の値を内部整数で返し，
