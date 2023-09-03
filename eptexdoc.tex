@@ -27,12 +27,16 @@
 \MakeShortVerb*{|}
 %%%%%%%%%%%%%%%%
 
-\makeatletter
+\makeatletter % adjust for lmodern
 {\lccode`\!=`\_
 \lowercase{%
 \protected\gdef\_{\ifdefstrequal{\f@family}{\ttdefault}{!}%
   {\leavevmode\vrule width .45em height -.2ex depth .3ex\relax}%
 }}
+\global\let\adj@underbar@\_
+\catcode`\_=13
+\gdef\adj@underbar{% depend on ptex-manual.sty
+  \catcode`\_=13 \let_\adj@underbar@}
 }
 \makeatother
 

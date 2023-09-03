@@ -23,11 +23,12 @@
 \def\paragraph#1{\par\medskip\par\noindent\emph{■#1}\par\nobreak}
 
 \def\Pkg#1{\textsf{#1}}
-\def\code{\begingroup\catcode`\_=12 \code@}
+\def\adj@underbar{\catcode`\_=12 }
+\def\code{\begingroup\adj@underbar\code@}
 \def\code@#1{\endgroup\texttt{#1}}
-\def\file{\begingroup\catcode`\_=12 \file@}
+\def\file{\begingroup\adj@underbar\file@}
 \def\file@#1{\endgroup\textsf{#1}}
-\def\node{\begingroup\catcode`\_=12 \node@}
+\def\node{\begingroup\adj@underbar\node@}
 \def\node@#1{\endgroup\textit{#1}}
 \def\hex#1{\ifmmode\mbox\fi{\texttt{"#1}}}%"
 \def\codechar#1{\ensuremath{\langle\mbox{\kern0pt\code{#1}\kern0pt}\rangle}}
