@@ -425,14 +425,25 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
 \begin{itemize}
  \item Unicodeでのバラツキを同一視する多対一変換（表\ref{table:jis_uni_var}）
   \footnote{例えば，ソースファイル中の全角ダーシ(\code{U+2015})と
-  EMダーシ(\code{U+2014})は同一視され，内部的にはJISコード\code{"213D}と
+  EMダーシ(\code{U+2014})は同一視され，内部的にはJISコード\hex{213D}と
   して扱われ，ファイルに書き出される時は\code{U+2015}になる．}
  \item BOMの無視（ファイル先頭に限らず）
  \item 結合濁点(\code{U+3099})・半濁点(\code{U+309A})の合字処理
  \item JIS外のため変換できない文字を|^^ab|形式に変換
   \footnote{例えば，ソースファイル中にçのようなJIS~X~0208外の文字を直接書くと，
-  これは和文文字の内部コードに変換できないため|ç|に変換されて欧文扱いされる．}% => ^^c3^^a7
-  …★
+  これは和文文字の内部コードに変換できないため|ç|に変換されて欧文扱いされる．}…★
+  %%%
+  % [動作チェック！]
+  % 上の行の説明文では |ç| が『ptexenc による |^^| 形式への変換』を経て
+  % 欧文 8 文字 |^^c3^^a7| としてリテラル印字されることを期待している！
+  % 本ソースを pLaTeX で処理すれば真．
+  % 内部 Unicode の upLaTeX では『ptexenc による |^^| 形式への変換』が起こらず
+  % 内部コード 0xE7 としてバッファに格納される．
+  % そして \kcatcode"E7=15 なのでインプットプロセッサの段階で欧文扱いされる．
+  % 既定の inputenc UTF-8 ならばこれは "E7 の欧文 1 文字になる．
+  % もし \UseRawInputEncoding ならば "C3 "A7 の欧文 2 文字になる．
+  \setbox0=\hbox{|ç|}\unless\ifdim\wd0>2em\ptErr{Check above: pLaTeX assumed}\fi
+  %%%
 \end{itemize}
 なお，UTF-8ファイル出力時にはこのような加工の逆変換は行わない（入力時に
 加工されたままで出力される）．
@@ -447,7 +458,7 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
 
  JIS~X~0213で規定された「85区1点」の位置の文字を入力ファイル中に書いた場合，
  \begin{description}
-  \item[エンコードがEUC,~Shift-JISの場合] DVIには29985~(\texttt{"7521})%"
+  \item[エンコードがEUC,~Shift-JISの場合] DVIには29985~(\hex{7521})%"
     番の文字として出力される．
   \item[エンコードがJISの場合] 「\verb+! Missing $ inserted.+」というエラーが発生する．
     これは，\pTeX がJIS~X~0213の1面を指示するエスケープシーケンス
@@ -456,7 +467,7 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
   \item[エンコードがUTF-8の場合] UTF-8のバイト列\texttt{E6 93 84}として読み込まれる．
  \end{description}
  なお，\.{char}により「\verb+\char\kuten"5521+」%"
- のようにして区点コードを指定した場合は，DVIには29985~(\texttt{"7521})%"
+ のようにして区点コードを指定した場合は，DVIには29985~(\hex{7521})%"
  番の文字として出力される．
  また，DVIに文字として出力されたからといって，それをPostScriptやPDFに変換したときに
  意図通りに出力されるかは全くの別問題である．
@@ -1171,7 +1182,7 @@ Unicodeのブロックごとであるので，
 \end{verbatim}
 と入力すると，一行目は\def\fuga{^^c3^^bf 耽}「\code{\fuga}」であるのに対し
 二行目は「\code{macro:->耽 耽}」となっていた（\char\euc"C3BFはEUC-JPで
-\code{"C3BF}である．|^^c3^^bf|の代わりに直接\code{ÿ}と入力しても同様）．
+\hex{C3BF}である．|^^c3^^bf|の代わりに直接\code{ÿ}と入力しても同様）．
 また
 \begin{verbatim}
   \catcode"C3=11 \catcode"BF=11
@@ -1185,6 +1196,12 @@ Unicodeのブロックごとであるので，
   \def\耽{P} \def\^^c3^^bf{Q}
   「\code{\meaning\耽}」% 和欧文が区別されるので "P" になるはず
 となる．
+  %%%
+  % [動作チェック！]
+  % 上の行の説明文では |\耽| と |\^^c3^^bf| が区別される TL2022 以降を期待している！
+  \def\XXXX{P}\unless\ifx\耽\XXXX\ptErr{Check above: pTeX 4.x assumed}\fi
+  %%%
+\end{dangerous}
 % メモ：上の例は「^^c5^^bf <=> 顛」でもよかったのだが，
 % マニュアルの欧文フォント newtx/newpx で表示可能な文字にした．
 % 外部ファイル出力の変化例：
@@ -1192,7 +1209,6 @@ Unicodeのブロックごとであるので，
 %   \label{^^c3^^9f}% % TL2021: <C3>^^9f => TL2022: ^^c3^^9f
 %   \label{ÿ}%        % TL2021: 耽       => TL2022: ^^c3^^bf
 %   \label{^^c3^^bf}% % TL2021: 耽       => TL2022: ^^c3^^bf
-\end{dangerous}
 
 \section{和文文字の出力}\label{sec:outchar}
 
