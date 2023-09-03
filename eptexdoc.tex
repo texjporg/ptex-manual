@@ -208,18 +208,18 @@ tracing機能や条件判断文の強化などあるが，そこら辺はパッ�
 以下，\eTeX 拡張を\pTeX 拡張とマージするにあたって調整した箇所を述べる．
 \begin{cslist}
  \csitem[\.{lastnodetype} (read-only integer)]
-  \pTeX 拡張では，\TeX と比較して\node{dir\_node}と\node{disp\_node}という2種類のノードが
+  \pTeX 拡張では，\TeX と比較して\node{dir_node}と\node{disp_node}という2種類のノードが
   追加された．前者は，現在のリストの中に違う組方向のboxを挿入する際に寸法を補正するために作られ，
   \.{hbox}や\.{vbox}のコンテナとなっている．
   また後者は，欧文文字のベースライン補正のために使われる．
 
   \epTeX~110102まではこれらのノードも\.{lastnodetype}の値として出力させるようにした．
   しかし，両者ともに\epTeX が自動的に挿入する（ユーザーが意識する必要はない）ノードであることから，
-  \epTeX~110227以降では\node{dir\_node}と\node{disp\_node}は
+  \epTeX~110227以降では\node{dir_node}と\node{disp_node}は
   \.{lastnodetype}の対象とする「最後のノード」とはならないようにしている
   \footnote{%
-    最後のノードが\node{dir\_node}であった場合，\.{lastnodetype}はそのノードが格納している
-    \node{hlist\_node}か\node{vlist\_node}の種類を返す．
+    最後のノードが\node{dir_node}であった場合，\.{lastnodetype}はそのノードが格納している
+    \node{hlist_node}か\node{vlist_node}の種類を返す．
   }．\\
   \parbox{.9\linewidth}{%
   \begin{multilist}{3}{\hfil\hskip1.5zw#:&\quad#\qquad\hfil}
@@ -1351,7 +1351,7 @@ $3$\,sp）だが，どこか気になるところである．
 \begin{thebibliography}{99}
  \bibitem{h7k} 北川 弘典，「計算数学II　作業記録」，2008．\\
   \url{https://osdn.jp/projects/eptex/document/resume/ja/1/resume.pdf}ほか，
-  本pdfと同じディレクトリにある\texttt{eptex\_resume.pdf}がそれにあたる．
+  本PDFと同じディレクトリにある\file{eptex_resume.pdf}がそれにあたる．
  \bibitem{yamamoto} 山本 和義，「数式famの制限とluatex」，
   掲示板「\TeX\ Q\ \&\ A」，2009/02/12．\\
   \url{https://oku.edu.mie-u.ac.jp/~okumura/texfaq/qa/52744.html}

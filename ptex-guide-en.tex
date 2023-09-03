@@ -33,19 +33,10 @@
 }
 \makeatother
 
-\def\file#1{\textsf{#1}}
-\def\code#1{\texttt{#1}}
-
 %%%%%%%%%%%%%%%%
 \makeatletter
 \setlist{leftmargin=2zw}
 \setlist[description]{labelwidth=2zw,labelindent=1zw,topsep=\medskipamount}
-
-\def\>{\ifhmode\hskip\xkanjiskip\fi}
-
-\def\tsp{_{\mbox{\fontsize\sf@size\z@\ttfamily \char32}}}
-\def\tpar{_{\mbox{\fontsize\sf@size\z@\ttfamily \string\par}}}
-\def\tign{_{\mbox{\fontsize\sf@size\z@\selectfont --}}}
 
 \usepackage{shortvrb}
 \MakeShortVerb*{|}
