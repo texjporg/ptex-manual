@@ -212,7 +212,8 @@ p3.1.11 (2009/08/17)．\url{https://asciidwango.github.io/ptex/}}ので，
 % http://ajt.ktug.org/assets/2008/5/1/0201tsuchimura_kuroki.pdf
 % https://okumuralab.org/tex/mod/forum/discuss.php?d=460
 
-\TeX82で扱える文字コードの範囲は0--255であった．
+オリジナルの\TeX で扱える文字コードの範囲は0--255であった
+\footnote{当初の\TeX82では7-bitだった：\TeX90で8-bitになった．}．
 \pTeX 系列では，日本語の文字を（\LaTeX の\code{inpuenc}のようなアクティブ化
 によらず）直接扱えるように，文字コードとして有効な範囲を拡張している．
 以降では，従来の枠組みで扱える文字を\emph{欧文文字}，
@@ -365,7 +366,7 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
 そして，以下の規則により和文文字と欧文文字に区別して取り扱われる．
 \begin{itemize}
  \item 7ビットASCII文字集合は\emph{欧文文字}として扱われる．
-    また，\TeX82互換の「|^^|記法」という間接的な入力法
+    また，\TeX90互換の「|^^|記法」という間接的な入力法
     \footnote{|^^ab|のようにカテゴリーコード7の文字2つに続いて
     |0|--|9|, |a|--|f|のいずれかが2つ続くと，
     それを16進文字コードとする文字入力がなされたのと同じ処理に回る．}も
@@ -374,6 +375,10 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
     \pTeX~3.1.8で制御綴内での扱いが改善された．また，
     コミュニティ版\pTeX~4.0.0で文字列化においても常に欧文扱いするように改修した．
     これについては\ref{sec:printkanji16bit}節を参照．}．
+    % |^^|記法は，|^^@|のようにASCII一文字（0--9,~a-f以外）が続くものと
+    % |^^ab|のように16進数2桁が続くものがある．
+    % 前者は\TeX82からあったもので，後者が\TeX90で追加された．
+    % 参考：Knuth, TUGboat, Volume 10 (1989), No.~3, p.325
  \item 最上位ビットが1の場合，そのバイトで始まる列について
     ファイルのエンコードから内部コード（EUC-JPまたはShift-JIS）への
     変換を試みる（同一コードなら恒等変換）．
@@ -489,7 +494,7 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
 %
 \begin{itemize}
  \item 7ビットASCII文字集合は欧文文字として扱われる．
-    また，\TeX82互換の「|^^|記法」という間接的な入力法も
+    また，\TeX90互換の「|^^|記法」という間接的な入力法も
     常に欧文扱いされる．（\pTeX と同様）
  \item 最上位ビットが1の場合，そのバイトで始まる列について
     ファイルのエンコードから内部コードへの変換を試みる（同一コードなら恒等変換）．
@@ -901,7 +906,7 @@ Unicodeのブロックごとであるので，
 \autoref{fig:ptex_input}は\emph{\pTeX~4.0.0既定時}における入力プロセッサの状態遷移図である．
 \TeX82から拡張された点，および説明が必要な点を以下に述べる．
 \begin{description}
-  \item[内部状態の追加] \TeX82 では状態\textit{N} (new line)，状態\textit{M} (middle of line)，
+  \item[内部状態の追加] \TeX82では状態\textit{N} (new line)，状態\textit{M} (middle of line)，
   状態\textit{S} (skipping spaces)という3状態であったが，\pTeX では
   次の2状態が追加された：
   \begin{description}
@@ -2293,7 +2298,7 @@ Unicodeとレガシーエンコードの間の変換では表\ref{table:jis_uni_
   は「{\kansujichar1=`壱 \kansujichar2=\euc"C6F5\relax
        \kansujichar3=\jis"3B32\relax \kansuji 1234}」と出力される．
   なお，\.{kansuji}に続く数値<number>が負の場合は，空文字列になる
-  （ちょうど|\.{romannumeral}|にゼロまたは負の値を与えた場合と同様）．
+  （ちょうど\.{romannumeral}にゼロまたは負の値を与えた場合と同様）．
 
   \.{kansujichar}で指定できるのは「和文文字の内部コードとして有効な値」であり，
   例えば\pTeX で|\kansujichar1=`A|のように無効な値（\pTeX において|`A|は
@@ -2301,7 +2306,7 @@ Unicodeとレガシーエンコードの間の変換では表\ref{table:jis_uni_
 \begin{verbatim}
 ! Invalid KANSUJI char ("41).
 \end{verbatim}
-  というエラーが発生する\footnote{\upTeX では0--127も含め，
+  というエラーが発生する\footnote{内部Unicodeの\upTeX では0--127も含め，
   Unicodeの文字コードすべてが和文文字コードとして有効であり
   （\.{kchar}で任意の文字コードを和文文字ノードに変換して出力できる），
   基本的にこのエラーは発生しない．}．
@@ -2311,7 +2316,7 @@ Unicodeとレガシーエンコードの間の変換では表\ref{table:jis_uni_
 ! Invalid KANSUJI number (10).
 \end{verbatim}
   というエラーが発生する．
-  % エラーからのリカバリで，他の TeX82 プリミティブが
+  % エラーからのリカバリで，他の\TeX82プリミティブが
   %   I changed this one to zero.
   % とするのに対し，\kansujichar では
   %   I'm skipping this control sequences.
@@ -2334,9 +2339,13 @@ Unicodeとレガシーエンコードの間の変換では表\ref{table:jis_uni_
 % luatexja.dtx より pTeX 用に移植
 \begin{dangerous}
   以上に挙げたプリミティブ(\.{kuten}, \.{jis}, \.{euc}, \.{sjis}, \.{ucs},
-  \.{toucs}, \.{kansuji})は展開可能(expandable)であり，
+  \.{toucs}, \.{tojis}, \.{kansuji})は展開可能(expandable)であり，
   内部整数を引数にとるが，実行結果は\emph{文字列}であることに注意
-  （\TeX82の\.{number}, |\.{romannumeral}|と同様）．
+  （\TeX82の\.{number}, \.{romannumeral}と同様）．
+  以下の例は内部コード
+  \ifnum\jis"2121="3000 Unicode\else
+  \ifnum\jis"2121="A1A1 EUC-JP\else
+  \ifnum\jis"2121="8140 Shift-JIS\else\ptErr{Check here}\fi\fi\fi の場合．
 
 \medskip\noindent
 \begin{minipage}{.6\linewidth}
@@ -2536,7 +2545,7 @@ Unicodeとレガシーエンコードの間の変換では表\ref{table:jis_uni_
  \end{itemize}
 
  \csitem[\.{if} <token$_1$> <token$_2$>, \.{ifcat} <token$_1$> <token$_2$>]
-  文字トークンを指定する場合，その文字コードは\TeX82では0--255のみが許されるが，
+  文字トークンを指定する場合，その文字コードはオリジナルの\TeX では0--255のみが許されるが，
   \pTeX では和文文字トークンも指定することができる．
 
   \.{if}による判定では，欧文文字トークン・和文文字トークンともに
