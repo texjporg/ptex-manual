@@ -1153,12 +1153,15 @@ Unicodeのブロックごとであるので，
 
 \subsection{和文文字の文字列化の挙動}% \pTeX~4.0.0での改修を含む
 \label{sec:printkanji16bit}
-\.{string}や\.{meaning}などの文字トークン列生成については以下の通りである．
+\.{meaning}や\.{string}などの文字トークン列生成（いわゆる“\.{the}-文字列化”）に
+ついては以下の通りである．
 \begin{itemize}
   \item 欧文文字は\TeX82と同様で，（文字コード32の空白を除き）
-    すべてカテゴリーコード12の文字トークンになるが，
-    和文文字は16--18のいずれかのカテゴリーコードを持つ．
-  \item 「コントロールワードの文字列化では後ろに空白文字を補い，
+    すべてカテゴリーコード12の欧文文字トークンになるが，
+    和文文字は和文文字トークンになる．その和文カテゴリーコードは
+    \pTeX では随時算出により，\upTeX では「その時の\.{kcatcode}の値」（ただし
+    それが15の場合は18）になる．
+  \item 制御綴名の文字列化において「コントロールワードの文字列化では後ろに空白文字を補い，
     コントロールシンボルの文字列化では空白文字を補わない」という点は，
     和文文字を含む場合も同様である
     \footnote{「|\】|」のように和文文字からなるコントロールシンボルを文字列化する際に，
@@ -1179,6 +1182,22 @@ Unicodeのブロックごとであるので，
 % 途中の結果を一旦配列 |str_pool| に格納する処理で和欧文の区別が失われていた．
 \emph{\pTeX~4.0.0以降}（\TeX~Live 2022）では，この状況でも
 和欧文の区別が維持される\cite{tjb81}．
+\begin{dangerous}
+\eTeX 由来の\.{scantokens}（\eTeXpre(u)\pTeX で利用可能）は
+和文文字と欧文文字の区別が維持されない．
+例えば\.{forcecjktoken}の状態で欧文バイト列を\.{scantokens}すると和文になる
+\footnote{\.{scantokens}は，引数のトークン列を脱トークン化して，
+改めて字句解析対象となる文字列として読み込む展開可能プリミティブである．
+基本的にはトークン列を一旦（仮想的な）ファイルに書き出して
+それをすぐに読み込んだのと同じになるが，
+% https://qiita.com/zr_tex8r/items/0cc96144dd46c212a989
+「引数を文字列化→bufferに書き戻し→それを入力として扱う」という動作手順のうち
+bufferに書き戻す時点で和欧文の区別が失われる．
+実際に一旦ファイルに書いて読み込む場合は，欧文バイトは
+|^^|形式で書き出されて欧文のままになるので，それとは異なる．}．
+% [TODO] -translate-file=cp8bit なら 8bit 全部が printable になるので ^^ab 形式にはならない．
+\end{dangerous}
+
 \begin{dangerous}
 \TeX~Live 2021では，ファイルのエンコードUTF-8，内部コードEUC-JPの場合に例えば
 \begin{verbatim}
@@ -1486,7 +1505,7 @@ so I use .notdef glyph instead.
 
 \begin{dangerous}
   上述の通り，欧文フォント・和文の横組用フォント・
-  和文の縦組用フォントのいずれも\.{tfont}一つで定義可能だが，
+  和文の縦組用フォントのいずれも\.{font}一つで定義可能だが，
   定義したフォントが実際にどの種類だったかを知る手段は
   バージョンp3.8.2までの\pTeX には存在しなかった．
   % https://github.com/texjporg/tex-jp-build/pull/97
@@ -1616,7 +1635,6 @@ so I use .notdef glyph instead.
 禁則テーブルに情報を登録する手段として，
 以下のプリミティブが追加されている．
 
-% アスキー公式サイトのプリミティブ一覧から適当にまとめ
 \begin{cslist}
 \csitem[\.{prebreakpenalty} <character code>=<number>]
   指定した文字の前方にペナルティを挿入する．
@@ -2005,10 +2023,8 @@ DtoU方向での数式ディレクションはそれぞれ非数式の場合と�
 \end{tabular}
 \end{table}
 
-
 以下が，組方向の変更や現在の組方向判定に関わるプリミティブの一覧である．
 
-% アスキー公式サイトのプリミティブ一覧から適当にまとめ
 \begin{cslist}
 \csitem[\.{tate}, \.{yoko}, \.{dtou}]
   組方向をそれぞれ縦組，横組，DtoU方向に変更する．
@@ -2233,10 +2249,14 @@ Unicodeとレガシーエンコードの間の変換では表\ref{table:jis_uni_
   内部コードからJISコードへの変換を行う．\pTeX~4.1.0で追加した．
 \end{cslist}
 
+文字コードとして不正な値を与えても
+``\verb|! Bad character code (...).|''エラーは発生しない（下記参照）．
+なお，JISコード，EUCコード，Shift-JISコードについて扱えるのは
+JIS~X~0208の範囲に限られる（\ref{sec:ptexchar}節でも述べた通り．
+すなわちJIS~X~0213には非対応）．
+
 \begin{dangerous}
-  \ref{sec:ptexchar}節でも述べたように，
-  \emph{\pTeX はJIS~X~0213には対応せず，JIS~X~0208の範囲のみ扱える}．
-  なお，\pTeX~3.9.1以前では，不正な文字コードを与えたときの挙動が
+  \pTeX~3.9.1以前では，不正な文字コードを与えたときの挙動が
   不統一で，特に以下の値を返すケースもあった：
   \begin{itemize}
     \item 区点コード表のJIS~X~0208における最初の未定義位置
@@ -2250,8 +2270,9 @@ Unicodeとレガシーエンコードの間の変換では表\ref{table:jis_uni_
     \item $-1$…文字コードとして無効．
           % 発生状況：KUTENtoJIS(不正)→JIStoEUC(-1)
   \end{itemize}
-  \pTeX~3.10.0では\.{ucs}と\.{toucs}を追加し，さらに不正な文字コードを
-  容易に判別できるように以下の仕様にした：
+  \pTeX~3.10.0以降では，% \.{ucs}と\.{toucs}を追加したと同時に，
+  不正な文字コードを容易に判別できるように以下の仕様にした：
+  % これは\pTeX~4.1.0で追加した\.{tojis}も同様である．
   \begin{itemize}
     \item 文字コード変換が\emph{不要}なケース\footnote{内部eucにおける\.{euc}，
         内部sjisにおける\.{sjis}，および\upTeX で内部uptexにおける\.{ucs}と
@@ -2260,7 +2281,6 @@ Unicodeとレガシーエンコードの間の変換では表\ref{table:jis_uni_
     \item 文字コード変換が\emph{必要}なケース…
         不正な文字コードを与えると$-1$を返す．（返り値を統一）
   \end{itemize}
-  これは\pTeX~4.1.0で追加した\.{tojis}も同様である．
 %%%
 %
 % pTeX-3.10.0 での実装メモ (2021-06-29 @aminophen)
@@ -2299,7 +2319,9 @@ Unicodeとレガシーエンコードの間の変換では表\ref{table:jis_uni_
        \kansujichar3=\jis"3B32\relax \kansuji 1234}」と出力される．
   なお，\.{kansuji}に続く数値<number>が負の場合は，空文字列になる
   （ちょうど\.{romannumeral}にゼロまたは負の値を与えた場合と同様）．
+\end{cslist}
 
+\begin{dangerous}
   \.{kansujichar}で指定できるのは「和文文字の内部コードとして有効な値」であり，
   例えば\pTeX で|\kansujichar1=`A|のように無効な値（\pTeX において|`A|は
   欧文文字コードであり，和文文字コードではない）を指定すると
@@ -2321,7 +2343,7 @@ Unicodeとレガシーエンコードの間の変換では表\ref{table:jis_uni_
   % とするのに対し，\kansujichar では
   %   I'm skipping this control sequences.
   % とスキップされ，値の代入は行われない．
-\end{cslist}
+\end{dangerous}
 
 \begin{dangerous}
   \.{kansujichar}は整数値パラメータであるが，p3.8.2までは
@@ -2336,10 +2358,9 @@ Unicodeとレガシーエンコードの間の変換では表\ref{table:jis_uni_
   % これは \kansujichar の代入時の挙動に合わせたものである．
 \end{dangerous}
 
-% luatexja.dtx より pTeX 用に移植
 \begin{dangerous}
-  以上に挙げたプリミティブ(\.{kuten}, \.{jis}, \.{euc}, \.{sjis}, \.{ucs},
-  \.{toucs}, \.{tojis}, \.{kansuji})は展開可能(expandable)であり，
+  以上のプリミティブ（\.{kansujichar}を除くすべて）は
+  展開可能(expandable)であり，
   内部整数を引数にとるが，実行結果は\emph{文字列}であることに注意
   （\TeX82の\.{number}, \.{romannumeral}と同様）．
   以下の例は内部コード
@@ -2365,12 +2386,25 @@ Unicodeとレガシーエンコードの間の変換では表\ref{table:jis_uni_
     \kansuji1701
 \end{minipage}\medskip
 
+\begin{itemize}
+ \item \.{kuten}, \.{jis}, \.{euc}, \.{sjis}, \.{ucs}, \.{toucs}, \.{tojis}
+   → 変換結果をカテゴリーコード12の欧文文字トークン列で返す．
+ \item \.{kansuji}
+   → 変換結果を和文文字トークン列で返す\footnote{例外的に，
+   内部Unicodeの\upTeX で0--127の文字コードを\.{kansujichar}で指定した
+   場合のみ，\.{kansuji}で生成されるトークンはカテゴリーコード12の
+   欧文文字トークンになる\cite{tjb36}．
+   % 文字コードが0--127の和文文字トークンは存在しない，という一貫性．
+   % \.{kchar}が和文文字トークンを経ずに直接和文文字ノードになるのとは異なる．
+   また，\upTeX では生成する和文文字トークンに
+   その時点での和文カテゴリーコードが与えられるが，
+   もし\.{kcatcode}が15ならば18扱いになる（\.{forcecjktoken}と同様）．}．
+\end{itemize}
+
+  \medskip
   以上の挙動から，\.{kansuji}を
   「整数値をその符号値をもつ和文文字トークンに変換する」という目的に
-  用いることもでき\footnote{ただし，\upTeX で
-  0--127の文字コードを\.{kansujichar}で指定した場合のみ，
-  \.{kansuji}で生成されるトークンはカテゴリーコード12の
-  欧文文字トークンになる\cite{tjb36}．}，
+  用いることもでき，
   これは時に“\.{kansuji}トリック”と呼ばれる．例えば
 \begin{verbatim}
   \kansujichar1=\jis"2422 \edef\X{\kansuji1}
@@ -2484,9 +2518,9 @@ Unicodeとレガシーエンコードの間の変換では表\ref{table:jis_uni_
 \end{quote}
 違反すると
 \begin{verbatim}
-! Bad character code (42146).
+! Bad character code (...).
 \end{verbatim}
-というエラーが発生する．
+というエラーが発生する（|...|はその文字コード）．
 \begin{dangerous}
 以前の\pTeX では，
 これらの命令の文字コード部分に和文文字の内部コードを指定することもでき，
