@@ -535,34 +535,7 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
 %
 \end{itemize}
 
-\upTeX における有効な文字コードの範囲は
-「欧文文字として有効な文字コード(0--255)」と
-「和文文字として有効な文字コード」の和集合である．
-内部レガシーの場合は\pTeX と全く同じであり，
-前者は1バイト・後者は2バイトなので互いに重ならない．
-内部Unicodeの場合は後者がUnicode全体（0以上0x10FFFF以下
-\footnote{実は上限が0x10FFFFというのは嘘である：24bit整数値が
-有効であり，0x110000以上0x1000000未満は特殊な用途で利用される．
-内部コードUnicode (\code{uptex})の
-\upTeX では，和文文字トークンおよび和文文字ノードにおいて
-文字コードをUTF-32の下位24bitで格納する．
-DVI出力時には「文字コード mod 0x110000」で書き込まれる．
-これはUnicodeの正規の文字コード（0x10FFFF以下）のカテゴリーコードや
-禁則ペナルティのしがらみの影響を受けない目的でOTFパッケージで使われる．}の
-整数値）となるので，\emph{0--255の範囲は重なっており
-和文・欧文どちらの文字コードとしても有効である}ことに注意．
-% 内部コードの範囲：kanji.c の |is_char_kanji| の実装
-% 0x110000 以上の扱い：0x1000000 以下は otf で意図的に利用．
-% https://okumuralab.org/~okumura/texfaq/qa/50036.html
-% https://github.com/texjporg/tex-jp-build/issues/160
-
-いずれの場合も，\upTeX は
-オリジナルの\TeX や\pdfTeX などの欧文\TeX とは入力に関して必ずしも
-互換でない（内部UnicodeへのUTF-8入力に限っても「BOMの無視」と
-「結合濁点・半濁点の合字処理」だけは起こる）が，
-\pTeX と比較すれば幾分差異が軽減されている．
-
-\begin{table}[tbp]
+\begin{table}[bp]
 \caption{JIS⇔Unicode一対多変換．Unicode→JIS変換では複数の文字が同一視
 される．JIS→Unicode変換では複数候補のうち\emph{太字}が選択される．}
 \label{table:jis_uni_var}
@@ -597,6 +570,63 @@ DVI出力時には「文字コード mod 0x110000」で書き込まれる．
 \bottomrule
 \end{tabular}
 \end{table}
+
+\upTeX における有効な文字コードの範囲は
+「欧文文字として有効な文字コード(0--255)」と
+「和文文字として有効な文字コード」の和集合である．
+内部レガシーの場合は\pTeX と全く同じであり，
+前者は1バイト・後者は2バイトなので互いに重ならない．
+内部Unicodeの場合は後者がUnicode全体（0以上0x10FFFF以下の
+整数値）となるので，\emph{0--255の範囲は重なっており
+和文・欧文どちらの文字コードとしても有効である}ことに注意．
+% 内部コードの範囲：kanji.c の |is_char_kanji| の実装
+
+いずれの場合も，\upTeX は
+オリジナルの\TeX や\pdfTeX などの欧文\TeX とは入力に関して必ずしも
+互換でない（内部UnicodeへのUTF-8入力に限っても「BOMの無視」と
+「結合濁点・半濁点の合字処理」だけは起こる）が，
+\pTeX と比較すれば幾分差異が軽減されている．
+
+\begin{dangerous}
+  内部コードUnicode (\code{uptex})の場合の上限が0x10FFFFというのは
+  実は嘘である．24bit整数値が有効であり，うち0x110000以上0xFFFFFF以下は
+  特殊な用途で利用できるよう留保されている．
+  \begin{itemize}
+   \item \verb|Bad character code|エラーが出ない範囲：0以上0xFFFFFF以下
+    \footnote{\verb|Invalid KANSUJI char|エラーが出ない範囲も同じ．}
+   \item 和文文字トークンの文字コードとして可能な範囲：0以上0x10FFFF以下
+   \item 和文文字ノードの文字コードとして可能な範囲：0以上0xFFFFFF以下
+  \end{itemize}
+  %
+  \upTeX では和文文字トークンおよび和文文字ノードにおいて
+  文字コードをUTF-32の下位24bitで格納する仕様となっている．
+  Unicode文字入力で0x110000以上0xFFFFFF以下の文字コードはありえないが，
+  文字コードを数値で指定する場合の扱いは以下としている：
+  \begin{itemize}
+   \item \.{char}, \.{chardef}及び\.{kchar}, \.{kchardef}：
+    文字コードが0x110000以上でもそのままの値で和文文字ノードを生成する．
+    DVI出力時には「文字コード mod 0x110000」で書き込まれる．
+    % Output node |p| ... の処理で toDVI()
+   \item \.{kansujichar}への文字コード代入：
+    値の格納時に「文字コード mod 0x110000」を行うので，
+    以降の\.{kansuji}により生成する文字トークンは0以上0x10FFFF以下．
+    % eqtb テーブル格納時に toDVI()
+   \item \eTeXpre(u)\pTeX の\.{Uchar}, \.{Ucharcat}：
+    文字トークン生成時に「文字コード mod 0x110000」を行うので，
+    やはり0以上0x10FFFF以下になる．
+    % print_kanji() の処理で toUCS()
+  \end{itemize}
+  特に\.{kchar}の上記仕様はOTFパッケージで使われている．
+  これは，|\CID| (Adobe-Japan1)のような
+  Unicodeでない文字コードを扱う内部処理において
+  Unicodeの正規の文字コード（0x10FFFF以下）の
+  カテゴリーコードや禁則ペナルティのしがらみの影響を受けない目的である．
+  % 0x110000 以上の扱い：現状では otf で意図的に利用．
+  % 将来的に異体字対応の内部コードに使う可能性を留保．
+  % https://okumuralab.org/~okumura/texfaq/qa/50036.html
+  % https://github.com/texjporg/tex-jp-build/issues/160
+  % https://github.com/texjporg/tex-jp-build/issues/46
+\end{dangerous}
 
 \subsection{文字コードの取得と指定}\label{sec:getcode}
 (u)\pTeX では「文字コードを引数にとるプリミティブ」といっても，状況によって
