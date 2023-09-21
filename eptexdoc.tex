@@ -304,8 +304,8 @@ tracing機能や条件判断文の強化などあるが，そこら辺はパッ�
   上記で「和文文字コードとして有効かどうか」は，関数|is_char_kanji|を参照．
   この関数は内部コードによって異なるため，マクロで実装するのは面倒であるが，
   \epTeX~190709以降では\.{iffontchar}で容易に実現できる．
-  なお，内部Unicodeの\upTeX では任意の非負の値が和文文字コードとして有効なため，
-  |is_char_kanji|は非負かどうかの判定になっている．
+  なお，内部Unicodeの\upTeX では0以上0xFFFFFF以下の値が和文文字コードとして
+  有効である．% https://github.com/texjporg/tex-jp-build/issues/160
 \end{dangerous}
 
 
