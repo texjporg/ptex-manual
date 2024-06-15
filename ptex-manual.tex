@@ -75,7 +75,7 @@ p3.1.11 (2009/08/17)．\url{https://asciidwango.github.io/ptex/}}ので，
 
 本ドキュメント(\jobname.pdf)では，\pTeX 系列における共通機能と
 \upTeX による拡張を説明する．% 和文文字トークンの扱いが異なる
-\epTeX による拡張についてはeptexdoc.pdfを参照されたい．
+\epTeX/\eupTeX による拡張についてはeptexdoc.pdfを参照されたい．
 
 \begin{itemize}
   \item コミュニティ版\pTeX の開発元：\\
@@ -112,7 +112,7 @@ p3.1.11 (2009/08/17)．\url{https://asciidwango.github.io/ptex/}}ので，
 
 \section*{\TeX~Liveにおける配布}
 \def\MODEext{{\tiny 拡張モード}}
-\the\year 現在，\TeX~Liveで配布されている主要なエンジンと
+現在，\TeX~Liveで配布されている主要なエンジンと
 \pTeX 系列の関係性は以下の図で表される．
 独立したプログラム（バイナリ）として配布されているものを
 \fbox{枠}で囲んである．\par\vskip-35pt
@@ -120,7 +120,7 @@ p3.1.11 (2009/08/17)．\url{https://asciidwango.github.io/ptex/}}ので，
 \xymatrix@ur{
  \text{\fbox{\TeX}}   \ar[r]\ar[d] & \text{\eTeX}   \ar[r]\ar[d]\ar[rd]
    & \text{\fbox{\pdfTeX}} \ar[rd] & \\
- \text{\pTeX}  \ar[r]\ar[d] & \text{\fbox{\epTeX}} \ar[d]
+ \text{\pTeX}  \ar[r]\ar[d] & \text{\epTeX} \ar[d]
    & \text{\fbox{\hologo{XeTeX}}}       & \text{\fbox{Lua\TeX}} \\
  \text{\upTeX} \ar[r]       & \text{\fbox{\eupTeX}} & & %\\ &&&
 }
@@ -130,23 +130,45 @@ p3.1.11 (2009/08/17)．\url{https://asciidwango.github.io/ptex/}}ので，
 \pTeX, \upTeX, \epTeX, \eupTeX の4種類のエンジンが
 独立したプログラムとして配布されていたが，
 \TeX~Live 2023では素の\pTeX と\upTeX の配布が停止され，
-それぞれ\epTeX と\eupTeX の互換モード（\code{-etex}スイッチ無効，
-すなわちextended modeでない状態）に置き換えられた
-\footnote{例えば，2022年まではコマンド\code{ptex}で
-\code{This is pTeX, Version ...}が起動していたが，2023年は
-\code{This is e-pTeX, Version ...}が起動する．
-ここだけ見るとコマンド\code{eptex}と似ているが，\code{eptex}では
-直後に\code{entering extended mode}と拡張モードに入るのと異なり，
-\code{ptex}では拡張モードに入らないので，\eTeX 特有の
-機能およびプリミティブは無効化された状態となる．}．
+それぞれ\epTeX と\eupTeX の互換モードに置き換えられた．
+さらに\TeX~Live 2024ではオリジナルの\epTeX の配布も停止され，
+4種類のエンジンは全て\eupTeX という単一のプログラムによる
+エミュレートへと整理された．表にまとめると次のようになる．
+
+\begin{description}\small
+ \item[互換モード]
+  \eTeX の拡張モード(extended mode)でない状態，
+  すなわち\code{-etex}スイッチ無効状態．\\
+  例えば，2022年まではコマンド\code{ptex}で
+  \code{This is pTeX, Version ...}が起動していたが，2023年は
+  \code{This is e-pTeX, Version ...}が起動する．
+  ここだけ見るとコマンド\code{eptex}と似ているが，\code{eptex}では
+  直後に\code{entering extended mode}と拡張モードに入るのと異なり，
+  \code{ptex}では拡張モードに入らないので，\eTeX 特有の
+  機能およびプリミティブは無効化された状態となる．
+ \item[内部レガシー]
+  (\eTeXpre)\upTeX が文字コードに関する内部処理を
+  Unicodeではなく(\eTeXpre)\pTeX 同様の
+  レガシーエンコーディング（EUC-JPやShift-JIS）で行うことを指す．
+  内部コードの差異だけであり，その他の(\eTeXpre)\upTeX 特有の
+  機能およびプリミティブは利用可能な状態である．
+  本文中\code{-kanji-internal}の説明も参照．\\
+  例えば，2023年のコマンド\code{eptex}が
+  \code{This is e-pTeX, Version ... (utf8.euc)}であったならば，
+  2024年には
+  \code{This is e-upTeX, Version ... (utf8.euc)}に変わっている．
+  一方\code{euptex}は
+  \code{This is e-upTeX, Version ... (utf8.uptex)}であるから
+  内部コードが異なる．
+\end{description}
 \begin{table}[ht]
   \centering
-  \begin{tabular}{ccc}
-    \code{コマンド名} & \TeX~Live 2022まで & \TeX~Live 2023 \\
-    \code{ptex} & \pTeX & \epTeX の互換モード \\
-    \code{uptex} & \upTeX & \eupTeX の互換モード \\
-    \code{eptex} & \epTeX\MODEext & →変更なし \\
-    \code{euptex} & \eupTeX\MODEext & →変更なし \\
+  \begin{tabular}{cccc}\hline
+    \code{コマンド名} & \TeX~Live 2022まで & \TeX~Live 2023 & \TeX~Live 2024以降 \\ \hline
+    \code{ptex} & \pTeX & \epTeX の互換モード & \eupTeX の内部レガシーの互換モード \\
+    \code{uptex} & \upTeX & \eupTeX の互換モード & →変更なし \\
+    \code{eptex} & \epTeX\MODEext & →変更なし & \eupTeX の内部レガシー \\
+    \code{euptex} & \eupTeX\MODEext & →変更なし & →変更なし \\ \hline
   \end{tabular}
 \end{table}
 
@@ -177,21 +199,14 @@ p3.1.11 (2009/08/17)．\url{https://asciidwango.github.io/ptex/}}ので，
 
 \TeX~Liveでのエンジン利用状況は以下の通りである．
 ここで，2023-06-01以降は\code{platex}で\epTeX ではなく
-「\eupTeX の内部処理をレガシーなEUC-JP/Shift-JISに変更した状態」
-が起動することに注意\footnote{(\eTeXpre)\upTeX は
-通常のコマンド名\code{uptex}や\code{euptex}で起動されると
-内部処理をUnicodeで行うが，
-コマンド名\code{ptex}や\code{eptex}で起動されると
-内部処理を(\eTeXpre)\pTeX 同様のレガシーエンコーディングで行う．
-内部コードの差異だけであり，その他の(\eTeXpre)\upTeX 特有の
-機能およびプリミティブは利用可能な状態である．
-本文中\code{-kanji-internal}の説明も参照．}．
+\eupTeX の内部レガシーが起動することに注意
+（\code{eptex}より一足早く変更された）．
 \begin{table}[ht]
   \centering
-  \begin{tabular}{ccc}
-    \code{コマンド名} & \TeX~Live 2012から2023初期まで & \TeX~Live 2023の2023-06-01以降 \\
+  \begin{tabular}{ccc}\hline
+    \code{コマンド名} & \TeX~Live 2012から2023初期まで & \TeX~Live 2023の2023-06-01以降 \\ \hline
     \code{platex} & \epTeX\MODEext & \eupTeX\MODEext の内部レガシー \\
-    \code{uplatex} & \eupTeX\MODEext & →変更なし \\
+    \code{uplatex} & \eupTeX\MODEext & →変更なし \\ \hline
   \end{tabular}
 \end{table}
 
