@@ -668,8 +668,9 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
  \item \TeX82と同様に，
   バッククオート(|`|)を使って「|`あ|」のようにして和文文字の内部コードを
   内部整数として得ることができる．欧文文字については，1文字の制御綴を
-  代わりに指定することができた（例えば，「|`b|」と「|`\b|」は同じ意味だった）が，
-  同じことを和文文字に対して「|`\あ|」などと行うことはできない．
+  代わりに指定することができる（例えば，「|`b|」と「|`\b|」は同じ意味である）．
+  従来\pTeX 系列では同じことを和文文字に対して「|`\あ|」などと行うことはできなかったが，
+  \TeX~Live 2025 \pTeX~4.1.2以降可能になった\cite{tjb167}．
  \item 数値で直接表現するために，異なるエンコードから内部コードへの
   文字コード変換を行うプリミティブが用意されている．
   \ref{sec:convert}節を参照．
@@ -2756,6 +2757,9 @@ has been |\let| equal to a non-active character token.
  \bibitem{dvistd0} TUG DVI Standards Working Group,
   \textit{The DVI Driver Standard, Level 0}.\\
   \url{https://ctan.org/pkg/dvistd}
+ \bibitem{tjb167} h-kitagawa, [XeTeX] BMP超のコントロールシンボル，
+  2024/02/25,\\
+  \url{https://github.com/texjporg/tex-jp-build/issues/167}
 \end{thebibliography}
 
 \newpage
