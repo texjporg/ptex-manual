@@ -646,14 +646,15 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
 \subsection{文字コードの範囲の拡張【\upTeX~u1.35, u2.00】}\label{sec:uptex_extension}
 \upTeX では従来の文字コードの範囲からの拡張を
 u1.35 および u2.00 (\TeX~Live 2025)にて行った．
-従来は和文を Unicode 1文字のコードポイントで取り扱い，欧文は8bitの範囲内にとどまっていたが
+従来は和文文字を Unicode 1文字のコードポイントで取り扱い欧文文字は8bitの範囲内にとどまっていたが，
 それを超えて扱えるようにするものである．
 やや特殊な扱いを要する上，新規の要素も多いためここに節を立てて説明する．
 
 \subsubsection{Unicode合成文字と異体字セレクタ(IVS) (\upTeX~u1.35)}\label{sec:uptex_ivs}
-Unicodeでは一つの文字を表すために複数のコードポイントの連なり(シーケンス)で示すことを規定されている文字がある．
-その例が異体字セレクタ(IVS, Ideographic Variation Sequence/Selector)や合成文字である．
-\upTeX ではそれを従来扱うことができなかったが\upTeX~u1.35 で対応を進めた\cite{tjb46}．
+Unicodeでは一つの文字を表すために複数のコードポイントの連なり(シーケンス)で示すことが規定されている文字がある．
+その例が異体字セレクタ(IVS, Ideographic Variation Sequence/Selector)\cite{ivd220913}や
+絵文字シーケンス\cite{emseq160}などである．
+\upTeX ではそれら合成文字を従来扱うことができなかったが\upTeX~u1.35 で対応を進めた\cite{tjb46}．
 仕様は以下の通りである．
 
 \begin{itemize}
@@ -666,14 +667,60 @@ Unicodeでは一つの文字を表すために複数のコードポイントの�
    DVIファイルにはそのコード値でDVI命令|set3|で書き込む．
  \item \upTeX に\.{kcatcode} 20 (modifier) を新設する．
    UTF-8の入力バッファの文字列で基底文字の直後に異体字セレクタや合成用濁点のようなmodifierが現れた場合には
-   基底文字の文字コードを複合文字用拡張文字コードに書き換えてトークン化する．
+   基底文字の文字コードを複合文字用拡張文字コードに置き換えてトークン化する．
    合成に失敗したmodifierは普通の文字(\.{kcatcode} 18 CJK記号)としてふるまう．
  \item \upTeX の処理中に文字バッファに書き戻す際には常にUTF-8のコードポイントのシーケンスに戻す．
-   それゆえ，テキスト形式の入出力では特殊な内部コードは現れることなく必ず正規のUnicodeになる．
+   それゆえ，テキスト形式の入出力では特殊な内部コードが現れることはなく必ず正規のUnicodeになる．
  \item dvips, dvipdfmxなどAdobe-Japan1 (AJ1)のCIDが扱えるdviwareでは，
    AJ1の文字に対してdvi命令|set3|からAJ1のCIDコードへ変換するvirtual fontを経由して出力することが可能である．
  \item dviware側の実装として，複合文字用拡張文字コードを直接扱いDVI命令|set3|に対し適切なグリフを選択するようにしてもよい．
 \end{itemize}
+
+\upTeX~u1.35で対応した複合文字用拡張文字コードの概略を表\ref{table:compound_charcode}にまとめた．
+各文字コードの具体的な変換式はptexencの実装を参照されたい．
+異体字セレクタは前述のIVSの他，SVS (Standardized Variation Sequence)にも対応している．
+IVSの最大VS256まで拡張可能になるよう複合文字用拡張文字コードでは考慮してあるが，
+おおもとのUnicode Ideographic Variation Database\cite{ivd220913}では今のところVS49〜VS256が未定義である．
+仮名の濁点・半濁点は基底文字が平仮名や片仮名の場合に加え変体仮名にも対応している．
+絵文字はかつての日本の携帯電話由来の絵文字の大部分に対応しているが，最近よく追加で規定される長くて複雑なシーケンスには対応していない．
+絵文字の国旗(RGI Emoji Flag Sequence)は，modifierとmodifierの連続が規定通りに組み合わさると合成文字の扱いになる．
+絵文字の肌色(Emoji Modifier Fitzpatrick Type-1..6)は，文字コード上対応しているがそれをどう出力するかはdviwareにお任せする．
+今後，さらに合成文字を追加対応するかどうかは未検討であり計画もない．
+
+\begin{table}[bp]
+\caption{複合文字用拡張文字コード．\upTeX~u1.35での対応状況．}
+\label{table:compound_charcode}
+\centering\small
+\begin{tabular}{ccccc}
+\toprule
+種類 & 基底文字 & modifier
+  & 複合文字用拡張文字コード & パラメータ \\
+\midrule
+仮名+濁点  & 仮名    & \code{U+3099}
+  & 0x22,0000〜0x23,FFFF &  \\
+仮名+半濁点 & 仮名   & \code{U+309A}
+  & 0x24,0000〜0x25,E6E5 &  \\
+絵文字(国旗) & \code{U+1F1E6..1F1FF} & \code{U+1F1E6..1F1FF}
+  & 0x25,E6E6〜0x25,FFFF & $26種\times 26種$ \\
+絵文字(肌色) & 絵文字 & \code{U+1F3FB..1F3FF}
+  & 0x26,0000〜0x2F,FFFF & Type-1-2〜6 \\
+SVS & 漢字,記号など  & \code{U+FE00..FE0F}
+  & 0x40,0000〜0x7F,FFFF & VS1〜VS16 \\
+IVS & 漢字          & \code{U+E0100..E011F}
+  & 0x80,0080〜0xFF,FFFF & VS17〜VS48 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+modifierに相当する文字コードは\upTeX~u1.35では既定で\.{kcatcode}=20 (modifier)に設定してある．
+複合文字用拡張文字コードのメトリックとしては通常JFMの既定値の全角幅を想定しているが，
+文字コード 0xFFFFFF 以内なので個別に設定することもできる．
+
+virtual fontの仕様としてフォーマットの面では今回新規な部分はないものの，
+最大で文字コード 0xFFFFFF となる点は従来の\TeX ファミリーで例がない．
+このため周辺ソフトウェアではこれに準拠した拡張が必要になる場合が多い．
+omfonts (ovp2ovf, ovf2ovp), dvips, dvipdfmxは対応を済ませてあり
+\TeX~Live 2025では利用可能である．
 
 
 \subsubsection{欧文8bit超 (\upTeX~u2.00, 実験的)}\label{sec:uptex_ofm}
@@ -700,7 +747,7 @@ Unicodeでは一つの文字を表すために複数のコードポイントの�
  \item |^^^^xyzw| の書式はその16bitコードの欧文ノードを生成する．(\.{kcatcode}=14,15両方, |^^xy|書式と同様)
 \end{itemize}
 
-関連ソフトウェアでは，updvitype も欧文用16bit OFM Level-0への対応が済んでいる．
+関連ソフトウェアでは，updvitype も欧文用16bit OFM Level-0への対応を済ませた．
 \pTeX 系列に対応したdviwareではすでに欧文用OFMへの対応が施されていることが多く，
 dvipdfmx, dvipsのような主要なdviwareでも\upTeX の欧文文字コードの範囲拡張もすでにカバーされている．
 現時点で\upTeX は欧文用OFM Level-1には未対応である．
@@ -883,10 +930,12 @@ CJK文字トークン（CJKトークン）と呼ぶべきだが，本文書で�
   \item \emph{和文文字トークンについてもカテゴリーコード}(\.{kcatcode})\emph{の情報を含む}．
     欧文トークンをcatcode 4bit + charcode 8bitで，
     和文トークンをkcatcode 5bit + charcode 24bitで表す．
+  \item \.{kcatcode}に14 (latin\_ucs)と20 (modifier)が\TeX~Live 2025で新設された．
+    内容は\ref{sec:uptex_extension}節で詳説した．
 \end{itemize}
 
 \begin{cslist}
-  \csitem[\.{kcatcode} <character code>=<15--19>]
+  \csitem[\.{kcatcode} <character code>=<14--20>]
   内部レガシーの\upTeX では，\pTeX と同様に
   JISコードでいう区ごとに値が設定可能．
   内部Unicodeの\upTeX では，和文カテゴリーコード(\.{kcatcode})は
@@ -2829,6 +2878,12 @@ has been |\let| equal to a non-active character token.
  \bibitem{tjb170} t-tk, [upTeX] ofm読み込みと符号位置 256 以上の欧文文字トークン・ノード,
   2024/08/18,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/170}
+ \bibitem{ivd220913} Ideographic Variation Database,
+  2022/09/13,\\
+  \url{https://www.unicode.org/ivd/data/2022-09-13/}
+ \bibitem{emseq160} Emoji Sequence Data,
+  2024/05/01,\\
+  \url{https://www.unicode.org/Public/emoji/16.0/emoji-sequences.txt}
 \end{thebibliography}
 
 \newpage
