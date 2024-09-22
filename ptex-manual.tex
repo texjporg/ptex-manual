@@ -643,6 +643,45 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
   % https://github.com/texjporg/tex-jp-build/issues/46
 \end{dangerous}
 
+\subsection{文字コードの範囲の拡張【\upTeX~u2.00以降】}\label{sec:uptex_extension}
+\upTeX では従来の文字コードの範囲に加えて
+u1.35 および u2.00 (\TeX~Live 2025)にて文字コードの範囲の拡張を行った．
+従来は和文を Unicode 1文字のコードポイントで取り扱い欧文は8bit以内だったが
+その範囲を超えて扱えるようにするものである．
+若干特殊な扱いを要する面もあり，新規の部分も多いため節を分けてここで説明する．
+
+\subsubsection{Unicode合成文字とIVS (\upTeX~u1.35)}\label{sec:uptex_ivs}
+
+\subsubsection{欧文8bit超 (\upTeX~u2.00, 実験的)}\label{sec:uptex_ofm}
+\upTeX では従来，欧文文字として扱える文字コードの範囲は8bit (\TeX90互換の0--255)であったが，
+\upTeX~u2.00 では0x2E7F以下まで拡張した\cite{tjb170}．
+動作実績がまだ少なく関連フォントの整備等にも時間を要するため，今のところ実験的機能と位置づけている．
+仕様は以下の通りである．
+\begin{itemize}
+ \item \upTeX エンジンが扱える欧文文字の範囲は 0--0x2E7F である．
+   文字コード256以上を含む文字フォントは Unicode U+0000..2E7F であることを想定する．
+ \item \.{kcatcode} 14 (latin\_ucs) を新設する．
+   UTF-8の入力バッファで8bit 文字コード列が正規のUTF-8として U+2E7F 以下と読み取れるとき，
+   Unicodeの欧文であると解釈して符号位置 0～0x2E7F の欧文文字ノードを生成する．
+   このとき「欧文 Unicode 1 文字に対し 1 トークン」となる．
+ \item 欧文用8bit TFMに加えて欧文用16bit OFM Level-0が読み込める．
+   符号位置 0～0x2E7F の欧文文字ノードはこれで扱う．
+   和文は従来同様 JFM で扱う．
+ \item 256～0x2E7Fの欧文文字コードは DVIファイルにはそのままの文字コードでDVI命令|set2|, |put2|で書き込む．
+ \item 0x2E80以上のUnicode文字は\upTeX では欧文扱いしない．
+   必要な場合はvirtual fontとdviwareで処置をする．
+ \item \.{catcode}, \.{lccode}, \.{uccode}, \.{sfcode} の扱う欧文文字コードの最大値は 0x2E7F とする．(\.{kcatcode}=14,15両方)
+ \item \.{kcatcode}=14のとき \.{char}, \.{chardef} は0～0x2E7F の欧文文字が扱える．
+ \item \eupTeX では \.{kcatcode}=14のとき \.{Uchar}, \.{Ucharcat}, \.{iffontchar} は0～0x2E7F の欧文文字が扱える．
+ \item |^^^^xyzw| の書式はその16bitコードの欧文ノードを生成する．(\.{kcatcode}=14,15両方, |^^xy|書式と同様)
+\end{itemize}
+
+関連ソフトウェアでは，updvitype も欧文用16bit OFM Level-0への対応が済んでいる．
+\pTeX 系列に対応したdviwareではすでに欧文用OFMへの対応が施されていることが多く，
+dvipdfmx, dvipsのような主要なdviwareでも\upTeX の欧文文字コードの範囲拡張もすでにカバーされている．
+現時点で\upTeX は欧文用OFM Level-1には未対応である．
+
+
 \subsection{文字コードの取得と指定}\label{sec:getcode}
 (u)\pTeX では「文字コードを引数にとるプリミティブ」といっても，状況によって
 \begin{itemize}
@@ -2760,6 +2799,9 @@ has been |\let| equal to a non-active character token.
  \bibitem{tjb167} h-kitagawa, [XeTeX] BMP超のコントロールシンボル，
   2024/02/25,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/167}
+ \bibitem{tjb170} t-tk, [upTeX] ofm読み込みと符号位置 256 以上の欧文文字トークン・ノード,
+  2024/08/18,\\
+  \url{https://github.com/texjporg/tex-jp-build/issues/170}
 \end{thebibliography}
 
 \newpage
