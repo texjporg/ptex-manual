@@ -643,14 +643,38 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
   % https://github.com/texjporg/tex-jp-build/issues/46
 \end{dangerous}
 
-\subsection{文字コードの範囲の拡張【\upTeX~u2.00以降】}\label{sec:uptex_extension}
-\upTeX では従来の文字コードの範囲に加えて
-u1.35 および u2.00 (\TeX~Live 2025)にて文字コードの範囲の拡張を行った．
-従来は和文を Unicode 1文字のコードポイントで取り扱い欧文は8bit以内だったが
-その範囲を超えて扱えるようにするものである．
-若干特殊な扱いを要する面もあり，新規の部分も多いため節を分けてここで説明する．
+\subsection{文字コードの範囲の拡張【\upTeX~u1.35, u2.00】}\label{sec:uptex_extension}
+\upTeX では従来の文字コードの範囲からの拡張を
+u1.35 および u2.00 (\TeX~Live 2025)にて行った．
+従来は和文を Unicode 1文字のコードポイントで取り扱い，欧文は8bitの範囲内にとどまっていたが
+それを超えて扱えるようにするものである．
+やや特殊な扱いを要する上，新規の要素も多いためここに節を立てて説明する．
 
-\subsubsection{Unicode合成文字とIVS (\upTeX~u1.35)}\label{sec:uptex_ivs}
+\subsubsection{Unicode合成文字と異体字セレクタ(IVS) (\upTeX~u1.35)}\label{sec:uptex_ivs}
+Unicodeでは一つの文字を表すために複数のコードポイントの連なり(シーケンス)で示すことを規定されている文字がある．
+その例が異体字セレクタ(IVS, Ideographic Variation Sequence/Selector)や合成文字である．
+\upTeX ではそれを従来扱うことができなかったが\upTeX~u1.35 で対応を進めた\cite{tjb46}．
+仕様は以下の通りである．
+
+\begin{itemize}
+ \item 想定した範囲のシーケンスの集合を定め\upTeX 独自の内部用の文字コード(複合文字用拡張文字コード)を定義する(後述)．
+   複合文字用拡張文字コードにはコード値0x22,0000以降を用いる．
+ \item ptexenc, \upTeX エンジンを拡張する．
+   ptexenc libraryで文字コードの合成・分解の関数を用意する．
+   \upTeX とdviwareの間の文字データ渡しには複合文字用拡張文字コードを用いる．
+ \item \upTeX エンジン内部では合成文字を複合文字用拡張文字コードで1文字として扱い，
+   DVIファイルにはそのコード値でDVI命令|set3|で書き込む．
+ \item \upTeX に\.{kcatcode} 20 (modifier) を新設する．
+   UTF-8の入力バッファの文字列で基底文字の直後に異体字セレクタや合成用濁点のようなmodifierが現れた場合には
+   基底文字の文字コードを複合文字用拡張文字コードに書き換えてトークン化する．
+   合成に失敗したmodifierは普通の文字(\.{kcatcode} 18 CJK記号)としてふるまう．
+ \item \upTeX の処理中に文字バッファに書き戻す際には常にUTF-8のコードポイントのシーケンスに戻す．
+   それゆえ，テキスト形式の入出力では特殊な内部コードは現れることなく必ず正規のUnicodeになる．
+ \item dvips, dvipdfmxなどAdobe-Japan1 (AJ1)のCIDが扱えるdviwareでは，
+   AJ1の文字に対してdvi命令|set3|からAJ1のCIDコードへ変換するvirtual fontを経由して出力することが可能である．
+ \item dviware側の実装として，複合文字用拡張文字コードを直接扱いDVI命令|set3|に対し適切なグリフを選択するようにしてもよい．
+\end{itemize}
+
 
 \subsubsection{欧文8bit超 (\upTeX~u2.00, 実験的)}\label{sec:uptex_ofm}
 \upTeX では従来，欧文文字として扱える文字コードの範囲は8bit (\TeX90互換の0--255)であったが，
@@ -667,7 +691,7 @@ u1.35 および u2.00 (\TeX~Live 2025)にて文字コードの範囲の拡張を
  \item 欧文用8bit TFMに加えて欧文用16bit OFM Level-0が読み込める．
    符号位置 0～0x2E7F の欧文文字ノードはこれで扱う．
    和文は従来同様 JFM で扱う．
- \item 256～0x2E7Fの欧文文字コードは DVIファイルにはそのままの文字コードでDVI命令|set2|, |put2|で書き込む．
+ \item 256～0x2E7Fの欧文文字コードは DVIファイルにはそのままの文字コードでDVI命令|set2|で書き込む．
  \item 0x2E80以上のUnicode文字は\upTeX では欧文扱いしない．
    必要な場合はvirtual fontとdviwareで処置をする．
  \item \.{catcode}, \.{lccode}, \.{uccode}, \.{sfcode} の扱う欧文文字コードの最大値は 0x2E7F とする．(\.{kcatcode}=14,15両方)
@@ -2769,6 +2793,9 @@ has been |\let| equal to a non-active character token.
  \bibitem{tjb37} aminophen, 「和文のコントロールシンボル」，
   2017/11/29,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/37}
+ \bibitem{tjb46} t-tk, [upTeX+dvipdfmx] 異体字セレクタ、Unicode合成文字,
+  2018/01/28,\\
+  \url{https://github.com/texjporg/tex-jp-build/issues/46}
  \bibitem{tjb55} aminophen, 「[(u)pTeX] 内部コードの -kanji-internal オプション」，
   2018/04/03,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/55}
