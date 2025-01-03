@@ -56,7 +56,7 @@ e-mail: \texttt{h\_kitagawa2001(at)yahoo.co.jp}}}
 \epTeX は，東京大学理学部数学科3年生対象の2007年度の授業「計算数学II」
 \footnote{\url{http://ks.ms.u-tokyo.ac.jp/}．}において北川が作成したプログ
 ラムである．もともとは\pTeX~3.1.10を基盤として，\eTeX~2.2相当の機能や
-10進21桁の浮動小数点演算を追加したものであったが，今では次の点が変わっている．
+10進21桁の浮動小数点演算を追加したものであったが，今では次の点が変わっている\footnote{本稿も最新版TeX Liveに取り込まれた機能追加・更新に合わせて改訂している．}．
 \begin{itemize}
   \item \TeX~Live~2011に取り込まれるにあたり，
   \eTeX をベースにして，その上に\pTeX 拡張やその他追加機能を載せる方針へと
@@ -277,9 +277,10 @@ tracing機能や条件判断文の強化などあるが，そこら辺はパッ�
       オリジナルの\eTeX と同じ挙動である．すなわち，
       引数に$c \geq 256$や$c < 0$を与えると
       \verb+! Bad character code (256).+
-      のようにエラーが出る．
+      のようにエラーが出る\footnotemark ．
   \end{itemize}
 
+  \addtocounter{footnote}{-2}
  \csitem[\.{iffontchar} <font> <number>]
   \begin{itemize}
     \item 和文フォントの場合： \.{iffontchar} <Japanese font> <number>\\
@@ -296,10 +297,12 @@ tracing機能や条件判断文の強化などあるが，そこら辺はパッ�
       オリジナルの\eTeX と同じ挙動である．すなわち，
       引数に$c \geq 256$や$c < 0$を与えると
       \verb+! Bad character code (256).+
-      のようにエラーが出る．
+      のようにエラーが出る\footnotemark ．
   \end{itemize}
 \end{cslist}
-
+  \footnotetext{\epTeX~241020 (\upTeX~2.00)以降，
+    \.{kcatcode}の値が14のときの欧文文字トークンの有効な文字コードの最大値は0x2E7Fであり，
+    $c \geq 0x2E80$でエラーが出る．}
 \begin{dangerous}
   上記で「和文文字コードとして有効かどうか」は，関数|is_char_kanji|を参照．
   この関数は内部コードによって異なるため，マクロで実装するのは面倒であるが，
@@ -1069,14 +1072,21 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 	  <character code>&和文・欧文&\multicolumn{2}{c}{category code}\\\cmidrule(lr){3-4}
 	  &&\epTeX&\eupTeX\\
 	  \midrule
-	  0--31, 33--255&欧文文字トークン&12&12\\
+	  0--31, 33--255\footnotemark%
+	                &欧文文字トークン&12&12\\
 	  32            &欧文文字トークン&10&10\\
 	  256以上の<kanji code>&和文文字トークン&---（都度取得）&その時の\.{kcatcode}\footnotemark\\
 	  \bottomrule
 	\end{tabular}
   \end{center}
+  \addtocounter{footnote}{-2}\stepcounter{footnote}
+  \footnotetext{\epTeX~241020 (\upTeX~2.00)以降，
+	\.{kcatcode}の値が14のときの欧文文字トークンの有効な文字コードの最大値は0x2E7F．}
+
+  \stepcounter{footnote}
   \footnotetext{もし\.{kcatcode}の値が15だったときは，得られる和文文字トークンの
 	\.{kcatcode}は18となる．}
+  \addtocounter{footnote}{-2}
 
  \csitem[\.{Ucharcat} <character code> <category code>]
   文字コード・カテゴリーコードがそれぞれ<character code>, <category code>の文字トークンに展開される．
@@ -1084,8 +1094,9 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
   \epTeX では和文文字トークンにはカテゴリーコードの情報は保存されないため，
   \epTeX の\.{Ucharcat}は欧文文字トークンの生成しかサポートしない．
   具体的には，
-  指定可能な値は<character code>が0--255，<category code>が1--4, 6--8, 10--13のみである．
+  指定可能な値は<character code>が0--255\footnotemark，<category code>が1--4, 6--8, 10--13のみである．
 \end{cslist}
+  \addtocounter{footnote}{1}
 \begin{dangerous}
   \eupTeX では，\.{Ucharcat}で和文文字トークンの生成もサポートしている．
 
@@ -1096,11 +1107,14 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 	\item <character code>が128--255のときは，欧文文字トークン・和文文字トークンの
 	どちらも生成可能である．
 	<category code>の指定可能値は1--4, 6--8, 10--13（以上欧文文字トークンを生成），
-	および16--19（和文文字トークンを生成）．
+	および16--19\footnotemark （和文文字トークンを生成）．
+	\addtocounter{footnote}{-1}
 	\item <character code>が256以上のときは，和文文字トークンのみ生成可能である．従って
-	<category code>の指定可能値は16--19．
+	<category code>の指定可能値は16--19\footnotemark ．
   \end{itemize}
 \end{dangerous}
+  \footnotetext{\upTeX~1.35以降，
+	和文文字トークンを生成する\.{kcatcode}の最大値は20．}
 \begin{dangerous}
   \.{Uchar}で和文文字トークンを生成するには，その和文文字コードを
   与える必要があるが，その値は内部漢字コードに依るので，
