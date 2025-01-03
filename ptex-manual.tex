@@ -747,12 +747,12 @@ virtual fontの仕様としてフォーマットの面では今回新規な部�
  \item 256～0x2E7Fの欧文文字コードは DVIファイルにはそのままの文字コード(UCS-2相当)でDVI命令|set2|で書き込む．
  \item U+2E80以上のUnicode文字は\upTeX では欧文文字として扱わない．
    必要な場合はvirtual fontとdviwareで処置%
-   \footnote{頻出する例にU+FB00..FB06のリガチャ(ff, fi, fl等)が挙げられる．\TeX90では8bit (0--255)の内部コードを使用しているが，それと同様の取り扱いを維持する必要がある．}%
+   \footnote{頻出する例にU+FB00..FB06のリガチャ(ff, fi, fl等)が挙げられる．\TeX90ではそれらを8bit (0--255)の内部コードに割り当てて使用しているが，それと同様の取り扱いを維持する必要がある．}%
    をする．
  \item \.{catcode}, \.{lccode}, \.{uccode}, \.{sfcode} の扱う欧文文字コードの最大値は 0x2E7F とする．(\.{kcatcode}=14,15両方)
  \item \.{kcatcode}=14のとき \.{char}, \.{chardef} は0～0x2E7F の欧文文字が扱える．
  \item \eupTeX では \.{kcatcode}=14のとき \.{Uchar}, \.{Ucharcat}, \.{iffontchar} は0～0x2E7F の欧文文字が扱える．
- \item |^^^^xyzw| の書式はその16bitコードの欧文ノードを生成する．(\.{kcatcode}の設定に依らない．|^^xy|書式と同様)
+ \item |^^^^abcd| の書式はその16bitコード(0xABCD)の欧文ノードを生成する．(\.{kcatcode}の設定に依らない．|^^ab|書式と同様)
 \end{itemize}
 
 関連ソフトウェアでは，\code{updvitype} も欧文用16bit OFM Level-0への対応を済ませた．
