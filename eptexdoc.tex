@@ -56,7 +56,7 @@ e-mail: \texttt{h\_kitagawa2001(at)yahoo.co.jp}}}
 \epTeX は，東京大学理学部数学科3年生対象の2007年度の授業「計算数学II」
 \footnote{\url{http://ks.ms.u-tokyo.ac.jp/}．}において北川が作成したプログ
 ラムである．もともとは\pTeX~3.1.10を基盤として，\eTeX~2.2相当の機能や
-10進21桁の浮動小数点演算を追加したものであったが，今では次の点が変わっている\footnote{本稿も最新版TeX Liveに取り込まれた機能追加・更新に合わせて改訂している．}．
+10進21桁の浮動小数点演算を追加したものであったが，今では次の点が変わっている\footnote{本稿も最新版\TeX~Liveに取り込まれた機能追加・更新に合わせて改訂している．}．
 \begin{itemize}
   \item \TeX~Live~2011に取り込まれるにあたり，
   \eTeX をベースにして，その上に\pTeX 拡張やその他追加機能を載せる方針へと
@@ -300,9 +300,9 @@ tracing機能や条件判断文の強化などあるが，そこら辺はパッ�
       のようにエラーが出る\footnotemark ．
   \end{itemize}
 \end{cslist}
-  \footnotetext{\epTeX~241020 (\upTeX~2.00)以降，
+  \footnotetext{\epTeX~241020 (\upTeX~2.00, \TeX~Live~2025)以降，
     \.{kcatcode}の値が14のときの欧文文字トークンの有効な文字コードの最大値は0x2E7Fであり，
-    $c \geq 0x2E80$でエラーが出る．}
+    $c \geq \textrm{0x2E80}$でエラーが出る(\cite{tjb170})．}
 \begin{dangerous}
   上記で「和文文字コードとして有効かどうか」は，関数|is_char_kanji|を参照．
   この関数は内部コードによって異なるため，マクロで実装するのは面倒であるが，
@@ -1080,8 +1080,8 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 	\end{tabular}
   \end{center}
   \addtocounter{footnote}{-2}\stepcounter{footnote}
-  \footnotetext{\epTeX~241020 (\upTeX~2.00)以降，
-	\.{kcatcode}の値が14のときの欧文文字トークンの有効な文字コードの最大値は0x2E7F．}
+  \footnotetext{\epTeX~241020 (\upTeX~2.00, \TeX~Live~2025)以降，
+	\.{kcatcode}の値が14のときの欧文文字トークンの有効な文字コードの最大値は0x2E7F(\cite{tjb170})．}
 
   \stepcounter{footnote}
   \footnotetext{もし\.{kcatcode}の値が15だったときは，得られる和文文字トークンの
@@ -1107,14 +1107,14 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 	\item <character code>が128--255のときは，欧文文字トークン・和文文字トークンの
 	どちらも生成可能である．
 	<category code>の指定可能値は1--4, 6--8, 10--13（以上欧文文字トークンを生成），
-	および16--19\footnotemark （和文文字トークンを生成）．
+	および16--20\footnotemark （和文文字トークンを生成）．
 	\addtocounter{footnote}{-1}
 	\item <character code>が256以上のときは，和文文字トークンのみ生成可能である．従って
-	<category code>の指定可能値は16--19\footnotemark ．
+	<category code>の指定可能値は16--20\footnotemark ．
   \end{itemize}
 \end{dangerous}
-  \footnotetext{\upTeX~1.35以降，
-	和文文字トークンを生成する\.{kcatcode}の最大値は20．}
+  \footnotetext{\upTeX~1.35以降(\TeX~Live~2025以降)，
+	和文文字トークンを生成する\.{kcatcode}の最大値は19から20に拡張された(\cite{tjb46})．}
 \begin{dangerous}
   \.{Uchar}で和文文字トークンを生成するには，その和文文字コードを
   与える必要があるが，その値は内部漢字コードに依るので，
@@ -1442,6 +1442,8 @@ $3$\,sp）だが，どこか気になるところである．
   non-ASCII symbols in labels.'',
   2018/12/03.\\
   \url{https://github.com/latex3/latex2e/issues/95}
+ \bibitem{tjb46} t-tk，「[upTeX+dvipdfmx] 異体字セレクタ、Unicode合成文字」，2018/01/28．\\
+  \url{https://github.com/texjporg/tex-jp-build/issues/46}．
  \bibitem{tjb81} 北川 弘典，「バイト列と和文文字トークンの区別」，2019/06/08．\\
   \url{https://github.com/texjporg/tex-jp-build/issues/81}．
  \bibitem{tjb83} aminophen，「[e-pTeX] \.{ifincsname}」，2019/07/09．\\
@@ -1457,6 +1459,8 @@ $3$\,sp）だが，どこか気になるところである．
   \url{https://www.latex-project.org/news/latex2e-news/ltnews31.pdf}.
  \bibitem{tjb115} aminophen，「e(u)ptex: Add |\vadjust pre|」，2021/05/22．\\
   \url{https://github.com/texjporg/tex-jp-build/pull/115}
+ \bibitem{tjb170} t-tk，「[upTeX] ofm読み込みと符号位置 256 以上の欧文文字トークン・ノード」，2024/06/23．\\
+  \url{https://github.com/texjporg/tex-jp-build/issues/170}
 \end{thebibliography}
 
 \newpage
