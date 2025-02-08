@@ -646,49 +646,62 @@ virtual modeでは，起動直後にバナーを表示してから，フォー�
 
 \subsection{文字コードの範囲の拡張【\upTeX~u1.35, u2.00】}\label{sec:uptex_extension}
 \upTeX では従来の文字コードの範囲からの拡張を
-u1.35 および u2.00 (\TeX~Live 2025)にて行った．
-従来は和文文字を Unicode 1文字のコードポイントで取り扱い欧文文字は8bitの範囲内にとどまっていたが，
+u1.35およびu2.00 (\TeX~Live 2025)にて行った．
+従来は和文文字をUnicode 1文字のコードポイントで「1文字1トークン」として取り扱うのに対し，
+欧文文字は8bitの範囲内にとどまり「1バイト1トークン」で扱っていたが，
 それを超えて扱えるようにするものである．
 やや特殊な扱いを要する上，新規の要素も多いためここに節を立てて説明する．
 
 \subsubsection{Unicode合成文字と異体字セレクタ(IVS) (\upTeX~u1.35)}\label{sec:uptex_ivs}
-Unicodeでは一つの文字を表すために複数のコードポイントの連なり(シーケンス)で示すことが規定されている文字がある．
+Unicodeでは，一つの文字を表すために複数のコードポイントの
+連なり（シーケンス）で示すことが規定されている文字がある．
 その例が異体字セレクタ(IVS, Ideographic Variation Sequence/Selector)\cite{ivd220913}や
 絵文字シーケンス\cite{emseq160}などである．
-\upTeX ではそれら合成文字を従来扱うことができなかったが\upTeX~u1.35 で対応を進めた\cite{tjb46}．
+\upTeX ではそれら合成文字を従来扱うことができなかったが，\upTeX~u1.35で対応を進めた\cite{tjb46}．
 仕様は以下の通りである．
 
 \begin{itemize}
  \item 想定した範囲のシーケンスの集合%
    \footnote{言い換えれば網羅的ではなく想定外のシーケンスには対応していない．}%
-   を定め\upTeX 独自の内部用の文字コード(合成文字用拡張文字コード)を定義する(後述)．
-   合成文字用拡張文字コードにはコード値0x22,0000以降を用い和文文字として扱う．
- \item \code{ptexenc}, \upTeX エンジンを拡張する．
+   を定め，\upTeX 独自の内部用の文字コード（合成文字用拡張文字コード）を定義する（後述）．
+   合成文字用拡張文字コードにはコード値0x220000以降を用い，和文文字として扱う．
+ \item \code{ptexenc}，\upTeX エンジンを拡張する．
    \code{ptexenc}ライブラリで文字コードの合成・分解のAPIを用意する．
    \upTeX とdviwareの間の文字データ渡しには合成文字用拡張文字コードを用いる．
  \item \upTeX エンジン内部では合成文字を合成文字用拡張文字コードで1文字として扱い，
    DVIファイルにはそのコード値でDVI命令|set3|で書き込む．
- \item \upTeX に\.{kcatcode} 20 ($\mathit{modifier}$) を新設する．
-   UTF-8の入力バッファの文字列で基底文字の直後に異体字セレクタや合成用濁点のような$\mathit{modifier}$が現れた場合には
+ \item \upTeX に\.{kcatcode} 20 ($\mathit{modifier}$)を新設する．
+   UTF-8の入力バッファの文字列で基底文字の直後に異体字セレクタや合成用濁点のような
+   $\mathit{modifier}$が現れた場合には，
    基底文字の文字コードを合成文字用拡張文字コードに置き換えてトークン化する．
-   合成に失敗した$\mathit{modifier}$は普通の文字(\.{kcatcode} 18 $\mathit{other\_kchar}$, CJK記号)としてふるまう．
- \item \upTeX の処理中に合成文字のデータを文字バッファに書き戻す際には常にUTF-8の複数コードポイントのシーケンスに戻す．
+   合成に失敗した$\mathit{modifier}$は
+   普通の文字(\.{kcatcode} 18 $\mathit{other\_kchar}$, CJK記号)としてふるまう．
+ \item \upTeX の処理中に合成文字のデータを文字バッファに書き戻す際には，
+   常にUTF-8の複数コードポイントのシーケンスに戻す．
    それゆえ，テキスト形式の入出力では特殊な内部コードが現れることはなく必ず正規のUnicodeになる．
  \item \code{dvips}, \code{dvipdfmx}などAdobe-Japan1 (AJ1)のCIDが扱えるdviwareでは，
-   AJ1の文字に対してDVI命令|set3|からAJ1のCIDコードへ変換するvirtual fontを経由して出力することが可能である．
- \item dviware側の実装として，合成文字用拡張文字コードを直接扱いDVI命令|set3|に対し適切なグリフを選択するようにしてもよい．
+   AJ1の文字に対してDVI命令|set3|からAJ1のCIDコードへ変換するvirtual fontを経由して
+   出力することが可能である．
+ \item dviware側の実装として，合成文字用拡張文字コードを直接扱い
+   DVI命令|set3|に対し適切なグリフを選択するようにしてもよい．
 \end{itemize}
 
 \upTeX~u1.35で対応した合成文字用拡張文字コードの概略を表\ref{table:compound_charcode}にまとめた．
-各文字コードの具体的な変換式は\href{https://github.com/texjporg/uptex-base}{\file{uptex-base}}で配布している
+各文字コードの具体的な変換式は
+\href{https://github.com/texjporg/uptex-base}{\file{uptex-base}}で配布している
 \file{01uptex_doc_utf8.txt}を参照されたい．
-異体字セレクタ(VS, Variation Selector)は前述のIVSの他，SVS (Standardized Variation Sequence)にも対応している．
+異体字セレクタ(VS, Variation Selector)は前述のIVSの他，
+SVS (Standardized Variation Sequence)にも対応している．
 IVSの最大VS256まで拡張可能になるよう合成文字用拡張文字コードでは考慮してあるが，
-おおもとのUnicode Ideographic Variation Database\cite{ivd220913}では今のところVS49〜VS256が未定義である．
+おおもとのUnicode Ideographic Variation Database\cite{ivd220913}では
+今のところVS49〜VS256が未定義である．
 仮名の濁点・半濁点は基底文字が平仮名や片仮名の場合に加え変体仮名にも対応している．
-絵文字はかつての日本の携帯電話由来の絵文字の大部分に対応しているが，最近よく追加で規定される長くて複雑なシーケンスには対応していない．
-絵文字の国旗(RGI Emoji Flag Sequence)は，$\mathit{modifier}$と$\mathit{modifier}$の連続が規定通りに組み合わさると合成文字の扱いになる．
-国旗および肌色(Emoji Modifier Fitzpatrick Type-1..6)など絵文字全般について，DVIに書かれたデータをどう出力するかはdviwareにお任せする．
+絵文字はかつての日本の携帯電話由来の絵文字の大部分に対応しているが，
+最近よく追加で規定される長くて複雑なシーケンスには対応していない．
+絵文字の国旗(RGI Emoji Flag Sequence)は，
+$\mathit{modifier}$と$\mathit{modifier}$の連続が規定通りに組み合わさると合成文字の扱いになる．
+国旗および肌色(Emoji Modifier Fitzpatrick Type-1..6)など絵文字全般について，
+DVIに書かれたデータをどう出力するかはdviwareにお任せする．
 今後，さらに合成文字を追加対応するかどうかは未検討であり計画もない．
 
 \begin{table}[bp]
@@ -716,48 +729,57 @@ IVS & 漢字          & \code{U+E0100..E011F}
 \end{tabular}
 \end{table}
 
-modifierに相当する文字コードは\upTeX~u1.35では既定で\.{kcatcode}=20 ($\mathit{modifier}$)に設定してある．
+modifierに相当する文字コードは
+\upTeX~u1.35では既定で\.{kcatcode}=20 ($\mathit{modifier}$)に設定してある．
 合成文字用拡張文字コードのメトリックとしては通常JFMの既定値の全角幅を想定しているが，
-文字コード 0xFFFFFF 以内なので個別に設定することもできる．
+文字コード0xFFFFFF以内なので個別に設定することもできる．
 
 virtual fontの仕様としてフォーマットの面では今回新規な部分はないものの，
-最大で文字コード 0xFFFFFF となる点は従来の\TeX ファミリーで例がない．
+最大で文字コード0xFFFFFFとなる点は従来の\TeX ファミリーで例がない．
 このため周辺ソフトウェアではこれに準拠した拡張が必要になる場合が多い．
 \code{omfonts} (\code{ovp2ovf}, \code{ovf2ovp}), \code{dvips}, \code{dvipdfmx}は対応を済ませてあり
 \TeX~Live 2025では利用可能である．
 
 
 \subsubsection{欧文8bit超 (\upTeX~u2.00, 実験的)}\label{sec:uptex_ofm}
-\upTeX では従来，欧文文字として扱える文字コードの範囲は8bit (\TeX90互換の0--255)であったが，
-\upTeX~u2.00 では0x2E7F以下まで拡張した\cite{tjb170}．
+\upTeX では従来，欧文文字として扱える文字コードの範囲は8bit（\TeX90互換の0--255）であったが，
+\upTeX~u2.00では0x2E7F以下まで拡張した\cite{tjb170}．
 動作実績がまだ少なく関連フォントの整備等にも時間を要するため，今のところ実験的機能と位置づけている．
 仕様は以下の通りである．
 \begin{itemize}
- \item \upTeX エンジンが扱える欧文文字の範囲は 0～0x2E7F である．
-   文字コード256以上を含む文字フォントは Unicode U+0000..2E7F であることを想定する．
- \item \.{kcatcode} 14 ($\mathit{latin\_ucs}$) を新設する．
-   UTF-8の入力バッファで8bit 文字コード列が正規のUTF-8として U+2E7F 以下と読み取れてかつ
-   そのコード値を含むブロックの\.{kcatcode}が14となっているとき，
-   Unicodeの欧文であると解釈して符号位置 0～0x2E7F の欧文文字ノードを生成する．
+ \item \upTeX エンジンが扱える欧文文字の範囲は0～0x2E7Fである．
+   文字コード256以上を含む文字フォントはUnicode U+0000..2E7Fであることを想定する．
+ \item \.{kcatcode} 14 ($\mathit{latin\_ucs}$)を新設する．
+   UTF-8の入力バッファで8bit文字コード列が正規のUTF-8としてU+2E7F以下と読み取れて，
+   かつそのコード値を含むブロックの\.{kcatcode}が14となっているとき，
+   Unicodeの欧文であると解釈して符号位置0～0x2E7Fの欧文文字ノードを生成する．
    同時にその文字コードに相当する欧文文字の\.{catcode}が付与される．
-   このとき「欧文 Unicode 1 文字に対し 1 トークン」となる．
+   このとき「欧文Unicode 1文字に対し1トークン」となる．
  \item 欧文用8bit TFMに加えて欧文用16bit OFM Level-0が読み込める．
-   符号位置 0～0x2E7F の欧文文字ノードはこれで扱う．
-   和文文字は従来同様 JFM で扱う．
- \item 256～0x2E7Fの欧文文字コードは DVIファイルにはそのままの文字コード(UCS-2相当)でDVI命令|set2|で書き込む．
+   符号位置0～0x2E7Fの欧文文字ノードはこれで扱う．
+   和文文字は従来同様JFMで扱う．
+ \item 256～0x2E7Fの欧文文字コードは，
+   DVIファイルにはそのままの文字コード（UCS-2相当）でDVI命令|set2|で書き込む．
  \item U+2E80以上のUnicode文字は\upTeX では欧文文字として扱わない．
    必要な場合はvirtual fontとdviwareで処置%
-   \footnote{頻出する例にU+FB00..FB06のリガチャ(ff, fi, fl等)が挙げられる．\TeX90ではそれらを8bit (0--255)の内部コードに割り当てて使用しているが，それと同様の取り扱いを維持する必要がある．}%
+   \footnote{頻出する例にU+FB00..FB06のリガチャ（ff, fi, fl等）が挙げられる．
+   \TeX90ではそれらを8bit (0--255)の内部コードに割り当てて使用しているが，
+   それと同様の取り扱いを維持する必要がある．}%
    をする．
- \item \.{catcode}, \.{lccode}, \.{uccode}, \.{sfcode} の扱う欧文文字コードの最大値は 0x2E7F とする．(\.{kcatcode}=14,15両方)
- \item \.{kcatcode}=14のとき \.{char}, \.{chardef} は0～0x2E7F の欧文文字が扱える．
- \item \eupTeX では \.{kcatcode}=14のとき \.{Uchar}, \.{Ucharcat}, \.{iffontchar} は0～0x2E7F の欧文文字が扱える．
- \item |^^^^abcd| の書式はその16bitコード(0xABCD)の欧文ノードを生成する．(\.{kcatcode}の設定に依らない．|^^ab|書式と同様)
+ \item \.{catcode}, \.{lccode}, \.{uccode}, \.{sfcode}の扱う欧文文字コードの
+   最大値は0x2E7Fとする（\.{kcatcode}=14,15両方）．
+ \item \.{kcatcode}=14のとき，
+   \.{char}, \.{chardef}は0～0x2E7Fの欧文文字が扱える．
+ \item \eupTeX では\.{kcatcode}=14のとき，
+   \.{Uchar}, \.{Ucharcat}, \.{iffontchar}は0～0x2E7Fの欧文文字が扱える．
+ \item |^^^^abcd|の書式は，その16bitコード(0xABCD)の欧文文字トークンを生成する
+   （\.{kcatcode}の設定に依らず常に欧文扱い．|^^ab|書式と同様）．
 \end{itemize}
 
-関連ソフトウェアでは，\code{updvitype} も欧文用16bit OFM Level-0への対応を済ませた．
+関連ソフトウェアでは，\code{updvitype}も欧文用16bit OFM Level-0への対応を済ませた．
 \pTeX 系列に対応したdviwareではすでにOFMへの対応が施されていることが多く，
-\code{dvipdfmx}, \code{dvips}のような主要なdviwareでも\upTeX の欧文文字コードの範囲拡張はすでにカバーされている．
+\code{dvipdfmx}, \code{dvips}のような主要なdviwareでも
+\upTeX の欧文文字コードの範囲拡張はすでにカバーされている．
 現時点で\upTeX は欧文用OFM Level-1には未対応である．
 
 
@@ -1648,7 +1670,7 @@ so I use .notdef glyph instead.
 \end{verbatim}
   というエラーが発生する（\TeX82と同じ挙動）．
   \upTeX~u2.00では，
-  欧文文字をUnicode 1文字に対し1トークンとして扱う機能が追加された(\ref{sec:uptex_ofm}節)が，
+  欧文文字をUnicode 1文字に対し1トークンとして扱う機能が追加された（\ref{sec:uptex_ofm}節）が，
   それに伴い<in spec>の書式も拡張された．
   指定可能な<encoding>は|t1|, |ts1|, |ly1|, |t5|, |l7x|, |t2a|, |t2b|, |t2c|, |lgr|である．
   レガシーエンコーディングの欧文TFMに対してこの指定をすると，
@@ -2812,7 +2834,7 @@ has been |\let| equal to a non-active character token.
     コード番号が$c$ ($\mathtt{0x10000} \le c < \mathtt{0x1000000}$)の
     文字を印字し，参照点を移動する．
     \upTeX ではUCS-4の下位3バイトが用いられる（\pTeX では現れない）．
-    \upTeX~u1.35以降では，合成文字用拡張文字コードも用いられる(\ref{sec:uptex_ivs}節)．
+    \upTeX~u1.35以降では，合成文字用拡張文字コードも用いられる（\ref{sec:uptex_ivs}節）．
   \item |dir| (255)\quad $\mathit{d}[1]$\\
     組方向を変更する．$\mathit{d}[1]=0$が横組，
     $\mathit{d}[1]=1$が縦組，$\mathit{d}[1]=3$がDtoU組を示す．
@@ -2857,7 +2879,7 @@ has been |\let| equal to a non-active character token.
  \bibitem{tjb37} aminophen, 「和文のコントロールシンボル」，
   2017/11/29,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/37}
- \bibitem{tjb46} t-tk, [upTeX+dvipdfmx] 異体字セレクタ、Unicode合成文字,
+ \bibitem{tjb46} t-tk, 「[upTeX+dvipdfmx] 異体字セレクタ、Unicode合成文字」，
   2018/01/28,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/46}
  \bibitem{tjb55} aminophen, 「[(u)pTeX] 内部コードの -kanji-internal オプション」，
@@ -2887,10 +2909,10 @@ has been |\let| equal to a non-active character token.
  \bibitem{dvistd0} TUG DVI Standards Working Group,
   \textit{The DVI Driver Standard, Level 0}.\\
   \url{https://ctan.org/pkg/dvistd}
- \bibitem{tjb167} h-kitagawa, [XeTeX] BMP超のコントロールシンボル，
+ \bibitem{tjb167} h-kitagawa, 「[XeTeX] BMP超のコントロールシンボル」，
   2024/02/25,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/167}
- \bibitem{tjb170} t-tk, [upTeX] ofm読み込みと符号位置 256 以上の欧文文字トークン・ノード,
+ \bibitem{tjb170} t-tk, 「[upTeX] ofm読み込みと符号位置 256 以上の欧文文字トークン・ノード」，
   2024/08/18,\\
   \url{https://github.com/texjporg/tex-jp-build/issues/170}
  \bibitem{ivd220913} Ideographic Variation Database,
