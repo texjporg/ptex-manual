@@ -1480,8 +1480,11 @@ bufferに書き戻す時点で和欧文の区別が失われる．
  \item 和文文字トークンは和文フォントを使用した\emph{和文文字ノード}になる．
  \item \.{char}, \.{chardef}は文字コード0--255からは\emph{欧文文字ノード}を，
    それ以外の文字コードからは\emph{和文文字ノード}を生成する
-   \footnote{\.{char}/\.{chardef}は文字トークンを経由しないので
-   \upTeX においても\.{kcatcode}は関係ない．}．
+   \footnote{\.{char}/\.{chardef}は文字トークンを経由しないので，
+   \upTeX においても\.{kcatcode}は基本的に関係ない．
+   ただし\upTeX~u2.00以降では，文字コード256--0x2E7Fについても，
+   \.{kcatcode}=14に設定されている場合に限って\emph{欧文文字ノード}を生成する．
+   \ref{sec:uptex_extension}節を参照のこと}．
 \end{itemize}
 
 ここで，\upTeX では\.{char}, \.{chardef}の挙動が問題になる．
