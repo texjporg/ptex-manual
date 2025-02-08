@@ -1144,7 +1144,7 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
 \end{dangerous}
 
 
-\subsection{エラー抑制(\.{suppress...error})}
+\subsection{エラー抑制(\.{suppress...error})}\label{suppress}
 \hologo{LuaTeX}に実装されているエラー発生を抑止するプリミティブたちのうち
 いくつかを，\epTeX~211207で追加した．
 % 説明文は https://github.com/texjporg/tex-jp-build/pull/127 より
@@ -1302,6 +1302,30 @@ abcfi\the\lastnodechar, abc\char"1C \the\lastnodechar
   （非\.{immediate}な\.{write}と同様）ことができる．同様の機能が
   \hologo{pdfTeX}, \hologo{XeTeX}, \hologo{LuaTeX}, Alephで
   一斉に実装されている．
+\end{cslist}
+
+
+\subsection{エラー抑制(\.{ignoreprimitiveerror})}
+\begin{cslist}
+ \csitem[\.{ignoreprimitiveerror} (integer)]
+  エンジンレベルの非致命的なエラーを抑制し，警告に軽減する
+  機能を持つビットフラグである．
+  現在は，1ビット目を立てると（つまり値を奇数に設定すると）
+  無限大の縮小度を持ったグルーが存在するボックスを\.{vsplit}で分割しようとすると発生する
+\begin{verbatim}
+! Infinite glue shrinkage found in box being split
+\end{verbatim}
+  のエラーが抑制される．
+  \LaTeX チームからの要望（背景は\file{ltnews39.pdf}の
+  ``Enhancements to the new mark mechanism''節であろう）で
+  \TeX~Live 2025の\hologo{pdfTeX}, \hologo{XeTeX}に実装されたので，
+  \epTeX~250202で同じものを追加した．
+
+  \hologo{LuaTeX}のエラー抑制プリミティブ（\ref{suppress}節）は
+  機能別に新たなプリミティブを導入する方式だが，
+  本プリミティブ\.{ignoreprimitiveerror}は将来の拡張に備えた
+  ビットフラグであり他のビットは留保されている．
+  % https://tug.org/pipermail/pdftex/2025-January/009434.html
 \end{cslist}
 
 
