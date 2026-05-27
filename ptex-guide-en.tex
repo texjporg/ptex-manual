@@ -758,7 +758,7 @@ is stored as \hex{3000} internally.
       % upTeX/e-upTeX with internal Unicode
     \else
       % pTeX/e-pTeX
-      % or, upTeX/e-upTeX with internal EUC-JP or Shift-JIS
+      % or, upTeX/e-upTeX with internal EUC-JP or Shift_JIS
     \fi
   \fi
 \end{verbatim}
@@ -966,7 +966,7 @@ multiple encodings are commonly used for Japanese text.
 Sometimes user documents and distribution files (classes, packages)
 may have different encodings.
 Among those, the universal UTF-8 and
-three major legacy encodings (ISO-2022-JP, EUC-JP, Shift-JIS)
+three major legacy encodings (ISO-2022-JP, EUC-JP, Shift\_JIS)
 are accepted as input to \pTeX\ family,
 depending on the configuration and runtime options.
 To make this possible,
@@ -1025,9 +1025,9 @@ configuration available in the latest \TL distribution (since 2023).
    It also properly reads \Opt{UTF-8} almost always\footnote{The
    exception of ``almost always'' comes from a failure of guessing;
    at the expense of properly reading a certain amount of
-   Shift-JIS and EUC-JP, there are occasional misreading of UTF-8.},
+   Shift\_JIS and EUC-JP, there are occasional misreading of UTF-8.},
    and successful results of ``guess-input-enc'' conversion of
-   Shift-JIS and EUC-JP.
+   Shift\_JIS and EUC-JP.
  \item When the command-line option \verb+-kanji=(sjis|euc)+ is
    specified: \Opt{UTF-8} above is replaced with the given encoding.
 \end{itemize}
@@ -1047,7 +1047,7 @@ Note on older versions:
   \end{itemize}
  \item In \TL2017 and older,
    the default input encoding of (\eTeXpre)\pTeX\ was
-   Shift-JIS for Windows, UTF-8 for Unix.
+   Shift\_JIS for Windows, UTF-8 for Unix.
  \item The primitive \.{epTeXinputencoding} was added to
    \epTeX/\eupTeX\ in \TL2016. Older versions does not have it.
  \item Very old distributions by ASCII Corporation (--2009)
@@ -1078,7 +1078,7 @@ when all files are UTF-8.
 The situation is more complicated in \pTeX.
 As described in Section \ref{file-enc}, it accepts UTF-8 input;
 however, \pTeX\ uses a legacy encoding as the internal Japanese encoding
-(default: Shift-JIS on Windows, and EUC-JP otherwise).
+(default: Shift\_JIS on Windows, and EUC-JP otherwise).
 This means that \pTeX\ does code conversion in input and output.
 ... [TODO]
 
@@ -1168,7 +1168,7 @@ In \upTeX\ (default internal Unicode mode), the range is very simple:
 \[ c \ge 0 \]
 
 However in \pTeX, only limited encodings are available;
-Shift-JIS as |sjis| (default for \TL Windows), or
+Shift\_JIS as |sjis| (default for \TL Windows), or
 EUC-JP as |euc| (otherwise).
 The range can be represented as follows:
 \[
