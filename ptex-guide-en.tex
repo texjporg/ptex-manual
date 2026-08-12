@@ -1085,10 +1085,85 @@ This means that \pTeX\ does code conversion in input and output.
 %%% e-upTeX の和文トークンの話：和文トークンが混ざっているので注意
 \subsection{Japanese tokens}
 
+[TODO]
+
 %%% 文字トークンが和文であるかを判定する方法
-%%% (1) \meaning が kanji で始まるかどうか
+\subsubsection{Determination of Japanese character tokens}
+
+Several techniques are used to determine whether a character token is treated as
+a Japanese character token or as a Latin character token.
+
+%%% (1) \meaning が "kanji " で始まるかどうか
+\paragraph{Method 1: Whether the output of \.{meaning} starts with ``\texttt{kanji\textvisiblespace}''}
+
+An engine-independent approach is to check whether the output of
+the \.{meaning} primitive begins with the string ``\texttt{kanji\textvisiblespace}''.
+\begin{verbatim}
+  \def\if@cjkchar#1{%
+    \expandafter\if@cjkchar@aux\meaning#1 \@nil}
+  \def\if@cjkchar@aux#1 #2\@nil{%
+    \ifnum\pdfstrcmp{#1}{kanji}=0 %
+      \expandafter\@firstoftwo  % Japanese character token
+    \else
+      \expandafter\@secondoftwo % Latin character token
+    \fi}
+\end{verbatim}
+This method works both in \pTeX\ and \upTeX. However, it is relatively slow
+because it depends on string comparison operations.
+
 %%% (2) pTeX: 文字コードが 256 以上かどうか
-%%% (3) upTeX: 予め作っておいた \kcatcode 16--19 のトークン各々と \ifcat で比較
+\paragraph{Method 2: \pTeX: Whether the character codes greater than 255}
+
+In \pTeX, and \upTeX\ with internal EUC-JP or Shift\_JIS,
+Japanese character tokens always have character codes greater than 255.
+Therefore, a simple character code check is sufficient:
+\begin{verbatim}
+  \def\if@cjkchar#1{%
+    \ifnum`#1>255 %
+      \expandafter\@firstoftwo  % Japanese character token
+    \else
+      \expandafter\@secondoftwo % Latin character token
+    \fi}
+\end{verbatim}
+%%% ``encoding detection'' は Section~\label{detecting-uptex}
+
+%%% (3) upTeX: 予め作っておいた \kcatcode 16--20 のトークン各々と \ifcat で比較
+\paragraph{Method 3: \upTeX: Compare against reference tokens using \.{ifcat}}
+
+In \upTeX\ with internal Unicode, some characters in the Latin-1 Supplement
+block (U+0080--U+00FF) are treated as Japanese character tokens.
+Because of this, it is impossible to reliably distinguish between Japanese and
+Latin character tokens based solely on character codes.
+
+This method uses the \.{ifcat} primitive to compare the given token against
+reference Japanese character tokens having \.{kcatcode} value 16--20.%
+\footnote{Support for \.{kcatcode} 20 was introduced in upTeX 1.35;
+using it in earlier versions causes an error. For older versions,
+omit the check for \.{kcatcode} 20.}
+%%% ASCII だけにしたいときは Section~\ref{jtoken-tricks}.
+\begin{verbatim}
+  \begingroup
+    \kcatcode`あ=16 \global\let\cjkchar@kanji=あ
+    \kcatcode`あ=17 \global\let\cjkchar@kana=あ
+    \kcatcode`あ=18 \global\let\cjkchar@kchar=あ
+    \kcatcode`あ=19 \global\let\cjkchar@hangul=あ
+    \kcatcode`あ=20 \global\let\cjkchar@modifier=あ% upTeX 1.35+
+  \endgroup
+  \def\if@cjkchar#1{%
+    \ifnum0%
+      \ifcat#1\cjkchar@kanji   1\fi
+      \ifcat#1\cjkchar@kana    1\fi
+      \ifcat#1\cjkchar@kchar   1\fi
+      \ifcat#1\cjkchar@hangul  1\fi
+      \ifcat#1\cjkchar@modifier1\fi % upTeX 1.35+
+      >0 %
+      \expandafter\@firstoftwo  % Japanese character token
+    \else
+      \expandafter\@secondoftwo % Latin character token
+    \fi}
+\end{verbatim}
+This method also works with \upTeX\ with internal EUC-JP or Shift\_JIS,
+but it does not work with \pTeX.
 
 %%% 和文組版の厳選トピック
 \section{Basic introduction to Japanese typesetting}
